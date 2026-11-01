@@ -11,14 +11,27 @@ export interface ArchitectureConfig {
     background: string;
   };
   view: { showNames: boolean; effects: boolean; autoOrbit: boolean; showGrid: boolean };
+  planes: ArchitecturePlane[];
   groups: ArchitectureGroup[];
   objects: ArchitectureObject[];
   connections: ArchitectureConnection[];
 }
 
+export interface ArchitecturePlane {
+  id: string;
+  name: string;
+  /** Horizontal X/Z footprint; auto mode treats these as minimum dimensions. */
+  width: number;
+  height: number;
+  elevation: number;
+  sizing: 'auto' | 'locked';
+  decoration: { color: string; opacity: number; border: boolean; grid: boolean; label: boolean };
+}
+
 export interface ArchitectureGroup {
   id: string; name: string; color: string;
-  /** Signed height of the group plane above/below world zero. Defaults to 0. */
+  plane: string;
+  /** Signed height relative to its parent plane. Defaults to 0. */
   elevation?: number;
 }
 export interface ArchitectureObject {
@@ -28,13 +41,17 @@ export interface ArchitectureObject {
   /** Omitted and unrecognized types render as containers. */
   type?: string;
   description?: string;
-  /** Signed height relative to the group plane. Defaults to 0. */
+  /** Signed height relative to its group. Defaults to 0. */
   elevation?: number;
 }
 export interface ArchitectureConnection {
   id: string;
-  from: string;
-  to: string;
+  from: ConnectionEndpoint;
+  to: ConnectionEndpoint;
   label?: string;
+  direction: 'forward' | 'bidirectional';
 }
+export interface EntityRef { kind: 'plane' | 'group' | 'object'; id: string }
+/** Strings retain the version 1 shorthand for object endpoints. */
+export type ConnectionEndpoint = string | EntityRef;
 export interface ValidationResult { config: ArchitectureConfig; warnings: string[] }

@@ -1,13 +1,16 @@
 import { objectCatalog, resolveType } from '../catalog/catalog';
 import { parseConfig } from '../config/validate';
 import { loadSaved, saveConfig } from '../config/storage';
-import type { ArchitectureConfig, ArchitectureObject } from '../config/types';
+import type { ArchitectureConfig, ArchitectureGroup, ArchitectureObject, ConnectionEndpoint, EntityRef } from '../config/types';
+import { endpointKey, endpointName, endpointRef } from '../config/connections';
+import { layoutGroups } from '../scene/layout';
 import { createViewer } from '../scene/viewer';
 import type { SceneViewer } from '../scene/viewer';
 import { element, get } from './dom';
 import { shell } from './shell';
 import { mountPresetPicker } from './presets';
 import { elevationControl } from './elevation';
+import { planeControls } from './planes';
 
 export async function startApp(): Promise<() => void> {
   get('app').innerHTML = shell;
@@ -17,7 +20,9 @@ export async function startApp(): Promise<() => void> {
   const saved = loadSaved();
   let config = saved.config ?? structuredClone(defaults);
   let activeGroup: string | null = null;
+  let activePlane: string | null = null;
   let selected: string | null = null;
+  let selectedScope: EntityRef | null = null;
   let query = '', typeFilter = 'all';
   let viewer: SceneViewer | undefined;
   let noticeTimer: ReturnType<typeof setTimeout> | undefined;
@@ -33,19 +38,34 @@ export async function startApp(): Promise<() => void> {
   function persist(): void {
     if (!saveConfig(config)) notify('Changes are active, but browser storage is unavailable. Export your configuration to keep them.');
   }
-  function refreshElevation(): void {
+  function refreshConfiguration(): void {
     viewer?.setConfig(config, true);
     renderDirectory();
     if (selected) inspect(selected, false);
-    else viewer?.focusGroup(activeGroup);
+    else if (selectedScope) inspectScope(selectedScope, false);
+    else if (activeGroup) viewer?.focusGroup(activeGroup);
+    else if (activePlane) viewer?.focusPlane(activePlane);
+    else viewer?.focusGroup(null);
     persist();
   }
   function matches(object: ArchitectureObject): boolean {
     return (!activeGroup || object.group === activeGroup)
+      && (!activePlane || config.groups.find(group => group.id === object.group)?.plane === activePlane)
       && (typeFilter === 'all' || resolveType(object.type).id === typeFilter)
       && `${object.name} ${object.description ?? ''} ${object.type ?? 'container'}`.toLowerCase().includes(query);
   }
   function renderDirectory(): void {
+    const planes = get<HTMLSelectElement>('plane-filter');
+    planes.replaceChildren();
+    const all = element('option', '', 'All planes'); all.value = ''; planes.append(all);
+    config.planes.forEach(plane => {
+      const option = element('option', '', plane.name); option.value = plane.id; planes.append(option);
+    });
+    planes.value = activePlane ?? '';
+    get<HTMLButtonElement>('inspect-plane').disabled = !activePlane;
+    const warnings = layoutGroups(config).warnings;
+    get('layout-notice').textContent = warnings.join(' ');
+    get('layout-notice').hidden = !warnings.length;
     const groups = get('groups');
     groups.replaceChildren();
     function groupButton(id: string | null, name: string, count: number, color: string): void {
@@ -53,19 +73,24 @@ export async function startApp(): Promise<() => void> {
       button.setAttribute('aria-pressed', String(id === activeGroup));
       const dot = element('span', 'group-dot'); dot.style.background = color;
       button.append(dot, element('span', '', name), element('small', '', String(count).padStart(2, '0')));
-      button.onclick = () => { activeGroup = id; closeInspector(); renderDirectory(); viewer?.focusGroup(id); };
+      button.onclick = () => { activeGroup = id; closeInspector(); renderDirectory(); if (!id && activePlane) viewer?.focusPlane(activePlane); else viewer?.focusGroup(id); };
       groups.append(button);
     }
-    groupButton(null, 'Entire network', config.objects.length, config.presentation.accent);
-    config.groups.forEach(group => groupButton(group.id, group.name, config.objects.filter(o => o.group === group.id).length, group.color));
+    groupButton(null, activePlane ? 'Entire plane' : 'Entire network', config.objects.filter(o => !activePlane || config.groups.find(g => g.id === o.group)?.plane === activePlane).length, config.presentation.accent);
+    config.groups.filter(group => !activePlane || group.plane === activePlane).forEach(group => groupButton(group.id, group.name, config.objects.filter(o => o.group === group.id).length, group.color));
     const groupEditor = get('group-elevation-controls');
     groupEditor.replaceChildren();
     const currentGroup = config.groups.find(group => group.id === activeGroup);
     groupEditor.hidden = !currentGroup;
     if (currentGroup) groupEditor.append(elevationControl('group-elevation', 'Group elevation', currentGroup.elevation ?? 0, '0 = baseline · positive = above · negative = below', value => {
       currentGroup.elevation = value;
-      refreshElevation();
+      refreshConfiguration();
     }));
+    if (currentGroup) {
+      const button = element('button', 'scope-button', 'Inspect group & connections ↗');
+      button.onclick = () => inspectScope({ kind: 'group', id: currentGroup.id });
+      groupEditor.append(button);
+    }
     const objects = config.objects.filter(matches);
     const list = get('object-list');
     list.replaceChildren();
@@ -84,7 +109,7 @@ export async function startApp(): Promise<() => void> {
     });
     if (!objects.length) list.append(element('p', 'empty-list', config.objects.length ? 'No objects match these filters.' : 'No objects yet. Add some in Configure.'));
     get('visible-count').textContent = `${objects.length} / ${config.objects.length}`;
-    get('scene-context').textContent = (config.groups.find(g => g.id === activeGroup)?.name ?? 'Entire network').toUpperCase();
+    get('scene-context').textContent = (config.groups.find(g => g.id === activeGroup)?.name ?? config.planes.find(p => p.id === activePlane)?.name ?? 'Entire network').toUpperCase();
     viewer?.setVisible(new Set(objects.map(o => o.id)));
     renderFallback(objects);
   }
@@ -107,6 +132,7 @@ export async function startApp(): Promise<() => void> {
   }
   function closeInspector(): void {
     selected = null;
+    selectedScope = null;
     get('inspector').hidden = true;
     document.querySelector('.workspace')?.classList.remove('inspecting');
   }
@@ -115,12 +141,16 @@ export async function startApp(): Promise<() => void> {
     if (!object) return;
     // Connections can lead to an object outside the current group or search.
     if (!matches(object)) {
-      activeGroup = null; query = ''; typeFilter = 'all';
+      activeGroup = null; activePlane = null; query = ''; typeFilter = 'all';
       get<HTMLInputElement>('search').value = '';
       get<HTMLSelectElement>('type-filter').value = 'all';
     }
     selected = id;
+    selectedScope = null;
+    get('inspector-label').textContent = 'OBJECT INSPECTOR';
+    get('inspector-nav').hidden = false;
     const group = config.groups.find(g => g.id === object.group)!;
+    const plane = config.planes.find(p => p.id === group.plane)!;
     const type = resolveType(object.type);
     const panel = get('inspector-content');
     panel.replaceChildren();
@@ -131,32 +161,91 @@ export async function startApp(): Promise<() => void> {
     panel.append(metadata);
     const elevations = element('section', 'inspector-elevations');
     elevations.append(
-      elevationControl('inspect-group-elevation', 'Group elevation', group.elevation ?? 0, 'Moves this group plane and all its objects.', value => {
-        group.elevation = value; refreshElevation();
+      elevationControl('inspect-group-elevation', 'Group elevation', group.elevation ?? 0, 'Moves this group and its objects relative to the parent plane.', value => {
+        group.elevation = value; refreshConfiguration();
       }),
       elevationControl('item-elevation', 'Item elevation', object.elevation ?? 0, 'Relative to its group: 10 above, −10 below.', value => {
-        object.elevation = value; refreshElevation();
+        object.elevation = value; refreshConfiguration();
       }),
-      element('p', 'muted', `Combined elevation: ${(group.elevation ?? 0) + (object.elevation ?? 0)} (${group.elevation ?? 0} group + ${object.elevation ?? 0} item)`),
+      element('p', 'muted', `World elevation: ${plane.elevation + (group.elevation ?? 0) + (object.elevation ?? 0)} (${plane.elevation} plane + ${group.elevation ?? 0} group + ${object.elevation ?? 0} item)`),
     );
+    const parent = element('button', 'scope-button', `Plane: ${plane.name} ↗`);
+    parent.onclick = () => inspectScope({ kind: 'plane', id: plane.id });
+    elevations.prepend(parent);
     panel.append(elevations);
-    const connections = config.connections.filter(c => c.from === id || c.to === id);
-    panel.append(element('div', 'section-heading', `CONNECTIONS / ${connections.length}`));
-    if (!connections.length) panel.append(element('p', 'muted', 'No connections defined.'));
-    connections.forEach(connection => {
-      const outgoing = connection.from === id;
-      const other = config.objects.find(o => o.id === (outgoing ? connection.to : connection.from))!;
-      const button = element('button', 'connection-row');
-      button.append(element('small', '', `${outgoing ? 'OUTGOING →' : '← INCOMING'} ${connection.label ?? ''}`), element('span', '', other.name));
-      button.onclick = () => inspect(other.id);
-      panel.append(button);
-    });
+    renderConnections(panel, id);
     get('object-position').textContent = `${config.objects.indexOf(object) + 1} / ${config.objects.length}`;
-    get('inspector').hidden = false;
-    document.querySelector('.workspace')?.classList.add('inspecting');
+    openInspector();
     renderDirectory();
     viewer?.focusObject(id);
     if (moveFocus) get<HTMLButtonElement>('close-inspector').focus({ preventScroll: true });
+  }
+  function selectEntity(endpoint: ConnectionEndpoint): void {
+    const ref = endpointRef(endpoint);
+    if (ref.kind === 'object') inspect(ref.id);
+    else inspectScope(ref);
+  }
+  function renderConnections(panel: HTMLElement, endpoint: ConnectionEndpoint): void {
+    const key = endpointKey(endpoint);
+    const connections = config.connections.filter(c => endpointKey(c.from) === key || endpointKey(c.to) === key);
+    panel.append(element('div', 'section-heading', `CONNECTIONS / ${connections.length}`));
+    if (!connections.length) panel.append(element('p', 'muted', 'No connections defined.'));
+    connections.forEach(connection => {
+      const outgoing = endpointKey(connection.from) === key;
+      const other = outgoing ? connection.to : connection.from;
+      const button = element('button', 'connection-row');
+      button.append(element('small', '', `${connection.direction === 'bidirectional' ? '↔ BIDIRECTIONAL' : outgoing ? 'OUTGOING →' : '← INCOMING'} ${connection.label ?? ''}`), element('span', '', `${endpointRef(other).kind}: ${endpointName(config, other)}`));
+      button.onclick = () => selectEntity(other);
+      panel.append(button);
+      const label = element('label', 'property-field connection-direction', 'Direction');
+      const select = element('select'); select.setAttribute('aria-label', `Direction of ${connection.label || connection.id}`);
+      for (const [value, name] of [['forward', 'From → To'], ['bidirectional', 'Both directions ↔']]) {
+        const option = element('option', '', name); option.value = value; select.append(option);
+      }
+      select.value = connection.direction;
+      select.onchange = () => { connection.direction = select.value as typeof connection.direction; refreshConfiguration(); };
+      label.append(select); panel.append(label);
+    });
+  }
+  function groupPlaneControl(group: ArchitectureGroup): HTMLElement {
+    const label = element('label', 'property-field', 'Parent plane');
+    const select = element('select'); select.setAttribute('aria-label', 'Group parent plane');
+    config.planes.forEach(plane => { const option = element('option', '', plane.name); option.value = plane.id; select.append(option); });
+    select.value = group.plane;
+    select.onchange = () => { group.plane = select.value; activePlane = select.value; refreshConfiguration(); };
+    label.append(select); return label;
+  }
+  function inspectScope(ref: EntityRef, moveFocus = true): void {
+    if (ref.kind === 'object') { inspect(ref.id, moveFocus); return; }
+    const entity = (ref.kind === 'plane' ? config.planes : config.groups).find(entry => entry.id === ref.id);
+    if (!entity) return;
+    selected = null; selectedScope = ref;
+    activeGroup = ref.kind === 'group' ? ref.id : null;
+    activePlane = ref.kind === 'plane' ? ref.id : config.groups.find(group => group.id === ref.id)!.plane;
+    query = ''; typeFilter = 'all'; get<HTMLInputElement>('search').value = ''; get<HTMLSelectElement>('type-filter').value = 'all';
+    get('inspector-label').textContent = `${ref.kind.toUpperCase()} INSPECTOR`;
+    get('inspector-nav').hidden = true;
+    const panel = get('inspector-content'); panel.replaceChildren();
+    panel.append(element('div', 'inspector-icon', ref.kind === 'plane' ? '▱' : '▦'), element('h2', '', entity.name));
+    if (ref.kind === 'plane') {
+      const plane = config.planes.find(p => p.id === ref.id)!;
+      const placed = layoutGroups(config).planes.find(p => p.id === ref.id)!;
+      panel.append(element('p', 'muted', `Rendered footprint: ${placed.width} × ${placed.height} · ${placed.groups.length} groups`));
+      if (placed.overflow) panel.append(element('p', 'error', 'Contents exceed this locked footprint. Increase the dimensions or choose auto-fit.'));
+      panel.append(planeControls(plane, refreshConfiguration));
+    } else {
+      const group = config.groups.find(g => g.id === ref.id)!;
+      const plane = config.planes.find(p => p.id === group.plane)!;
+      panel.append(groupPlaneControl(group), elevationControl('inspect-group-elevation', 'Group elevation', group.elevation ?? 0, 'Relative to its parent plane.', value => { group.elevation = value; refreshConfiguration(); }), element('p', 'muted', `World elevation: ${plane.elevation + (group.elevation ?? 0)} (${plane.elevation} plane + ${group.elevation ?? 0} group)`));
+    }
+    renderConnections(panel, ref);
+    openInspector(); renderDirectory();
+    if (ref.kind === 'plane') viewer?.focusPlane(ref.id); else viewer?.focusGroup(ref.id);
+    if (moveFocus) get<HTMLButtonElement>('close-inspector').focus({ preventScroll: true });
+  }
+  function openInspector(): void {
+    get('inspector').hidden = false;
+    document.querySelector('.workspace')?.classList.add('inspecting');
   }
   function renderPresentation(): void {
     const p = config.presentation;
@@ -177,7 +266,7 @@ export async function startApp(): Promise<() => void> {
     }
   }
   function apply(next: ArchitectureConfig): void {
-    config = next; activeGroup = null; query = ''; typeFilter = 'all';
+    config = next; activeGroup = null; activePlane = null; query = ''; typeFilter = 'all';
     get<HTMLInputElement>('search').value = '';
     get<HTMLSelectElement>('type-filter').value = 'all';
     closeInspector();
@@ -186,7 +275,7 @@ export async function startApp(): Promise<() => void> {
     persist();
   }
 
-  try { viewer = createViewer(get('scene-host'), inspect); }
+  try { viewer = createViewer(get('scene-host'), inspect, inspectScope); }
   catch {
     get('scene-host').replaceChildren();
     get('fallback').hidden = false;
@@ -209,9 +298,14 @@ export async function startApp(): Promise<() => void> {
   get<HTMLSelectElement>('type-filter').onchange = event => {
     typeFilter = (event.target as HTMLSelectElement).value; closeInspector(); renderDirectory();
   };
-  get('close-inspector').onclick = () => { closeInspector(); renderDirectory(); viewer?.focusGroup(activeGroup); get<HTMLInputElement>('search').focus(); };
+  get<HTMLSelectElement>('plane-filter').onchange = event => {
+    activePlane = (event.target as HTMLSelectElement).value || null; activeGroup = null;
+    closeInspector(); renderDirectory(); if (activePlane) viewer?.focusPlane(activePlane); else viewer?.focusGroup(null);
+  };
+  get('inspect-plane').onclick = () => { if (activePlane) inspectScope({ kind: 'plane', id: activePlane }); };
+  get('close-inspector').onclick = () => { closeInspector(); renderDirectory(); if (activeGroup) viewer?.focusGroup(activeGroup); else if (activePlane) viewer?.focusPlane(activePlane); else viewer?.focusGroup(null); get<HTMLInputElement>('search').focus(); };
   get('reset-view').onclick = () => {
-    activeGroup = null; query = ''; typeFilter = 'all';
+    activeGroup = null; activePlane = null; query = ''; typeFilter = 'all';
     get<HTMLInputElement>('search').value = ''; get<HTMLSelectElement>('type-filter').value = 'all';
     closeInspector(); renderDirectory(); viewer?.focusGroup(null);
   };
@@ -275,7 +369,7 @@ export async function startApp(): Promise<() => void> {
   };
   const keyboard = (event: KeyboardEvent) => {
     if ((event.target as HTMLElement).matches('input,textarea,select') || document.querySelector('dialog[open]')) return;
-    if (event.key === 'Escape' && selected) { get<HTMLButtonElement>('close-inspector').click(); }
+    if (event.key === 'Escape' && (selected || selectedScope)) { get<HTMLButtonElement>('close-inspector').click(); }
     if (event.key === 'ArrowLeft' && selected) { event.preventDefault(); step(-1); }
     if (event.key === 'ArrowRight' && selected) { event.preventDefault(); step(1); }
   };

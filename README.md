@@ -1,6 +1,6 @@
 # Dimentionalizer
 
-A configurable 3D architecture explorer. Describe a system in JSON, then explore its groups, objects, and connections. Every object is a container by default; choose a specialized type when its shape communicates more.
+A configurable 3D architecture explorer. Describe a system in JSON, then explore its planes, groups, objects, and connections. Every object is a container by default; choose a specialized type when its shape communicates more.
 
 Version 1 builds on the original container explorer's grouped platforms, luminous wire geometry, orbit navigation, and object inspection. It is product-neutral: branding, page title, headline, description, colors, and architecture all come from configuration.
 
@@ -35,7 +35,7 @@ npm run preview   # Serve the production build locally
 | `frontend/src/config/` | Document types, defaults, runtime validation, migration, and browser persistence |
 | `frontend/src/catalog/` | Predefined object metadata and independent 3D geometry builders |
 | `frontend/src/presets/` | Preset catalog contract and validated, cancellable document loading |
-| `frontend/src/scene/` | Deterministic group layout, camera, selection, connections, and GPU lifecycle |
+| `frontend/src/scene/` | Deterministic plane/group layout, camera, selection, connections, and GPU lifecycle |
 | `frontend/src/ui/` | Directory, inspector, configuration editor, and app coordination |
 | `frontend/src/style.css` | Responsive application styling |
 | `frontend/tests/` | Behavior-focused automated tests |
@@ -49,13 +49,16 @@ The frontend uses **TypeScript, Vite, and Three.js**, with native DOM components
 - Omitted types default to Container; unknown types retain their identifier but render as Container with a warning.
 - Configurable brand text, browser title, eyebrow, headline, description, accent, background, group names and colors.
 - Grouped 3D platforms, orbit/pan/zoom, group and object focus, labels, automatic orbit, and animated directional connection packets.
-- Signed group and item elevation controls (`0` baseline, positive above, negative below), plus independently toggleable ground-grid visibility. Settings persist and export with the configuration.
+- Configurable planes with auto-fit or locked dimensions, color, opacity, border, grid, and labels. Groups reference their parent plane; existing documents receive a default auto-fit plane.
+- Signed plane, group, and item elevation controls (`0` baseline, positive above, negative below), plus independently toggleable ground-grid visibility. Settings persist and export with the configuration.
 - Search and type filtering; keyboard-accessible directory and inspector. Left/right arrows browse objects while inspecting; Escape closes the inspector.
-- Explicit connections with labels and incoming/outgoing inspection. Only configured connections are displayed; no dependencies are inferred from proximity.
+- Connections between planes, groups, and items, with one-way or bidirectional animated dots and inspector controls. Explicit labels and incoming/outgoing inspection. Only configured connections are displayed; no dependencies are inferred from proximity.
 - JSON editing, import, validated export, default restoration, and browser-local persistence.
 - Preset picker with seven common system setups plus a source-grounded Umbraco Cluster snapshot; open any preset as an editable draft before applying it.
 - Migration of the original `{ name, group, text }[]` format into a version 1 document.
 - Responsive layout, reduced-motion support, and a usable WebGL fallback.
+
+Elevation composes as **world → plane → group → item**: plane `10` + group `-3` + item `-2` = world `5`. Choose a plane in the directory to inspect its properties; inspect a group to change its parent plane. Try the [three-plane example](frontend/public/examples/planes.json) through **Configure → Import JSON**.
 
 Open **Configure** to edit the active document. Imported files and **Load default** update the editor draft; only **Apply configuration** changes the explorer. **Export draft** validates and downloads the document currently in the editor.
 

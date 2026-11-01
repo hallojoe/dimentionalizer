@@ -2,23 +2,26 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { createObjectVisual } from '../catalog/geometry';
 import type { ObjectVisual } from '../catalog/geometry';
-import type { ArchitectureConfig } from '../config/types';
-import { layoutGroups, groupViewBounds } from './layout';
-import type { PlacedGroup } from './layout';
+import type { ArchitectureConfig, ArchitectureConnection, ConnectionEndpoint, EntityRef } from '../config/types';
+import { endpointKey } from '../config/connections';
+import { connectionAnchor, packetProgress } from './connections';
+import { layoutGroups, groupViewBounds, planeViewBounds } from './layout';
+import type { PlacedGroup, PlacedPlane } from './layout';
 
 interface RenderedObject extends ObjectVisual { id: string; group: string; position: THREE.Vector3; label: HTMLButtonElement }
-interface Packet { dot: THREE.Mesh; path: THREE.CatmullRomCurve3; offset: number; from: string; to: string }
+interface Packet { dots: THREE.Mesh[]; path: THREE.CatmullRomCurve3; offset: number; from: ConnectionEndpoint; to: ConnectionEndpoint; direction: ArchitectureConnection['direction'] }
 export interface SceneViewer {
   setConfig(config: ArchitectureConfig, preserveCamera?: boolean): void;
   focusObject(id: string): void;
   focusGroup(id: string | null): void;
+  focusPlane(id: string): void;
   setVisible(ids: Set<string>): void;
   setOptions(options: ArchitectureConfig['view']): void;
   dispose(): void;
 }
 
 /** Owns GPU resources and camera only. No document persistence or inspector markup. */
-export function createViewer(host: HTMLElement, onSelect: (id: string) => void): SceneViewer {
+export function createViewer(host: HTMLElement, onSelect: (id: string) => void, onScopeSelect?: (ref: EntityRef) => void): SceneViewer {
   const renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
   renderer.domElement.setAttribute('aria-label', 'Interactive 3D architecture. Use the object directory for keyboard navigation.');
@@ -42,8 +45,10 @@ export function createViewer(host: HTMLElement, onSelect: (id: string) => void):
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
   let objects: RenderedObject[] = [];
   let groups: PlacedGroup[] = [];
+  let planes: PlacedPlane[] = [];
   let packets: Packet[] = [];
-  let links: { line: THREE.Line; from: string; to: string }[] = [];
+  let links: { line: THREE.Line; from: ConnectionEndpoint; to: ConnectionEndpoint }[] = [];
+  let visibleEndpoints = new Set<string>();
   let groupLabels: { element: HTMLElement; position: THREE.Vector3 }[] = [];
   let options = { showNames: true, effects: true, autoOrbit: false, showGrid: true };
   let selected = '', hovered = '', frame = 0;
@@ -76,6 +81,37 @@ export function createViewer(host: HTMLElement, onSelect: (id: string) => void):
     scene.fog = new THREE.FogExp2(config.presentation.background, 0.003);
     const layout = layoutGroups(config);
     groups = layout.groups;
+    planes = layout.planes;
+    for (const plane of planes) {
+      const { color, opacity, border, grid: showPlaneGrid, label } = plane.decoration;
+      const surface = new THREE.Mesh(new THREE.PlaneGeometry(plane.width, plane.depth), new THREE.MeshBasicMaterial({ color, transparent: true, opacity, side: THREE.DoubleSide, depthWrite: false }));
+      surface.rotation.x = -Math.PI / 2;
+      surface.position.set(plane.x, plane.y - 0.04, plane.z);
+      root.add(surface);
+      const corners = [[-1, -1], [1, -1], [1, 1], [-1, 1], [-1, -1]].map(([x, z]) => new THREE.Vector3(plane.x + x * plane.width / 2, plane.y - 0.03, plane.z + z * plane.depth / 2));
+      if (border) root.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(corners), new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.6 })));
+      if (showPlaneGrid) {
+        const lines: THREE.Vector3[] = [];
+        const nx = Math.min(80, Math.ceil(plane.width / 2.5)), nz = Math.min(80, Math.ceil(plane.depth / 2.5));
+        for (let i = 1; i < nx; i++) {
+          const x = plane.x - plane.width / 2 + plane.width * i / nx;
+          lines.push(new THREE.Vector3(x, plane.y - 0.02, plane.z - plane.depth / 2), new THREE.Vector3(x, plane.y - 0.02, plane.z + plane.depth / 2));
+        }
+        for (let i = 1; i < nz; i++) {
+          const z = plane.z - plane.depth / 2 + plane.depth * i / nz;
+          lines.push(new THREE.Vector3(plane.x - plane.width / 2, plane.y - 0.02, z), new THREE.Vector3(plane.x + plane.width / 2, plane.y - 0.02, z));
+        }
+        root.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(lines), new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.2, depthWrite: false })));
+      }
+      if (label) {
+        const heading = document.createElement('button');
+        heading.className = 'platform-label plane-label'; heading.style.color = color;
+        heading.textContent = `${plane.name.toUpperCase()} / PLANE`;
+        heading.tabIndex = -1; heading.onclick = () => onScopeSelect?.({ kind: 'plane', id: plane.id });
+        labelLayer.append(heading);
+        groupLabels.push({ element: heading, position: new THREE.Vector3(plane.x - plane.width / 2, plane.y + 0.1, plane.z - plane.depth / 2 - 1) });
+      }
+    }
     for (const group of groups) {
       const floor = new THREE.Mesh(new THREE.PlaneGeometry(group.width, group.depth), new THREE.MeshBasicMaterial({ color: group.color, transparent: true, opacity: 0.035, side: THREE.DoubleSide, depthWrite: false }));
       floor.rotation.x = -Math.PI / 2;
@@ -83,8 +119,9 @@ export function createViewer(host: HTMLElement, onSelect: (id: string) => void):
       root.add(floor);
       const bounds = [[-1, -1], [1, -1], [1, 1], [-1, 1], [-1, -1]].map(([x, z]) => new THREE.Vector3(group.x + x * group.width / 2, group.y + 0.02, group.z + z * group.depth / 2));
       root.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(bounds), new THREE.LineBasicMaterial({ color: group.color, transparent: true, opacity: 0.5 })));
-      const heading = document.createElement('span');
+      const heading = document.createElement('button');
       heading.className = 'platform-label';
+      heading.tabIndex = -1; heading.onclick = () => onScopeSelect?.({ kind: 'group', id: group.id });
       heading.textContent = group.name.toUpperCase();
       heading.style.color = group.color;
       labelLayer.append(heading);
@@ -106,19 +143,18 @@ export function createViewer(host: HTMLElement, onSelect: (id: string) => void):
         objects.push({ ...visual, id: entry.object.id, group: group.id, position: new THREE.Vector3(entry.x, entry.y + 1.5, entry.z), label });
       }
     }
-    const byId = new Map(objects.map(object => [object.id, object]));
     config.connections.forEach((connection, index) => {
-      const from = byId.get(connection.from)!, to = byId.get(connection.to)!;
-      const start = from.position.clone();
-      const end = to.position.clone();
+      const start = new THREE.Vector3(...connectionAnchor(layout, connection.from));
+      const end = new THREE.Vector3(...connectionAnchor(layout, connection.to));
       const middle = start.clone().lerp(end, 0.5);
-      middle.y += Math.min(start.distanceTo(end) * 0.13, 5);
+      middle.y += Math.max(1, Math.min(start.distanceTo(end) * 0.13, 5));
+      if (start.distanceTo(end) < 0.01) middle.x += 3;
       const path = new THREE.CatmullRomCurve3([start, middle, end]);
       const line = new THREE.Line(new THREE.BufferGeometry().setFromPoints(path.getPoints(40)), new THREE.LineBasicMaterial({ color: config.presentation.accent, transparent: true, opacity: 0.18 }));
-      const dot = new THREE.Mesh(new THREE.SphereGeometry(0.09, 6, 6), new THREE.MeshBasicMaterial({ color: config.presentation.accent }));
-      root.add(line, dot);
-      links.push({ line, from: from.id, to: to.id });
-      packets.push({ dot, path, offset: index * 0.13, from: from.id, to: to.id });
+      const dots = packetProgress(0, connection.direction).map(() => new THREE.Mesh(new THREE.SphereGeometry(0.09, 6, 6), new THREE.MeshBasicMaterial({ color: config.presentation.accent })));
+      root.add(line, ...dots);
+      links.push({ line, from: connection.from, to: connection.to });
+      packets.push({ dots, path, offset: index * 0.13, from: connection.from, to: connection.to, direction: connection.direction });
     });
     homeTarget.set(0, layout.centerY, 0);
     home.set(layout.size * 0.85, layout.centerY + layout.size * 0.95, layout.size * 1.2);
@@ -131,6 +167,7 @@ export function createViewer(host: HTMLElement, onSelect: (id: string) => void):
     }
     flight = null;
     setOptions(config.view);
+    setVisible(new Set(objects.map(object => object.id)));
   }
 
   function setOptions(value: ArchitectureConfig['view']): void {
@@ -151,9 +188,23 @@ export function createViewer(host: HTMLElement, onSelect: (id: string) => void):
     selected = id;
     fly(object.position.clone().add(new THREE.Vector3(8, 7, 11)), object.position.clone());
   }
+  function focusPlane(id: string): void {
+    selected = '';
+    const plane = planes.find(p => p.id === id);
+    if (!plane) return;
+    const { size, centerY } = planeViewBounds(plane);
+    fly(new THREE.Vector3(plane.x + size * 0.85, centerY + size * 1.2, plane.z + size * 1.35), new THREE.Vector3(plane.x, centerY, plane.z));
+  }
   function setVisible(ids: Set<string>): void {
     objects.forEach(object => { object.root.visible = ids.has(object.id); });
-    links.forEach(link => { link.line.visible = ids.has(link.from) && ids.has(link.to); });
+    visibleEndpoints = new Set([...ids].map(id => endpointKey(id)));
+    groups.forEach(group => {
+      if (!group.objects.length || group.objects.some(entry => ids.has(entry.object.id))) visibleEndpoints.add(endpointKey({ kind: 'group', id: group.id }));
+    });
+    planes.forEach(plane => {
+      if (!plane.groups.length || plane.groups.some(group => visibleEndpoints.has(endpointKey({ kind: 'group', id: group.id })))) visibleEndpoints.add(endpointKey({ kind: 'plane', id: plane.id }));
+    });
+    links.forEach(link => { link.line.visible = visibleEndpoints.has(endpointKey(link.from)) && visibleEndpoints.has(endpointKey(link.to)); });
   }
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
@@ -200,7 +251,6 @@ export function createViewer(host: HTMLElement, onSelect: (id: string) => void):
       if (t === 1) flight = null;
     }
     controls.update();
-    const visibleIds = new Set(objects.filter(o => o.root.visible).map(o => o.id));
     for (const object of objects) {
       const active = object.id === selected || object.id === hovered;
       object.highlight(active);
@@ -209,14 +259,17 @@ export function createViewer(host: HTMLElement, onSelect: (id: string) => void):
     }
     groupLabels.forEach(label => positionLabel(label.element, label.position, true));
     packets.forEach(packet => {
-      packet.dot.visible = options.effects && visibleIds.has(packet.from) && visibleIds.has(packet.to);
-      packet.dot.position.copy(packet.path.getPoint(reducedMotion ? 0.5 : (now * 0.00008 + packet.offset) % 1));
+      const progress = packetProgress(reducedMotion ? 0.25 : now * 0.00008 + packet.offset, packet.direction);
+      packet.dots.forEach((dot, i) => {
+        dot.visible = options.effects && visibleEndpoints.has(endpointKey(packet.from)) && visibleEndpoints.has(endpointKey(packet.to));
+        dot.position.copy(packet.path.getPoint(progress[i]));
+      });
     });
     renderer.render(scene, camera);
   }
   frame = requestAnimationFrame(render);
   return {
-    setConfig, focusGroup, focusObject, setVisible, setOptions,
+    setConfig, focusGroup, focusObject, focusPlane, setVisible, setOptions,
     dispose() {
       cancelAnimationFrame(frame);
       observer.disconnect();

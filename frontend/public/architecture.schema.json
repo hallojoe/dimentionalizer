@@ -104,7 +104,13 @@
             "minimum": -10000,
             "maximum": 10000,
             "default": 0,
-            "description": "Signed group-plane elevation relative to world zero."
+            "description": "Signed group elevation relative to its parent plane."
+          },
+          "plane": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 10000,
+            "description": "Parent plane ID; omitted uses the first plane."
           }
         },
         "additionalProperties": false
@@ -152,7 +158,7 @@
             "minimum": -10000,
             "maximum": 10000,
             "default": 0,
-            "description": "Signed object elevation relative to its group plane."
+            "description": "Signed object elevation relative to its group."
           }
         },
         "additionalProperties": false
@@ -175,21 +181,158 @@
             "maxLength": 10000
           },
           "from": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 10000
+            "oneOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 10000
+              },
+              {
+                "type": "object",
+                "required": [
+                  "kind",
+                  "id"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "kind": {
+                    "enum": [
+                      "plane",
+                      "group",
+                      "object"
+                    ]
+                  },
+                  "id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 10000
+                  }
+                }
+              }
+            ]
           },
           "to": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 10000
+            "oneOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 10000
+              },
+              {
+                "type": "object",
+                "required": [
+                  "kind",
+                  "id"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "kind": {
+                    "enum": [
+                      "plane",
+                      "group",
+                      "object"
+                    ]
+                  },
+                  "id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 10000
+                  }
+                }
+              }
+            ]
           },
           "label": {
             "type": "string",
             "maxLength": 10000
+          },
+          "direction": {
+            "enum": [
+              "forward",
+              "bidirectional"
+            ],
+            "default": "forward"
           }
         },
         "additionalProperties": false
+      }
+    },
+    "planes": {
+      "type": "array",
+      "maxItems": 50,
+      "description": "Omitted: an auto-fit default plane at world zero. Groups without plane use the first plane.",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "name"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 10000
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 10000
+          },
+          "width": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 10000,
+            "default": 20
+          },
+          "height": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 10000,
+            "default": 20
+          },
+          "elevation": {
+            "type": "number",
+            "minimum": -10000,
+            "maximum": 10000,
+            "default": 0
+          },
+          "sizing": {
+            "enum": [
+              "auto",
+              "locked"
+            ],
+            "default": "auto"
+          },
+          "decoration": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "color": {
+                "type": "string",
+                "pattern": "^#[0-9a-fA-F]{6}$"
+              },
+              "opacity": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1,
+                "default": 0.025
+              },
+              "border": {
+                "type": "boolean",
+                "default": true
+              },
+              "grid": {
+                "type": "boolean",
+                "default": false
+              },
+              "label": {
+                "type": "boolean",
+                "default": true
+              }
+            }
+          }
+        }
       }
     }
   },

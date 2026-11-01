@@ -1,0 +1,174 @@
+{
+  "schemaVersion": 1,
+  "presentation": {
+    "title": "Planes and hierarchy \u2014 Dimentionalizer",
+    "headline": "One system.\nSeveral planes.",
+    "description": "Auto-fit and locked planes, relative elevations, and directed connections at every level."
+  },
+  "planes": [
+    {
+      "id": "edge",
+      "name": "Edge plane",
+      "width": 28,
+      "height": 24,
+      "elevation": 10,
+      "sizing": "locked",
+      "decoration": {
+        "color": "#61d8ee",
+        "opacity": 0.05,
+        "border": true,
+        "grid": true,
+        "label": true
+      }
+    },
+    {
+      "id": "core",
+      "name": "Core plane",
+      "width": 20,
+      "height": 20,
+      "elevation": 0,
+      "sizing": "auto",
+      "decoration": {
+        "color": "#b8ff6c",
+        "opacity": 0.025,
+        "border": true,
+        "grid": false,
+        "label": true
+      }
+    },
+    {
+      "id": "data",
+      "name": "Data plane",
+      "width": 20,
+      "height": 20,
+      "elevation": -10,
+      "sizing": "auto",
+      "decoration": {
+        "color": "#b9a0ff",
+        "opacity": 0.04,
+        "border": true,
+        "grid": true,
+        "label": true
+      }
+    }
+  ],
+  "groups": [
+    {
+      "id": "delivery",
+      "name": "Delivery",
+      "plane": "edge",
+      "elevation": 0,
+      "color": "#61d8ee"
+    },
+    {
+      "id": "services",
+      "name": "Services",
+      "plane": "core",
+      "elevation": 5,
+      "color": "#b8ff6c"
+    },
+    {
+      "id": "persistence",
+      "name": "Persistence",
+      "plane": "data",
+      "elevation": 2,
+      "color": "#b9a0ff"
+    }
+  ],
+  "objects": [
+    {
+      "id": "proxy",
+      "name": "Reverse proxy",
+      "group": "delivery",
+      "type": "reverse-proxy"
+    },
+    {
+      "id": "api",
+      "name": "API service",
+      "group": "services",
+      "elevation": 0
+    },
+    {
+      "id": "worker",
+      "name": "Worker",
+      "group": "services",
+      "elevation": -5
+    },
+    {
+      "id": "database",
+      "name": "Database",
+      "group": "persistence",
+      "type": "database",
+      "elevation": -2
+    },
+    {
+      "id": "cache",
+      "name": "Cache",
+      "group": "persistence",
+      "type": "cache",
+      "elevation": 3
+    }
+  ],
+  "connections": [
+    {
+      "id": "plane-link",
+      "from": {
+        "kind": "plane",
+        "id": "edge"
+      },
+      "to": {
+        "kind": "plane",
+        "id": "core"
+      },
+      "label": "Plane relationship",
+      "direction": "bidirectional"
+    },
+    {
+      "id": "group-link",
+      "from": {
+        "kind": "group",
+        "id": "services"
+      },
+      "to": {
+        "kind": "group",
+        "id": "persistence"
+      },
+      "label": "Data dependency",
+      "direction": "forward"
+    },
+    {
+      "id": "proxy-api",
+      "from": "proxy",
+      "to": "api",
+      "label": "Request / response",
+      "direction": "bidirectional"
+    },
+    {
+      "id": "api-database",
+      "from": "api",
+      "to": "database",
+      "label": "Read / write",
+      "direction": "forward"
+    },
+    {
+      "id": "api-cache",
+      "from": "api",
+      "to": "cache",
+      "label": "Cache exchange",
+      "direction": "bidirectional"
+    },
+    {
+      "id": "mixed-link",
+      "from": {
+        "kind": "object",
+        "id": "worker"
+      },
+      "to": {
+        "kind": "plane",
+        "id": "data"
+      },
+      "label": "Data-plane dependency",
+      "direction": "forward"
+    }
+  ]
+}

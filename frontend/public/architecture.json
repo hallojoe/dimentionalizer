@@ -20,25 +20,29 @@
       "id": "delivery",
       "name": "Delivery",
       "color": "#b8ff6c",
-      "elevation": 0
+      "elevation": 0,
+      "plane": "default"
     },
     {
       "id": "application",
       "name": "Application",
       "color": "#61d8ee",
-      "elevation": 0
+      "elevation": 0,
+      "plane": "default"
     },
     {
       "id": "data",
       "name": "Data layer",
       "color": "#b9a0ff",
-      "elevation": 0
+      "elevation": 0,
+      "plane": "default"
     },
     {
       "id": "async",
       "name": "Background work",
       "color": "#ffb16c",
-      "elevation": 0
+      "elevation": 0,
+      "plane": "default"
     }
   ],
   "objects": [
@@ -160,85 +164,116 @@
       "id": "link-1",
       "to": "proxy",
       "label": "HTTPS",
-      "from": "edge"
+      "from": "edge",
+      "direction": "forward"
     },
     {
       "id": "link-2",
       "to": "web",
       "label": "Web traffic",
-      "from": "proxy"
+      "from": "proxy",
+      "direction": "forward"
     },
     {
       "id": "link-3",
       "to": "api",
       "label": "API requests",
-      "from": "proxy"
+      "from": "proxy",
+      "direction": "forward"
     },
     {
       "id": "link-4",
       "to": "identity",
       "label": "Validate session",
-      "from": "api"
+      "from": "api",
+      "direction": "forward"
     },
     {
       "id": "link-5",
       "to": "cache",
       "label": "Read / cache",
-      "from": "api"
+      "from": "api",
+      "direction": "forward"
     },
     {
       "id": "link-6",
       "to": "db",
       "label": "Read / write",
-      "from": "api"
+      "from": "api",
+      "direction": "forward"
     },
     {
       "id": "link-7",
       "to": "replica",
       "label": "Replication",
-      "from": "db"
+      "from": "db",
+      "direction": "forward"
     },
     {
       "id": "link-8",
       "to": "replica",
       "label": "Index records",
-      "from": "search"
+      "from": "search",
+      "direction": "forward"
     },
     {
       "id": "link-9",
       "to": "edge",
       "label": "Static assets",
-      "from": "web"
+      "from": "web",
+      "direction": "forward"
     },
     {
       "id": "link-10",
       "to": "files",
       "label": "Upload / retrieve",
-      "from": "api"
+      "from": "api",
+      "direction": "forward"
     },
     {
       "id": "link-11",
       "to": "queue",
       "label": "Enqueue work",
-      "from": "api"
+      "from": "api",
+      "direction": "forward"
     },
     {
       "id": "link-12",
       "to": "worker",
       "label": "Consume",
-      "from": "queue"
+      "from": "queue",
+      "direction": "forward"
     },
     {
       "id": "link-13",
       "to": "mail",
       "label": "Send notification",
-      "from": "worker"
+      "from": "worker",
+      "direction": "forward"
     },
     {
       "id": "link-14",
       "to": "archive",
       "label": "Write export",
-      "from": "worker"
+      "from": "worker",
+      "direction": "forward"
+    }
+  ],
+  "planes": [
+    {
+      "id": "default",
+      "name": "System plane",
+      "width": 20,
+      "height": 20,
+      "elevation": 0,
+      "sizing": "auto",
+      "decoration": {
+        "color": "#6d8795",
+        "opacity": 0.025,
+        "border": true,
+        "grid": false,
+        "label": true
+      }
     }
   ]
 }

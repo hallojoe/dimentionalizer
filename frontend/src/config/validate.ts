@@ -1,7 +1,8 @@
 import { isKnownType } from '../catalog/catalog';
 import { palette, presentationDefaults, viewDefaults } from './defaults';
-import type { ArchitectureConfig, ValidationResult } from './types';
+import type { ArchitectureConfig, ConnectionEndpoint, ValidationResult } from './types';
 import { validateElevation } from './elevation';
+import { endpointKey } from './connections';
 
 type RecordValue = Record<string, unknown>;
 function record(value: unknown, path: string): RecordValue {
@@ -29,6 +30,16 @@ function array(value: unknown, path: string, max: number): unknown[] {
 }
 function unique(ids: string[], path: string): void {
   if (new Set(ids).size !== ids.length) throw Error(`${path} contains duplicate IDs.`);
+}
+function number(value: unknown, path: string, fallback: number, min: number, max: number): number {
+  if (value === undefined) return fallback;
+  if (typeof value !== 'number' || !Number.isFinite(value) || value < min || value > max) throw Error(`${path} must be a number between ${min} and ${max}.`);
+  return value;
+}
+function boolean(value: unknown, path: string, fallback: boolean): boolean {
+  if (value === undefined) return fallback;
+  if (typeof value !== 'boolean') throw Error(`${path} must be true or false.`);
+  return value;
 }
 
 /** Migrates the original Sites array without inferring specialized types from names. */
@@ -66,9 +77,33 @@ export function validateConfig(input: unknown): ValidationResult {
     if (v[key] !== undefined && typeof v[key] !== 'boolean') throw Error(`view.${key} must be true or false.`);
     view[key] = (v[key] as boolean | undefined) ?? viewDefaults[key];
   }
+  const planes = array(value.planes === undefined ? [{ id: 'default', name: 'Default plane' }] : value.planes, 'planes', 50).map((entry, i) => {
+    const plane = record(entry, `planes[${i}]`);
+    const decoration = record(plane.decoration === undefined ? {} : plane.decoration, `planes[${i}].decoration`);
+    const sizing = plane.sizing === undefined ? 'auto' : plane.sizing;
+    if (sizing !== 'auto' && sizing !== 'locked') throw Error(`planes[${i}].sizing must be auto or locked.`);
+    return {
+      id: string(plane.id, `planes[${i}].id`), name: string(plane.name, `planes[${i}].name`),
+      width: number(plane.width, `planes[${i}].width`, 20, 1, 10000),
+      height: number(plane.height, `planes[${i}].height`, 20, 1, 10000),
+      elevation: validateElevation(plane.elevation, `planes[${i}].elevation`),
+      sizing: sizing as 'auto' | 'locked',
+      decoration: {
+        color: color(decoration.color, `planes[${i}].decoration.color`, presentation.accent),
+        opacity: number(decoration.opacity, `planes[${i}].decoration.opacity`, 0.025, 0, 1),
+        border: boolean(decoration.border, `planes[${i}].decoration.border`, true),
+        grid: boolean(decoration.grid, `planes[${i}].decoration.grid`, false),
+        label: boolean(decoration.label, `planes[${i}].decoration.label`, true),
+      },
+    };
+  });
+  unique(planes.map(plane => plane.id), 'planes');
+  const planeIds = new Set(planes.map(plane => plane.id));
   const groups = array(value.groups, 'groups', 50).map((entry, i) => {
     const g = record(entry, `groups[${i}]`);
-    return { id: string(g.id, `groups[${i}].id`), name: string(g.name, `groups[${i}].name`), color: color(g.color, `groups[${i}].color`, palette[i % palette.length]), elevation: validateElevation(g.elevation, `groups[${i}].elevation`) };
+    const plane = string(g.plane, `groups[${i}].plane`, planes[0]?.id);
+    if (!planeIds.has(plane)) throw Error(`groups[${i}].plane references unknown plane "${plane}".`);
+    return { id: string(g.id, `groups[${i}].id`), name: string(g.name, `groups[${i}].name`), color: color(g.color, `groups[${i}].color`, palette[i % palette.length]), elevation: validateElevation(g.elevation, `groups[${i}].elevation`), plane };
   });
   unique(groups.map(g => g.id), 'groups');
   const groupIds = new Set(groups.map(g => g.id));
@@ -82,16 +117,29 @@ export function validateConfig(input: unknown): ValidationResult {
   });
   unique(objects.map(o => o.id), 'objects');
   const objectIds = new Set(objects.map(o => o.id));
+  function endpoint(value: unknown, path: string): ConnectionEndpoint {
+    if (typeof value === 'string') {
+      if (!objectIds.has(value)) throw Error(`${path} references an unknown object.`);
+      return value;
+    }
+    const ref = record(value, path);
+    const id = string(ref.id, `${path}.id`);
+    if (ref.kind !== 'plane' && ref.kind !== 'group' && ref.kind !== 'object') throw Error(`${path}.kind must be plane, group, or object.`);
+    const ids = ref.kind === 'plane' ? planeIds : ref.kind === 'group' ? groupIds : objectIds;
+    if (!ids.has(id)) throw Error(`${path} references an unknown ${ref.kind}.`);
+    return { kind: ref.kind, id };
+  }
   const connections = array(value.connections ?? [], 'connections', 2000).map((entry, i) => {
     const c = record(entry, `connections[${i}]`);
-    const from = string(c.from, `connections[${i}].from`);
-    const to = string(c.to, `connections[${i}].to`);
-    if (!objectIds.has(from) || !objectIds.has(to)) throw Error(`connections[${i}] references an unknown object.`);
-    if (from === to) throw Error(`connections[${i}] connects an object to itself; self-connections are not supported in v1.`);
-    return { id: string(c.id, `connections[${i}].id`), from, to, label: optionalText(c.label, `connections[${i}].label`) };
+    const from = endpoint(c.from, `connections[${i}].from`);
+    const to = endpoint(c.to, `connections[${i}].to`);
+    if (endpointKey(from) === endpointKey(to)) throw Error(`connections[${i}] connects an entity to itself; self-connections are not supported in v1.`);
+    const direction = c.direction === undefined ? 'forward' : c.direction;
+    if (direction !== 'forward' && direction !== 'bidirectional') throw Error(`connections[${i}].direction must be forward or bidirectional.`);
+    return { id: string(c.id, `connections[${i}].id`), from, to, label: optionalText(c.label, `connections[${i}].label`), direction: direction as 'forward' | 'bidirectional' };
   });
   unique(connections.map(c => c.id), 'connections');
-  const config: ArchitectureConfig = { schemaVersion: 1, presentation, view, groups, objects, connections };
+  const config: ArchitectureConfig = { schemaVersion: 1, presentation, view, planes, groups, objects, connections };
   return { config, warnings };
 }
 
