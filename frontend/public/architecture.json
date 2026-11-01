@@ -1,0 +1,225 @@
+{
+  "schemaVersion": 1,
+  "presentation": {
+    "title": "Dimentionalizer \u2014 Architecture explorer",
+    "brand": "Dimentionalizer",
+    "eyebrow": "SYSTEM ARCHITECTURE",
+    "headline": "Give your systems\na new dimension.",
+    "description": "Explore the building blocks. Follow the connections. See how it all fits together.",
+    "accent": "#b8ff6c",
+    "background": "#090f14"
+  },
+  "view": {
+    "showNames": true,
+    "effects": true,
+    "autoOrbit": false
+  },
+  "groups": [
+    {
+      "id": "delivery",
+      "name": "Delivery",
+      "color": "#b8ff6c"
+    },
+    {
+      "id": "application",
+      "name": "Application",
+      "color": "#61d8ee"
+    },
+    {
+      "id": "data",
+      "name": "Data layer",
+      "color": "#b9a0ff"
+    },
+    {
+      "id": "async",
+      "name": "Background work",
+      "color": "#ffb16c"
+    }
+  ],
+  "objects": [
+    {
+      "id": "edge",
+      "name": "Global edge",
+      "group": "delivery",
+      "type": "cdn",
+      "description": "Delivers static assets from locations close to visitors."
+    },
+    {
+      "id": "proxy",
+      "name": "Request gateway",
+      "group": "delivery",
+      "type": "reverse-proxy",
+      "description": "Routes incoming requests to the web application and API."
+    },
+    {
+      "id": "web",
+      "name": "Web application",
+      "group": "delivery",
+      "type": "container",
+      "description": "The browser-facing experience. A generic container can represent any building block."
+    },
+    {
+      "id": "api",
+      "name": "Application API",
+      "group": "application",
+      "type": "container",
+      "description": "Exposes application capabilities to clients and coordinates the data layer."
+    },
+    {
+      "id": "identity",
+      "name": "Identity service",
+      "group": "application",
+      "type": "container",
+      "description": "Authenticates requests and manages user sessions."
+    },
+    {
+      "id": "search",
+      "name": "Search service",
+      "group": "application",
+      "type": "container",
+      "description": "Builds a searchable view of the application data."
+    },
+    {
+      "id": "db",
+      "name": "Primary database",
+      "group": "data",
+      "type": "database",
+      "description": "Stores authoritative records for the application."
+    },
+    {
+      "id": "replica",
+      "name": "Read replica",
+      "group": "data",
+      "type": "database",
+      "description": "Serves read-heavy workloads independently of the primary store."
+    },
+    {
+      "id": "cache",
+      "name": "Response cache",
+      "group": "data",
+      "type": "cache",
+      "description": "Keeps frequently requested results close to the application."
+    },
+    {
+      "id": "files",
+      "name": "Asset storage",
+      "group": "data",
+      "type": "storage",
+      "description": "Persists uploaded files and generated assets."
+    },
+    {
+      "id": "queue",
+      "name": "Work queue",
+      "group": "async",
+      "type": "queue",
+      "description": "Buffers work so producers and consumers can run independently."
+    },
+    {
+      "id": "worker",
+      "name": "Task worker",
+      "group": "async",
+      "type": "container",
+      "description": "Processes queued tasks and persists their results."
+    },
+    {
+      "id": "mail",
+      "name": "E-mail delivery",
+      "group": "async",
+      "type": "email",
+      "description": "Delivers transactional notifications produced by background tasks."
+    },
+    {
+      "id": "archive",
+      "name": "Archive storage",
+      "group": "async",
+      "type": "storage",
+      "description": "Keeps completed exports and historical artifacts."
+    }
+  ],
+  "connections": [
+    {
+      "id": "link-1",
+      "to": "proxy",
+      "label": "HTTPS",
+      "from": "edge"
+    },
+    {
+      "id": "link-2",
+      "to": "web",
+      "label": "Web traffic",
+      "from": "proxy"
+    },
+    {
+      "id": "link-3",
+      "to": "api",
+      "label": "API requests",
+      "from": "proxy"
+    },
+    {
+      "id": "link-4",
+      "to": "identity",
+      "label": "Validate session",
+      "from": "api"
+    },
+    {
+      "id": "link-5",
+      "to": "cache",
+      "label": "Read / cache",
+      "from": "api"
+    },
+    {
+      "id": "link-6",
+      "to": "db",
+      "label": "Read / write",
+      "from": "api"
+    },
+    {
+      "id": "link-7",
+      "to": "replica",
+      "label": "Replication",
+      "from": "db"
+    },
+    {
+      "id": "link-8",
+      "to": "replica",
+      "label": "Index records",
+      "from": "search"
+    },
+    {
+      "id": "link-9",
+      "to": "edge",
+      "label": "Static assets",
+      "from": "web"
+    },
+    {
+      "id": "link-10",
+      "to": "files",
+      "label": "Upload / retrieve",
+      "from": "api"
+    },
+    {
+      "id": "link-11",
+      "to": "queue",
+      "label": "Enqueue work",
+      "from": "api"
+    },
+    {
+      "id": "link-12",
+      "to": "worker",
+      "label": "Consume",
+      "from": "queue"
+    },
+    {
+      "id": "link-13",
+      "to": "mail",
+      "label": "Send notification",
+      "from": "worker"
+    },
+    {
+      "id": "link-14",
+      "to": "archive",
+      "label": "Write export",
+      "from": "worker"
+    }
+  ]
+}

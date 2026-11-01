@@ -1,0 +1,178 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Dimentionalizer architecture v1",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "groups",
+    "objects"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "schemaVersion": {
+      "const": 1
+    },
+    "presentation": {
+      "type": "object",
+      "required": [],
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 10000
+        },
+        "brand": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 10000
+        },
+        "eyebrow": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 10000
+        },
+        "headline": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 10000
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 10000
+        },
+        "accent": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{6}$"
+        },
+        "background": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{6}$"
+        }
+      },
+      "additionalProperties": false
+    },
+    "view": {
+      "type": "object",
+      "required": [],
+      "properties": {
+        "showNames": {
+          "type": "boolean"
+        },
+        "effects": {
+          "type": "boolean"
+        },
+        "autoOrbit": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "groups": {
+      "type": "array",
+      "maxItems": 50,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 10000
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 10000
+          },
+          "color": {
+            "type": "string",
+            "pattern": "^#[0-9a-fA-F]{6}$"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "objects": {
+      "type": "array",
+      "maxItems": 500,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "group"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 10000
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 10000
+          },
+          "group": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 10000
+          },
+          "type": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 10000,
+            "default": "container",
+            "description": "Predefined: container, database, email, cache, reverse-proxy, queue, storage, cdn. Unknown IDs fall back to container."
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 10000
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "connections": {
+      "type": "array",
+      "maxItems": 2000,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "from",
+          "to"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 10000
+          },
+          "from": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 10000
+          },
+          "to": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 10000
+          },
+          "label": {
+            "type": "string",
+            "maxLength": 10000
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

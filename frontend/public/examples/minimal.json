@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "presentation": {
+    "brand": "My project",
+    "headline": "Inside my system.",
+    "description": "A minimal starting point. Edit this document to describe your architecture."
+  },
+  "groups": [
+    {
+      "id": "core",
+      "name": "Core"
+    }
+  ],
+  "objects": [
+    {
+      "id": "app",
+      "name": "Application",
+      "group": "core"
+    },
+    {
+      "id": "db",
+      "name": "Database",
+      "group": "core",
+      "type": "database"
+    }
+  ],
+  "connections": [
+    {
+      "id": "app-db",
+      "from": "app",
+      "to": "db",
+      "label": "Read / write"
+    }
+  ]
+}
