@@ -25,7 +25,7 @@ The initial catalog has Container plus the seven requested specialized types. No
 ## Deliberately deferred
 
 - Decorators and technology badges, including SQLite and file-system attributes.
-- Graphical drag-and-drop authoring, nested groups, manual node positions, and custom edge routing.
+- Graphical drag-and-drop authoring, nested groups, manual horizontal node positions, and custom edge routing. Signed vertical elevation is supported for groups and objects.
 - Multi-user editing, backend persistence, authentication, and Git synchronization from the browser.
 - Telemetry ingestion and automatic architecture discovery.
 - A plugin loader or remotely loaded executable geometry.

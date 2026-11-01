@@ -1,6 +1,7 @@
 import { isKnownType } from '../catalog/catalog';
 import { palette, presentationDefaults, viewDefaults } from './defaults';
 import type { ArchitectureConfig, ValidationResult } from './types';
+import { validateElevation } from './elevation';
 
 type RecordValue = Record<string, unknown>;
 function record(value: unknown, path: string): RecordValue {
@@ -67,7 +68,7 @@ export function validateConfig(input: unknown): ValidationResult {
   }
   const groups = array(value.groups, 'groups', 50).map((entry, i) => {
     const g = record(entry, `groups[${i}]`);
-    return { id: string(g.id, `groups[${i}].id`), name: string(g.name, `groups[${i}].name`), color: color(g.color, `groups[${i}].color`, palette[i % palette.length]) };
+    return { id: string(g.id, `groups[${i}].id`), name: string(g.name, `groups[${i}].name`), color: color(g.color, `groups[${i}].color`, palette[i % palette.length]), elevation: validateElevation(g.elevation, `groups[${i}].elevation`) };
   });
   unique(groups.map(g => g.id), 'groups');
   const groupIds = new Set(groups.map(g => g.id));
@@ -77,7 +78,7 @@ export function validateConfig(input: unknown): ValidationResult {
     if (!groupIds.has(group)) throw Error(`objects[${i}].group references unknown group "${group}".`);
     const type = string(o.type, `objects[${i}].type`, 'container');
     if (!isKnownType(type)) warnings.push(`Object "${String(o.name)}": unknown type "${type}"; displayed as Container.`);
-    return { id: string(o.id, `objects[${i}].id`), name: string(o.name, `objects[${i}].name`), group, type, description: optionalText(o.description, `objects[${i}].description`) };
+    return { id: string(o.id, `objects[${i}].id`), name: string(o.name, `objects[${i}].name`), group, type, description: optionalText(o.description, `objects[${i}].description`), elevation: validateElevation(o.elevation, `objects[${i}].elevation`) };
   });
   unique(objects.map(o => o.id), 'objects');
   const objectIds = new Set(objects.map(o => o.id));

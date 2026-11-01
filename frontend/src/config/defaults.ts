@@ -9,5 +9,5 @@ export const presentationDefaults: ArchitectureConfig['presentation'] = {
   accent: '#b8ff6c',
   background: '#090f14',
 };
-export const viewDefaults = { showNames: true, effects: true, autoOrbit: false };
+export const viewDefaults = { showNames: true, effects: true, autoOrbit: false, showGrid: true };
 export const palette = ['#b8ff6c', '#61d8ee', '#b9a0ff', '#ffb16c', '#f488b5', '#77ebc4'];

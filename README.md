@@ -49,6 +49,7 @@ The frontend uses **TypeScript, Vite, and Three.js**, with native DOM components
 - Omitted types default to Container; unknown types retain their identifier but render as Container with a warning.
 - Configurable brand text, browser title, eyebrow, headline, description, accent, background, group names and colors.
 - Grouped 3D platforms, orbit/pan/zoom, group and object focus, labels, automatic orbit, and animated directional connection packets.
+- Signed group and item elevation controls (`0` baseline, positive above, negative below), plus independently toggleable ground-grid visibility. Settings persist and export with the configuration.
 - Search and type filtering; keyboard-accessible directory and inspector. Left/right arrows browse objects while inspecting; Escape closes the inspector.
 - Explicit connections with labels and incoming/outgoing inspection. Only configured connections are displayed; no dependencies are inferred from proximity.
 - JSON editing, import, validated export, default restoration, and browser-local persistence.

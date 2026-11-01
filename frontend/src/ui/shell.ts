@@ -13,6 +13,7 @@ export const shell = `
       <label class="search"><span aria-hidden="true">⌕</span><input id="search" type="search" aria-label="Search objects" placeholder="Find an object…" /></label>
       <label class="type-filter">Object type<select id="type-filter"><option value="all">All types</option></select></label>
       <nav id="groups" class="groups" aria-label="Groups"></nav>
+      <div id="group-elevation-controls" hidden></div>
       <div class="section-heading object-heading">OBJECTS <span>SELECT TO INSPECT</span></div>
       <div id="object-list" class="object-list"></div>
       <p class="sidebar-foot">A map of your architecture.<br>Not live telemetry.</p>
@@ -22,7 +23,7 @@ export const shell = `
       <div id="scene-host"></div>
       <div id="fallback" class="fallback" hidden><span class="fallback-symbol">◇</span><h2>Your architecture, connected.</h2><p>3D is unavailable in this browser. Explore every object and its connections in the directory.</p><p class="muted">Enable WebGL / hardware acceleration to use the spatial view.</p><div id="fallback-summary"></div></div>
       <div id="empty-state" class="empty-state" hidden><h2>A new space to build.</h2><p>Open Configure to add groups and objects.</p></div>
-      <div class="viewbar" aria-label="View controls"><button id="names" aria-pressed="true">◉ <span>Names</span></button><button id="orbit" aria-pressed="false">◌ <span>Auto orbit</span></button><button id="effects" aria-pressed="true">✧ <span>Effects</span></button><span class="control-divider"></span><button id="reset-view">⌖ <span>Reset view</span></button></div>
+      <div class="viewbar" aria-label="View controls"><button id="names" aria-pressed="true">◉ <span>Names</span></button><button id="orbit" aria-pressed="false">◌ <span>Auto orbit</span></button><button id="effects" aria-pressed="true">✧ <span>Effects</span></button><button id="grid" aria-pressed="true" aria-label="Plane grid visibility">▦ <span>Grid</span></button><span class="control-divider"></span><button id="reset-view">⌖ <span>Reset view</span></button></div>
       <div class="stage-footer"><span>DRAG TO ORBIT <b>·</b> SCROLL TO ZOOM <b>·</b> CLICK TO INSPECT</span><span>DIMENSION / 01</span></div>
     </section>
     <aside id="inspector" class="inspector" aria-label="Object inspector" hidden>

@@ -12,28 +12,33 @@
   "view": {
     "showNames": true,
     "effects": true,
-    "autoOrbit": false
+    "autoOrbit": false,
+    "showGrid": true
   },
   "groups": [
     {
       "id": "delivery",
       "name": "Delivery",
-      "color": "#b8ff6c"
+      "color": "#b8ff6c",
+      "elevation": 0
     },
     {
       "id": "application",
       "name": "Application",
-      "color": "#61d8ee"
+      "color": "#61d8ee",
+      "elevation": 0
     },
     {
       "id": "data",
       "name": "Data layer",
-      "color": "#b9a0ff"
+      "color": "#b9a0ff",
+      "elevation": 0
     },
     {
       "id": "async",
       "name": "Background work",
-      "color": "#ffb16c"
+      "color": "#ffb16c",
+      "elevation": 0
     }
   ],
   "objects": [
@@ -42,98 +47,112 @@
       "name": "Global edge",
       "group": "delivery",
       "type": "cdn",
-      "description": "Delivers static assets from locations close to visitors."
+      "description": "Delivers static assets from locations close to visitors.",
+      "elevation": 0
     },
     {
       "id": "proxy",
       "name": "Request gateway",
       "group": "delivery",
       "type": "reverse-proxy",
-      "description": "Routes incoming requests to the web application and API."
+      "description": "Routes incoming requests to the web application and API.",
+      "elevation": 0
     },
     {
       "id": "web",
       "name": "Web application",
       "group": "delivery",
       "type": "container",
-      "description": "The browser-facing experience. A generic container can represent any building block."
+      "description": "The browser-facing experience. A generic container can represent any building block.",
+      "elevation": 0
     },
     {
       "id": "api",
       "name": "Application API",
       "group": "application",
       "type": "container",
-      "description": "Exposes application capabilities to clients and coordinates the data layer."
+      "description": "Exposes application capabilities to clients and coordinates the data layer.",
+      "elevation": 0
     },
     {
       "id": "identity",
       "name": "Identity service",
       "group": "application",
       "type": "container",
-      "description": "Authenticates requests and manages user sessions."
+      "description": "Authenticates requests and manages user sessions.",
+      "elevation": 0
     },
     {
       "id": "search",
       "name": "Search service",
       "group": "application",
       "type": "container",
-      "description": "Builds a searchable view of the application data."
+      "description": "Builds a searchable view of the application data.",
+      "elevation": 0
     },
     {
       "id": "db",
       "name": "Primary database",
       "group": "data",
       "type": "database",
-      "description": "Stores authoritative records for the application."
+      "description": "Stores authoritative records for the application.",
+      "elevation": 0
     },
     {
       "id": "replica",
       "name": "Read replica",
       "group": "data",
       "type": "database",
-      "description": "Serves read-heavy workloads independently of the primary store."
+      "description": "Serves read-heavy workloads independently of the primary store.",
+      "elevation": 0
     },
     {
       "id": "cache",
       "name": "Response cache",
       "group": "data",
       "type": "cache",
-      "description": "Keeps frequently requested results close to the application."
+      "description": "Keeps frequently requested results close to the application.",
+      "elevation": 0
     },
     {
       "id": "files",
       "name": "Asset storage",
       "group": "data",
       "type": "storage",
-      "description": "Persists uploaded files and generated assets."
+      "description": "Persists uploaded files and generated assets.",
+      "elevation": 0
     },
     {
       "id": "queue",
       "name": "Work queue",
       "group": "async",
       "type": "queue",
-      "description": "Buffers work so producers and consumers can run independently."
+      "description": "Buffers work so producers and consumers can run independently.",
+      "elevation": 0
     },
     {
       "id": "worker",
       "name": "Task worker",
       "group": "async",
       "type": "container",
-      "description": "Processes queued tasks and persists their results."
+      "description": "Processes queued tasks and persists their results.",
+      "elevation": 0
     },
     {
       "id": "mail",
       "name": "E-mail delivery",
       "group": "async",
       "type": "email",
-      "description": "Delivers transactional notifications produced by background tasks."
+      "description": "Delivers transactional notifications produced by background tasks.",
+      "elevation": 0
     },
     {
       "id": "archive",
       "name": "Archive storage",
       "group": "async",
       "type": "storage",
-      "description": "Keeps completed exports and historical artifacts."
+      "description": "Keeps completed exports and historical artifacts.",
+      "elevation": 0
     }
   ],
   "connections": [

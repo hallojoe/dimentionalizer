@@ -66,6 +66,11 @@
         },
         "autoOrbit": {
           "type": "boolean"
+        },
+        "showGrid": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show the ground reference grid; group platforms remain visible."
         }
       },
       "additionalProperties": false
@@ -93,6 +98,13 @@
           "color": {
             "type": "string",
             "pattern": "^#[0-9a-fA-F]{6}$"
+          },
+          "elevation": {
+            "type": "number",
+            "minimum": -10000,
+            "maximum": 10000,
+            "default": 0,
+            "description": "Signed group-plane elevation relative to world zero."
           }
         },
         "additionalProperties": false
@@ -134,6 +146,13 @@
           "description": {
             "type": "string",
             "maxLength": 10000
+          },
+          "elevation": {
+            "type": "number",
+            "minimum": -10000,
+            "maximum": 10000,
+            "default": 0,
+            "description": "Signed object elevation relative to its group plane."
           }
         },
         "additionalProperties": false

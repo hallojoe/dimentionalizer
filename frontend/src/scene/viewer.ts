@@ -3,13 +3,13 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { createObjectVisual } from '../catalog/geometry';
 import type { ObjectVisual } from '../catalog/geometry';
 import type { ArchitectureConfig } from '../config/types';
-import { layoutGroups } from './layout';
+import { layoutGroups, groupViewBounds } from './layout';
 import type { PlacedGroup } from './layout';
 
 interface RenderedObject extends ObjectVisual { id: string; group: string; position: THREE.Vector3; label: HTMLButtonElement }
 interface Packet { dot: THREE.Mesh; path: THREE.CatmullRomCurve3; offset: number; from: string; to: string }
 export interface SceneViewer {
-  setConfig(config: ArchitectureConfig): void;
+  setConfig(config: ArchitectureConfig, preserveCamera?: boolean): void;
   focusObject(id: string): void;
   focusGroup(id: string | null): void;
   setVisible(ids: Set<string>): void;
@@ -45,9 +45,10 @@ export function createViewer(host: HTMLElement, onSelect: (id: string) => void):
   let packets: Packet[] = [];
   let links: { line: THREE.Line; from: string; to: string }[] = [];
   let groupLabels: { element: HTMLElement; position: THREE.Vector3 }[] = [];
-  let options = { showNames: true, effects: true, autoOrbit: false };
+  let options = { showNames: true, effects: true, autoOrbit: false, showGrid: true };
   let selected = '', hovered = '', frame = 0;
   const home = new THREE.Vector3(30, 40, 50);
+  const homeTarget = new THREE.Vector3();
   let flight: { start: number; from: THREE.Vector3; to: THREE.Vector3; targetFrom: THREE.Vector3; targetTo: THREE.Vector3 } | null = null;
 
   function disposeRoot(object: THREE.Object3D): void {
@@ -65,7 +66,7 @@ export function createViewer(host: HTMLElement, onSelect: (id: string) => void):
   const cancelFlight = () => { flight = null; };
   controls.addEventListener('start', cancelFlight);
 
-  function setConfig(config: ArchitectureConfig): void {
+  function setConfig(config: ArchitectureConfig, preserveCamera = false): void {
     disposeRoot(root);
     root.clear();
     labelLayer.replaceChildren();
@@ -76,21 +77,21 @@ export function createViewer(host: HTMLElement, onSelect: (id: string) => void):
     const layout = layoutGroups(config);
     groups = layout.groups;
     for (const group of groups) {
-      const floor = new THREE.Mesh(new THREE.PlaneGeometry(group.width, group.depth), new THREE.MeshBasicMaterial({ color: group.color, transparent: true, opacity: 0.035, side: THREE.DoubleSide }));
+      const floor = new THREE.Mesh(new THREE.PlaneGeometry(group.width, group.depth), new THREE.MeshBasicMaterial({ color: group.color, transparent: true, opacity: 0.035, side: THREE.DoubleSide, depthWrite: false }));
       floor.rotation.x = -Math.PI / 2;
-      floor.position.set(group.x, 0, group.z);
+      floor.position.set(group.x, group.y, group.z);
       root.add(floor);
-      const bounds = [[-1, -1], [1, -1], [1, 1], [-1, 1], [-1, -1]].map(([x, z]) => new THREE.Vector3(group.x + x * group.width / 2, 0.02, group.z + z * group.depth / 2));
+      const bounds = [[-1, -1], [1, -1], [1, 1], [-1, 1], [-1, -1]].map(([x, z]) => new THREE.Vector3(group.x + x * group.width / 2, group.y + 0.02, group.z + z * group.depth / 2));
       root.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(bounds), new THREE.LineBasicMaterial({ color: group.color, transparent: true, opacity: 0.5 })));
       const heading = document.createElement('span');
       heading.className = 'platform-label';
       heading.textContent = group.name.toUpperCase();
       heading.style.color = group.color;
       labelLayer.append(heading);
-      groupLabels.push({ element: heading, position: new THREE.Vector3(group.x - group.width / 2, 0.1, group.z + group.depth / 2 + 1.2) });
+      groupLabels.push({ element: heading, position: new THREE.Vector3(group.x - group.width / 2, group.y + 0.1, group.z + group.depth / 2 + 1.2) });
       for (const entry of group.objects) {
         const visual = createObjectVisual(entry.object.type, group.color);
-        visual.root.position.set(entry.x, 0.35, entry.z);
+        visual.root.position.set(entry.x, entry.y + 0.35, entry.z);
         visual.hit.userData.id = entry.object.id;
         root.add(visual.root);
         const label = document.createElement('button');
@@ -102,7 +103,7 @@ export function createViewer(host: HTMLElement, onSelect: (id: string) => void):
         // The permanent directory is the ordered keyboard equivalent of these moving labels.
         label.tabIndex = -1;
         labelLayer.append(label);
-        objects.push({ ...visual, id: entry.object.id, group: group.id, position: new THREE.Vector3(entry.x, 1.5, entry.z), label });
+        objects.push({ ...visual, id: entry.object.id, group: group.id, position: new THREE.Vector3(entry.x, entry.y + 1.5, entry.z), label });
       }
     }
     const byId = new Map(objects.map(object => [object.id, object]));
@@ -119,12 +120,15 @@ export function createViewer(host: HTMLElement, onSelect: (id: string) => void):
       links.push({ line, from: from.id, to: to.id });
       packets.push({ dot, path, offset: index * 0.13, from: from.id, to: to.id });
     });
-    home.set(layout.size * 0.85, layout.size * 0.95, layout.size * 1.2);
+    homeTarget.set(0, layout.centerY, 0);
+    home.set(layout.size * 0.85, layout.centerY + layout.size * 0.95, layout.size * 1.2);
     controls.maxDistance = layout.size * 5;
     camera.far = Math.max(2000, layout.size * 10);
     camera.updateProjectionMatrix();
-    camera.position.copy(home);
-    controls.target.set(0, 0, 0);
+    if (!preserveCamera) {
+      camera.position.copy(home);
+      controls.target.copy(homeTarget);
+    }
     flight = null;
     setOptions(config.view);
   }
@@ -132,13 +136,14 @@ export function createViewer(host: HTMLElement, onSelect: (id: string) => void):
   function setOptions(value: ArchitectureConfig['view']): void {
     options = { ...value };
     controls.autoRotate = options.autoOrbit && !reducedMotion;
+    grid.visible = options.showGrid;
   }
   function focusGroup(id: string | null): void {
     selected = '';
     const group = groups.find(g => g.id === id);
-    if (!group) { fly(home.clone(), new THREE.Vector3()); return; }
-    const size = Math.max(group.width, group.depth);
-    fly(new THREE.Vector3(group.x + size * 0.85, size * 1.2, group.z + size * 1.35), new THREE.Vector3(group.x, 0, group.z));
+    if (!group) { fly(home.clone(), homeTarget.clone()); return; }
+    const { size, centerY } = groupViewBounds(group);
+    fly(new THREE.Vector3(group.x + size * 0.85, centerY + size * 1.2, group.z + size * 1.35), new THREE.Vector3(group.x, centerY, group.z));
   }
   function focusObject(id: string): void {
     const object = objects.find(o => o.id === id);
@@ -200,7 +205,7 @@ export function createViewer(host: HTMLElement, onSelect: (id: string) => void):
       const active = object.id === selected || object.id === hovered;
       object.highlight(active);
       object.label.classList.toggle('selected', active);
-      positionLabel(object.label, object.position.clone().setY(3.4), options.showNames && object.root.visible);
+      positionLabel(object.label, object.position.clone().add(new THREE.Vector3(0, 1.9, 0)), options.showNames && object.root.visible);
     }
     groupLabels.forEach(label => positionLabel(label.element, label.position, true));
     packets.forEach(packet => {

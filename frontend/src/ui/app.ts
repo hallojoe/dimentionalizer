@@ -7,6 +7,7 @@ import type { SceneViewer } from '../scene/viewer';
 import { element, get } from './dom';
 import { shell } from './shell';
 import { mountPresetPicker } from './presets';
+import { elevationControl } from './elevation';
 
 export async function startApp(): Promise<() => void> {
   get('app').innerHTML = shell;
@@ -32,6 +33,13 @@ export async function startApp(): Promise<() => void> {
   function persist(): void {
     if (!saveConfig(config)) notify('Changes are active, but browser storage is unavailable. Export your configuration to keep them.');
   }
+  function refreshElevation(): void {
+    viewer?.setConfig(config, true);
+    renderDirectory();
+    if (selected) inspect(selected, false);
+    else viewer?.focusGroup(activeGroup);
+    persist();
+  }
   function matches(object: ArchitectureObject): boolean {
     return (!activeGroup || object.group === activeGroup)
       && (typeFilter === 'all' || resolveType(object.type).id === typeFilter)
@@ -50,6 +58,14 @@ export async function startApp(): Promise<() => void> {
     }
     groupButton(null, 'Entire network', config.objects.length, config.presentation.accent);
     config.groups.forEach(group => groupButton(group.id, group.name, config.objects.filter(o => o.group === group.id).length, group.color));
+    const groupEditor = get('group-elevation-controls');
+    groupEditor.replaceChildren();
+    const currentGroup = config.groups.find(group => group.id === activeGroup);
+    groupEditor.hidden = !currentGroup;
+    if (currentGroup) groupEditor.append(elevationControl('group-elevation', 'Group elevation', currentGroup.elevation ?? 0, '0 = baseline · positive = above · negative = below', value => {
+      currentGroup.elevation = value;
+      refreshElevation();
+    }));
     const objects = config.objects.filter(matches);
     const list = get('object-list');
     list.replaceChildren();
@@ -94,7 +110,7 @@ export async function startApp(): Promise<() => void> {
     get('inspector').hidden = true;
     document.querySelector('.workspace')?.classList.remove('inspecting');
   }
-  function inspect(id: string): void {
+  function inspect(id: string, moveFocus = true): void {
     const object = config.objects.find(o => o.id === id);
     if (!object) return;
     // Connections can lead to an object outside the current group or search.
@@ -113,6 +129,17 @@ export async function startApp(): Promise<() => void> {
     const metadata = element('dl', 'metadata');
     for (const [label, value] of [['Object ID', object.id], ['Type', object.type ?? 'container']]) metadata.append(element('dt', '', label), element('dd', '', value));
     panel.append(metadata);
+    const elevations = element('section', 'inspector-elevations');
+    elevations.append(
+      elevationControl('inspect-group-elevation', 'Group elevation', group.elevation ?? 0, 'Moves this group plane and all its objects.', value => {
+        group.elevation = value; refreshElevation();
+      }),
+      elevationControl('item-elevation', 'Item elevation', object.elevation ?? 0, 'Relative to its group: 10 above, −10 below.', value => {
+        object.elevation = value; refreshElevation();
+      }),
+      element('p', 'muted', `Combined elevation: ${(group.elevation ?? 0) + (object.elevation ?? 0)} (${group.elevation ?? 0} group + ${object.elevation ?? 0} item)`),
+    );
+    panel.append(elevations);
     const connections = config.connections.filter(c => c.from === id || c.to === id);
     panel.append(element('div', 'section-heading', `CONNECTIONS / ${connections.length}`));
     if (!connections.length) panel.append(element('p', 'muted', 'No connections defined.'));
@@ -129,7 +156,7 @@ export async function startApp(): Promise<() => void> {
     document.querySelector('.workspace')?.classList.add('inspecting');
     renderDirectory();
     viewer?.focusObject(id);
-    get<HTMLButtonElement>('close-inspector').focus({ preventScroll: true });
+    if (moveFocus) get<HTMLButtonElement>('close-inspector').focus({ preventScroll: true });
   }
   function renderPresentation(): void {
     const p = config.presentation;
@@ -145,7 +172,7 @@ export async function startApp(): Promise<() => void> {
     syncControls();
   }
   function syncControls(): void {
-    for (const [id, key] of [['names', 'showNames'], ['orbit', 'autoOrbit'], ['effects', 'effects']] as const) {
+    for (const [id, key] of [['names', 'showNames'], ['orbit', 'autoOrbit'], ['effects', 'effects'], ['grid', 'showGrid']] as const) {
       get(id).setAttribute('aria-pressed', String(config.view[key]));
     }
   }
@@ -188,7 +215,7 @@ export async function startApp(): Promise<() => void> {
     get<HTMLInputElement>('search').value = ''; get<HTMLSelectElement>('type-filter').value = 'all';
     closeInspector(); renderDirectory(); viewer?.focusGroup(null);
   };
-  for (const [id, key] of [['names', 'showNames'], ['orbit', 'autoOrbit'], ['effects', 'effects']] as const) {
+  for (const [id, key] of [['names', 'showNames'], ['orbit', 'autoOrbit'], ['effects', 'effects'], ['grid', 'showGrid']] as const) {
     get(id).onclick = () => { config.view[key] = !config.view[key]; viewer?.setOptions(config.view); syncControls(); persist(); };
   }
   function step(delta: number): void {

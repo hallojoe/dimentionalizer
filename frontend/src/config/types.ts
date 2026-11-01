@@ -10,13 +10,17 @@ export interface ArchitectureConfig {
     accent: string;
     background: string;
   };
-  view: { showNames: boolean; effects: boolean; autoOrbit: boolean };
+  view: { showNames: boolean; effects: boolean; autoOrbit: boolean; showGrid: boolean };
   groups: ArchitectureGroup[];
   objects: ArchitectureObject[];
   connections: ArchitectureConnection[];
 }
 
-export interface ArchitectureGroup { id: string; name: string; color: string }
+export interface ArchitectureGroup {
+  id: string; name: string; color: string;
+  /** Signed height of the group plane above/below world zero. Defaults to 0. */
+  elevation?: number;
+}
 export interface ArchitectureObject {
   id: string;
   name: string;
@@ -24,6 +28,8 @@ export interface ArchitectureObject {
   /** Omitted and unrecognized types render as containers. */
   type?: string;
   description?: string;
+  /** Signed height relative to the group plane. Defaults to 0. */
+  elevation?: number;
 }
 export interface ArchitectureConnection {
   id: string;
