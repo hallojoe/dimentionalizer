@@ -40,6 +40,9 @@ Start with `frontend/public/examples/minimal.json`. `architecture.schema.json` c
 | `presentation.accent`, `background` | Six-digit hex colors; group colors are independent |
 | `view` | Optional boolean settings; reduced-motion preference suppresses automatic motion |
 | `view.showGrid` | Show/hide the world ground grid; defaults to `true`; does not hide group platforms |
+| `view.showPlaneFrames`, `view.showGroupFrames` | Global frame visibility; each defaults to `true`; leaves contents and connectors visible |
+| Plane, group, or object `visible` | Optional boolean, default `true`; hidden parents also hide descendants; see [visibility](visibility.md) |
+| Plane or group `showFrame` | Optional boolean, default `true`; hides only its surface, border, grid, and heading |
 | Entity `spacing` | Optional on spaces, planes, groups, and objects; see [spacing and overrides](spacing.md) |
 | `spaces` | Optional array of 1–50 spaces; omitted creates Main space; each needs unique `id` and `name` |
 | `spaceView` | Optional `{ visible: [space IDs], active: space ID or null }`; defaults to all spaces in combined view |

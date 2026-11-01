@@ -122,7 +122,7 @@ export function validateConfig(input: unknown): ValidationResult {
     const sizing = plane.sizing === undefined ? 'auto' : plane.sizing;
     if (sizing !== 'auto' && sizing !== 'locked') throw Error(`planes[${i}].sizing must be auto or locked.`);
     return {
-      ...validateSpacing(plane.spacing, `planes[${i}].spacing`), space, id: string(plane.id, `planes[${i}].id`), name: string(plane.name, `planes[${i}].name`),
+      ...validateSpacing(plane.spacing, `planes[${i}].spacing`), visible: boolean(plane.visible, `planes[${i}].visible`, true), showFrame: boolean(plane.showFrame, `planes[${i}].showFrame`, true),  space, id: string(plane.id, `planes[${i}].id`), name: string(plane.name, `planes[${i}].name`),
       width: number(plane.width, `planes[${i}].width`, 20, 1, 10000),
       height: number(plane.height, `planes[${i}].height`, 20, 1, 10000),
       elevation: validateElevation(plane.elevation, `planes[${i}].elevation`),
@@ -142,7 +142,7 @@ export function validateConfig(input: unknown): ValidationResult {
     const g = record(entry, `groups[${i}]`);
     const plane = string(g.plane, `groups[${i}].plane`, planes[0]?.id);
     if (!planeIds.has(plane)) throw Error(`groups[${i}].plane references unknown plane "${plane}".`);
-    return { ...validateSpacing(g.spacing, `groups[${i}].spacing`), id: string(g.id, `groups[${i}].id`), name: string(g.name, `groups[${i}].name`), color: color(g.color, `groups[${i}].color`, palette[i % palette.length]), elevation: validateElevation(g.elevation, `groups[${i}].elevation`), plane };
+    return { ...validateSpacing(g.spacing, `groups[${i}].spacing`), visible: boolean(g.visible, `groups[${i}].visible`, true), showFrame: boolean(g.showFrame, `groups[${i}].showFrame`, true),  id: string(g.id, `groups[${i}].id`), name: string(g.name, `groups[${i}].name`), color: color(g.color, `groups[${i}].color`, palette[i % palette.length]), elevation: validateElevation(g.elevation, `groups[${i}].elevation`), plane };
   });
   unique(groups.map(g => g.id), 'groups');
   const groupIds = new Set(groups.map(g => g.id));
@@ -161,7 +161,7 @@ export function validateConfig(input: unknown): ValidationResult {
       return { id: string(item.id, `objects[${i}].checklist[${j}].id`), text: string(item.text, `objects[${i}].checklist[${j}].text`), done: boolean(item.done, `objects[${i}].checklist[${j}].done`, false) };
     });
     if (checklist) unique(checklist.map(item => item.id), `objects[${i}].checklist`);
-    return { ...validateSpacing(o.spacing, `objects[${i}].spacing`, false), ...(checklist ? { checklist } : {}), ...(linkedSpace ? { linkedSpace } : {}), id: string(o.id, `objects[${i}].id`), name: string(o.name, `objects[${i}].name`), group, type, description: optionalText(o.description, `objects[${i}].description`), elevation: validateElevation(o.elevation, `objects[${i}].elevation`) };
+    return { ...validateSpacing(o.spacing, `objects[${i}].spacing`, false), visible: boolean(o.visible, `objects[${i}].visible`, true),  ...(checklist ? { checklist } : {}), ...(linkedSpace ? { linkedSpace } : {}), id: string(o.id, `objects[${i}].id`), name: string(o.name, `objects[${i}].name`), group, type, description: optionalText(o.description, `objects[${i}].description`), elevation: validateElevation(o.elevation, `objects[${i}].elevation`) };
   });
   unique(objects.map(o => o.id), 'objects');
   const objectIds = new Set(objects.map(o => o.id));

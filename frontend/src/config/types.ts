@@ -12,7 +12,7 @@ export interface ArchitectureConfig {
     accent: string;
     background: string;
   };
-  view: { showNames: boolean; effects: boolean; autoOrbit: boolean; showGrid: boolean };
+  view: { showNames: boolean; effects: boolean; autoOrbit: boolean; showGrid: boolean; showPlaneFrames: boolean; showGroupFrames: boolean };
   spaces: ArchitectureSpace[];
   spaceView: SpaceView;
   objectTypes: CustomObjectType[];
@@ -24,11 +24,13 @@ export interface ArchitectureConfig {
 
 export interface Spacing { mode: 'margin' | 'padding'; target: 'self' | 'children'; value: number }
 export interface SpacedEntity { spacing?: Spacing }
+export interface VisibleEntity { visible?: boolean }
+export interface FramedEntity extends VisibleEntity { showFrame?: boolean }
 
 export interface ArchitectureSpace extends SpacedEntity { id: string; name: string; description: string }
 export interface SpaceView { visible: string[]; active: string | null }
 
-export interface ArchitecturePlane extends SpacedEntity {
+export interface ArchitecturePlane extends SpacedEntity, FramedEntity {
   space: string;
   id: string;
   name: string;
@@ -40,13 +42,13 @@ export interface ArchitecturePlane extends SpacedEntity {
   decoration: { color: string; opacity: number; border: boolean; grid: boolean; label: boolean };
 }
 
-export interface ArchitectureGroup extends SpacedEntity {
+export interface ArchitectureGroup extends SpacedEntity, FramedEntity {
   id: string; name: string; color: string;
   plane: string;
   /** Signed height relative to its parent plane. Defaults to 0. */
   elevation?: number;
 }
-export interface ArchitectureObject extends SpacedEntity {
+export interface ArchitectureObject extends SpacedEntity, VisibleEntity {
   checklist?: { id: string; text: string; done: boolean }[];
   /** Clicking the object enters this space, without changing its parent group. */
   linkedSpace?: string;

@@ -219,3 +219,7 @@ button.platform-label { pointer-events: auto; padding: 2px 4px; border: none; ba
 .checklist-item { display: flex; align-items: flex-start; gap: 10px; font-size: 12px; line-height: 1.7; padding: 9px 0; overflow-wrap: anywhere; }
 .checklist-item input { flex-shrink: 0; margin-top: 5px; accent-color: var(--accent); }
 .checklist-item.completed span { color: var(--muted); text-decoration: line-through; }
+
+/* Frame controls wrap within narrow stages, including an open inspector. */
+.viewbar { max-width: calc(100% - 24px); width: max-content; flex-wrap: wrap; justify-content: center; }
+.visibility-controls { margin: 18px 0; padding-top: 12px; border-top: 1px solid #26343d; }

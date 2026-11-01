@@ -16,6 +16,8 @@ import { connectorControls } from './connectors';
 import { spacingControls } from './spacing';
 import { checklistControls } from './checklist';
 import { planeControls } from './planes';
+import { visibleEntities } from '../config/visibility';
+import { visibilityControls } from './visibility';
 
 export async function startApp(): Promise<() => void> {
   get('app').innerHTML = shell;
@@ -91,11 +93,13 @@ export async function startApp(): Promise<() => void> {
   }
   function renderDirectory(): void {
     renderSpaceNavigation();
+    const shown = visibleEntities(config, config.spaces.map(space => space.id));
+    const hiddenSuffix = (ref: EntityRef) => shown.has(endpointKey(ref)) ? '' : ' · Hidden';
     const planes = get<HTMLSelectElement>('plane-filter');
     planes.replaceChildren();
     const all = element('option', '', 'All planes'); all.value = ''; planes.append(all);
     config.planes.filter(plane => spaceContains(plane.space)).forEach(plane => {
-      const option = element('option', '', plane.name); option.value = plane.id; planes.append(option);
+      const option = element('option', '', plane.name + hiddenSuffix({ kind: 'plane', id: plane.id })); option.value = plane.id; planes.append(option);
     });
     planes.value = activePlane ?? '';
     get<HTMLButtonElement>('inspect-plane').disabled = !activePlane;
@@ -113,7 +117,7 @@ export async function startApp(): Promise<() => void> {
       groups.append(button);
     }
     groupButton(null, activePlane ? 'Entire plane' : 'Entire network', config.objects.filter(o => spaceContains(endpointSpace(config, o.id)) && (!activePlane || config.groups.find(g => g.id === o.group)?.plane === activePlane)).length, config.presentation.accent);
-    config.groups.filter(group => spaceContains(endpointSpace(config, { kind: 'group', id: group.id })) && (!activePlane || group.plane === activePlane)).forEach(group => groupButton(group.id, group.name, config.objects.filter(o => o.group === group.id).length, group.color));
+    config.groups.filter(group => spaceContains(endpointSpace(config, { kind: 'group', id: group.id })) && (!activePlane || group.plane === activePlane)).forEach(group => groupButton(group.id, group.name + hiddenSuffix({ kind: 'group', id: group.id }), config.objects.filter(o => o.group === group.id).length, group.color));
     const groupEditor = get('group-elevation-controls');
     groupEditor.replaceChildren();
     const currentGroup = config.groups.find(group => group.id === activeGroup);
@@ -138,7 +142,7 @@ export async function startApp(): Promise<() => void> {
       const symbol = element('span', 'object-symbol', type.symbol);
       symbol.style.color = config.groups.find(g => g.id === object.group)!.color;
       const text = element('span', 'object-row-text');
-      text.append(element('span', '', object.name), element('small', '', object.linkedSpace ? `${type.name} · opens ${config.spaces.find(s => s.id === object.linkedSpace)!.name}` : type.name));
+      text.append(element('span', '', object.name + hiddenSuffix({ kind: 'object', id: object.id })), element('small', '', object.linkedSpace ? `${type.name} · opens ${config.spaces.find(s => s.id === object.linkedSpace)!.name}` : type.name));
       button.append(symbol, text, element('span', 'row-arrow', '↗'));
       button.onclick = () => inspect(object.id);
       list.append(button);
@@ -152,7 +156,7 @@ export async function startApp(): Promise<() => void> {
       return config.spaceView.visible.includes(space) && (config.spaceView.active && config.spaceView.active !== space || matches(object));
     });
     viewer?.setVisible(new Set(sceneObjects.map(o => o.id)));
-    renderFallback(objects);
+    renderFallback(objects.filter(object => shown.has(endpointKey(object.id))));
   }
   function renderFallback(objects: ArchitectureObject[]): void {
     const summary = get('fallback-summary');
@@ -200,7 +204,7 @@ export async function startApp(): Promise<() => void> {
     panel.append(icon, element('div', 'eyebrow', type.name.toUpperCase()), element('h2', '', object.name), element('span', 'tag', group.name), element('p', 'object-description', object.description || 'No description provided.'));
     const metadata = element('dl', 'metadata');
     for (const [label, value] of [['Object ID', object.id], ['Type', object.type ?? 'container']]) metadata.append(element('dt', '', label), element('dd', '', value));
-    panel.append(metadata, checklistControls(object, persist));
+    panel.append(metadata, visibilityControls(config, { kind: 'object', id: object.id }, object, refreshConfiguration), checklistControls(object, persist));
     const typeLabel = element('label', 'property-field', 'Object type');
     const typeSelect = element('select'); typeSelect.setAttribute('aria-label', 'Object type');
     const availableTypes = getObjectCatalog(config.objectTypes);
@@ -238,7 +242,7 @@ export async function startApp(): Promise<() => void> {
     get('object-position').textContent = `${config.objects.indexOf(object) + 1} / ${config.objects.length}`;
     openInspector();
     renderDirectory();
-    if (moveFocus && object.linkedSpace) navigateSpace(object.linkedSpace);
+    if (moveFocus && object.linkedSpace && visibleEntities(config).has(endpointKey(id))) navigateSpace(object.linkedSpace);
     else if (moveFocus) viewer?.focusObject(id);
     if (moveFocus) get<HTMLButtonElement>('close-inspector').focus({ preventScroll: true });
   }
@@ -294,7 +298,7 @@ export async function startApp(): Promise<() => void> {
     get('inspector-label').textContent = `${ref.kind.toUpperCase()} INSPECTOR`;
     get('inspector-nav').hidden = true;
     const panel = get('inspector-content'); panel.replaceChildren();
-    panel.append(element('div', 'inspector-icon', ref.kind === 'plane' ? '▱' : '▦'), element('h2', '', entity.name));
+    panel.append(element('div', 'inspector-icon', ref.kind === 'plane' ? '▱' : '▦'), element('h2', '', entity.name), visibilityControls(config, ref, entity, refreshConfiguration));
     if (ref.kind === 'plane') {
       const plane = config.planes.find(p => p.id === ref.id)!;
       const placed = layoutGroups(config).planes.find(p => p.id === ref.id)!;
@@ -309,7 +313,7 @@ export async function startApp(): Promise<() => void> {
     if (ref.kind === 'group') { const group = config.groups.find(g => g.id === ref.id)!; panel.append(spacingControls(group, config.planes.find(p => p.id === group.plane), true, refreshConfiguration)); }
     renderConnections(panel, ref);
     openInspector(); renderDirectory();
-    if (ref.kind === 'plane') viewer?.focusPlane(ref.id); else viewer?.focusGroup(ref.id);
+    if (moveFocus) { if (ref.kind === 'plane') viewer?.focusPlane(ref.id); else viewer?.focusGroup(ref.id); }
     if (moveFocus) get<HTMLButtonElement>('close-inspector').focus({ preventScroll: true });
   }
   function openInspector(): void {
@@ -330,7 +334,7 @@ export async function startApp(): Promise<() => void> {
     syncControls();
   }
   function syncControls(): void {
-    for (const [id, key] of [['names', 'showNames'], ['orbit', 'autoOrbit'], ['effects', 'effects'], ['grid', 'showGrid']] as const) {
+    for (const [id, key] of [['names', 'showNames'], ['orbit', 'autoOrbit'], ['effects', 'effects'], ['grid', 'showGrid'], ['plane-frames', 'showPlaneFrames'], ['group-frames', 'showGroupFrames']] as const) {
       get(id).setAttribute('aria-pressed', String(config.view[key]));
     }
   }
@@ -389,8 +393,8 @@ export async function startApp(): Promise<() => void> {
     get<HTMLInputElement>('search').value = ''; get<HTMLSelectElement>('type-filter').value = 'all';
     closeInspector(); renderDirectory(); viewer?.focusGroup(null);
   };
-  for (const [id, key] of [['names', 'showNames'], ['orbit', 'autoOrbit'], ['effects', 'effects'], ['grid', 'showGrid']] as const) {
-    get(id).onclick = () => { config.view[key] = !config.view[key]; viewer?.setOptions(config.view); syncControls(); persist(); };
+  for (const [id, key] of [['names', 'showNames'], ['orbit', 'autoOrbit'], ['effects', 'effects'], ['grid', 'showGrid'], ['plane-frames', 'showPlaneFrames'], ['group-frames', 'showGroupFrames']] as const) {
+    get(id).onclick = () => { config.view[key] = !config.view[key]; viewer?.setOptions(config.view); syncControls(); if (selected) inspect(selected, false); else if (selectedScope) inspectScope(selectedScope, false); persist(); };
   }
   function step(delta: number): void {
     if (!selected || !config.objects.length) return;

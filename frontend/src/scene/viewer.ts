@@ -7,6 +7,8 @@ import { disposeResources } from './resources';
 import type { ObjectVisual } from '../catalog/geometry';
 import type { ArchitectureConfig, ArchitectureConnection, ConnectionEndpoint, EntityRef } from '../config/types';
 import { endpointKey, endpointSpace } from '../config/connections';
+import { sceneVisibility } from '../config/visibility';
+import { viewDefaults } from '../config/defaults';
 import { capacityMaximum, capacityRadius, connectorPath, connectionAnchor, packetProgress } from './connections';
 import { layoutGroups, groupViewBounds, planeViewBounds, spaceViewBounds } from './layout';
 import type { PlacedGroup, PlacedPlane, PlacedSpace } from './layout';
@@ -54,17 +56,23 @@ export function createViewer(host: HTMLElement, onSelect: (id: string) => void, 
   let spaces: PlacedSpace[] = [];
   let configState: ArchitectureConfig;
   let visibleSpaces = new Set<string>(), activeSpace: string | null = null;
-  let visibleObjects = new Set<string>();
+  let visibleObjects = new Set<string>(), requestedObjects = new Set<string>(), visibleFrames = new Set<string>();
   const materialOpacity = new WeakMap<THREE.Material, number>();
   function addToSpace(space: string, ...entries: THREE.Object3D[]): void {
     entries.forEach(entry => { entry.userData.space = space; root.add(entry); });
+  }
+  function addFrame(space: string, ref: EntityRef, ...entries: THREE.Object3D[]): void {
+    entries.forEach(entry => { entry.userData.frameKey = endpointKey(ref); });
+    addToSpace(space, ...entries);
   }
   function dimmed(space: string): boolean { return activeSpace !== null && activeSpace !== space; }
   function applySpaceAppearance(): void {
     for (const entry of root.children) {
       const space = entry.userData.space as string | undefined;
       const endpoints = entry.userData.endpoints as string[] | undefined;
-      if (space) entry.visible = visibleSpaces.has(space) && (!entry.userData.objectId || visibleObjects.has(entry.userData.objectId));
+      if (space) entry.visible = visibleSpaces.has(space)
+        && (!entry.userData.objectId || visibleObjects.has(entry.userData.objectId))
+        && (!entry.userData.frameKey || visibleFrames.has(entry.userData.frameKey));
       const dim = space ? dimmed(space) : endpoints?.some(dimmed) ?? false;
       entry.traverse(child => {
         if (!(child instanceof THREE.Mesh || child instanceof THREE.Line || child instanceof THREE.Points)) return;
@@ -78,8 +86,8 @@ export function createViewer(host: HTMLElement, onSelect: (id: string) => void, 
   let packets: Packet[] = [];
   let links: { line: THREE.Object3D; from: ConnectionEndpoint; to: ConnectionEndpoint }[] = [];
   let visibleEndpoints = new Set<string>();
-  let groupLabels: { element: HTMLElement; position: THREE.Vector3; space: string }[] = [];
-  let options = { showNames: true, effects: true, autoOrbit: false, showGrid: true };
+  let groupLabels: { element: HTMLElement; position: THREE.Vector3; space: string; key: string }[] = [];
+  let options = { ...viewDefaults };
   let selected = '', hovered = '', frame = 0;
   const home = new THREE.Vector3(30, 40, 50);
   const homeTarget = new THREE.Vector3();
@@ -115,16 +123,16 @@ export function createViewer(host: HTMLElement, onSelect: (id: string) => void, 
       addToSpace(space.id, new THREE.Line(new THREE.BufferGeometry().setFromPoints(corners), new THREE.LineBasicMaterial({ color: config.presentation.accent, transparent: true, opacity: 0.25 })));
       const heading = document.createElement('button'); heading.className = 'platform-label space-label'; heading.textContent = space.name;
       heading.tabIndex = -1; heading.onclick = () => onScopeSelect?.({ kind: 'space', id: space.id }); labelLayer.append(heading);
-      groupLabels.push({ element: heading, space: space.id, position: new THREE.Vector3(space.x, 0, space.z - space.depth / 2 - 5) });
+      groupLabels.push({ element: heading, space: space.id, key: endpointKey({ kind: 'space', id: space.id }), position: new THREE.Vector3(space.x, 0, space.z - space.depth / 2 - 5) });
     }
     for (const plane of planes) {
       const { color, opacity, border, grid: showPlaneGrid, label } = plane.decoration;
       const surface = new THREE.Mesh(new THREE.PlaneGeometry(plane.width, plane.depth), new THREE.MeshBasicMaterial({ color, transparent: true, opacity, side: THREE.DoubleSide, depthWrite: false }));
       surface.rotation.x = -Math.PI / 2;
       surface.position.set(plane.x, plane.y - 0.04, plane.z);
-      addToSpace(plane.space, surface);
+      addFrame(plane.space, { kind: 'plane', id: plane.id }, surface);
       const corners = [[-1, -1], [1, -1], [1, 1], [-1, 1], [-1, -1]].map(([x, z]) => new THREE.Vector3(plane.x + x * plane.width / 2, plane.y - 0.03, plane.z + z * plane.depth / 2));
-      if (border) addToSpace(plane.space, new THREE.Line(new THREE.BufferGeometry().setFromPoints(corners), new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.6 })));
+      if (border) addFrame(plane.space, { kind: 'plane', id: plane.id }, new THREE.Line(new THREE.BufferGeometry().setFromPoints(corners), new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.6 })));
       if (showPlaneGrid) {
         const lines: THREE.Vector3[] = [];
         const nx = Math.min(80, Math.ceil(plane.width / 2.5)), nz = Math.min(80, Math.ceil(plane.depth / 2.5));
@@ -136,7 +144,7 @@ export function createViewer(host: HTMLElement, onSelect: (id: string) => void, 
           const z = plane.z - plane.depth / 2 + plane.depth * i / nz;
           lines.push(new THREE.Vector3(plane.x - plane.width / 2, plane.y - 0.02, z), new THREE.Vector3(plane.x + plane.width / 2, plane.y - 0.02, z));
         }
-        addToSpace(plane.space, new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(lines), new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.2, depthWrite: false })));
+        addFrame(plane.space, { kind: 'plane', id: plane.id }, new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(lines), new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.2, depthWrite: false })));
       }
       if (label) {
         const heading = document.createElement('button');
@@ -144,7 +152,7 @@ export function createViewer(host: HTMLElement, onSelect: (id: string) => void, 
         heading.textContent = `${plane.name.toUpperCase()} / PLANE`;
         heading.tabIndex = -1; heading.onclick = () => onScopeSelect?.({ kind: 'plane', id: plane.id });
         labelLayer.append(heading);
-        groupLabels.push({ element: heading, space: plane.space, position: new THREE.Vector3(plane.x - plane.width / 2, plane.y + 0.1, plane.z - plane.depth / 2 - 1) });
+        groupLabels.push({ element: heading, space: plane.space, key: endpointKey({ kind: 'plane', id: plane.id }), position: new THREE.Vector3(plane.x - plane.width / 2, plane.y + 0.1, plane.z - plane.depth / 2 - 1) });
       }
     }
     for (const group of groups) {
@@ -152,16 +160,16 @@ export function createViewer(host: HTMLElement, onSelect: (id: string) => void, 
       const floor = new THREE.Mesh(new THREE.PlaneGeometry(group.width, group.depth), new THREE.MeshBasicMaterial({ color: group.color, transparent: true, opacity: 0.035, side: THREE.DoubleSide, depthWrite: false }));
       floor.rotation.x = -Math.PI / 2;
       floor.position.set(group.x, group.y, group.z);
-      addToSpace(space, floor);
+      addFrame(space, { kind: 'group', id: group.id }, floor);
       const bounds = [[-1, -1], [1, -1], [1, 1], [-1, 1], [-1, -1]].map(([x, z]) => new THREE.Vector3(group.x + x * group.width / 2, group.y + 0.02, group.z + z * group.depth / 2));
-      addToSpace(space, new THREE.Line(new THREE.BufferGeometry().setFromPoints(bounds), new THREE.LineBasicMaterial({ color: group.color, transparent: true, opacity: 0.5 })));
+      addFrame(space, { kind: 'group', id: group.id }, new THREE.Line(new THREE.BufferGeometry().setFromPoints(bounds), new THREE.LineBasicMaterial({ color: group.color, transparent: true, opacity: 0.5 })));
       const heading = document.createElement('button');
       heading.className = 'platform-label';
       heading.tabIndex = -1; heading.onclick = () => onScopeSelect?.({ kind: 'group', id: group.id });
       heading.textContent = group.name.toUpperCase();
       heading.style.color = group.color;
       labelLayer.append(heading);
-      groupLabels.push({ element: heading, space, position: new THREE.Vector3(group.x - group.width / 2, group.y + 0.1, group.z + group.depth / 2 + 1.2) });
+      groupLabels.push({ element: heading, space, key: endpointKey({ kind: 'group', id: group.id }), position: new THREE.Vector3(group.x - group.width / 2, group.y + 0.1, group.z + group.depth / 2 + 1.2) });
       for (const entry of group.objects) {
         const visual = createObjectVisual(entry.object.type, group.color, config.objectTypes);
         const type = resolveType(entry.object.type, config.objectTypes);
@@ -234,6 +242,7 @@ export function createViewer(host: HTMLElement, onSelect: (id: string) => void, 
     options = { ...value };
     controls.autoRotate = options.autoOrbit && !reducedMotion;
     grid.visible = options.showGrid;
+    setVisible(requestedObjects);
   }
   function focusGroup(id: string | null): void {
     selected = '';
@@ -263,18 +272,14 @@ export function createViewer(host: HTMLElement, onSelect: (id: string) => void, 
   }
   function setSpaceView(visible: string[], active: string | null): void {
     visibleSpaces = new Set(visible); activeSpace = active;
-    setVisible(visibleObjects);
+    setVisible(requestedObjects);
   }
   function setVisible(ids: Set<string>): void {
-    visibleObjects = new Set([...ids].filter(id => visibleSpaces.has(endpointSpace(configState, id))));
-    visibleEndpoints = new Set([...visibleObjects].map(id => endpointKey(id)));
-    groups.forEach(group => {
-      if (visibleSpaces.has(endpointSpace(configState, { kind: 'group', id: group.id })) && (!group.objects.length || group.objects.some(entry => visibleObjects.has(entry.object.id)))) visibleEndpoints.add(endpointKey({ kind: 'group', id: group.id }));
-    });
-    planes.forEach(plane => {
-      if (visibleSpaces.has(plane.space) && (!plane.groups.length || plane.groups.some(group => visibleEndpoints.has(endpointKey({ kind: 'group', id: group.id }))))) visibleEndpoints.add(endpointKey({ kind: 'plane', id: plane.id }));
-    });
-    visibleSpaces.forEach(id => visibleEndpoints.add(endpointKey({ kind: 'space', id })));
+    requestedObjects = new Set(ids);
+    const visibility = sceneVisibility(configState, requestedObjects, [...visibleSpaces], options);
+    visibleObjects = visibility.objects;
+    visibleEndpoints = visibility.endpoints;
+    visibleFrames = visibility.frames;
     links.forEach(link => { link.line.visible = visibleEndpoints.has(endpointKey(link.from)) && visibleEndpoints.has(endpointKey(link.to)); });
     applySpaceAppearance();
   }
@@ -330,7 +335,7 @@ export function createViewer(host: HTMLElement, onSelect: (id: string) => void, 
       object.label.style.opacity = dimmed(object.root.userData.space) ? '0.12' : '1';
       positionLabel(object.label, object.position.clone().add(new THREE.Vector3(0, 1.9, 0)), options.showNames && object.root.visible);
     }
-    groupLabels.forEach(label => { label.element.style.opacity = dimmed(label.space) ? '0.12' : '1'; positionLabel(label.element, label.position, visibleSpaces.has(label.space)); });
+    groupLabels.forEach(label => { label.element.style.opacity = dimmed(label.space) ? '0.12' : '1'; positionLabel(label.element, label.position, visibleFrames.has(label.key)); });
     packets.forEach(packet => {
       const progress = packetProgress(reducedMotion ? 0.25 : now * 0.00008 + packet.offset, packet.direction);
       packet.dots.forEach((dot, i) => {

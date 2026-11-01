@@ -71,6 +71,14 @@
           "type": "boolean",
           "default": true,
           "description": "Show the ground reference grid; group platforms remain visible."
+        },
+        "showPlaneFrames": {
+          "type": "boolean",
+          "default": true
+        },
+        "showGroupFrames": {
+          "type": "boolean",
+          "default": true
         }
       },
       "additionalProperties": false
@@ -114,6 +122,16 @@
           },
           "spacing": {
             "$ref": "#/$defs/spacing"
+          },
+          "visible": {
+            "type": "boolean",
+            "default": true,
+            "description": "Hide this entity and its descendants without changing layout."
+          },
+          "showFrame": {
+            "type": "boolean",
+            "default": true,
+            "description": "Show surface, border, grid and heading when the corresponding global frame setting is enabled. Contents remain visible."
           }
         },
         "additionalProperties": false
@@ -210,6 +228,11 @@
                 }
               }
             }
+          },
+          "visible": {
+            "type": "boolean",
+            "default": true,
+            "description": "Hide this entity and its descendants without changing layout."
           }
         },
         "additionalProperties": false
@@ -434,6 +457,16 @@
           },
           "spacing": {
             "$ref": "#/$defs/spacing"
+          },
+          "visible": {
+            "type": "boolean",
+            "default": true,
+            "description": "Hide this entity and its descendants without changing layout."
+          },
+          "showFrame": {
+            "type": "boolean",
+            "default": true,
+            "description": "Show surface, border, grid and heading when the corresponding global frame setting is enabled. Contents remain visible."
           }
         }
       }
@@ -463,7 +496,7 @@
             "type": "string",
             "minLength": 1,
             "maxLength": 8,
-            "default": "◇"
+            "default": "\u25c7"
           },
           "description": {
             "type": "string",

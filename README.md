@@ -57,6 +57,7 @@ The frontend uses **TypeScript, Vite, and Three.js**, with native DOM components
 - Connector styles **Normal, Lightning, Wobbly**, with optional independent in/out capacities expressed as lane thickness.
 - Spacing on spaces, planes, groups, and objects: margin or padding, applied to self or direct children with explicit child overrides.
 - Saved object checklists for planning and learning, displayed in the existing inspector.
+- Global and individual plane/group frame controls, plus visibility switches for planes, groups, and objects. Hidden entities remain reachable in the directory; layout and child preferences are preserved.
 - Configurable planes with auto-fit or locked dimensions, color, opacity, border, grid, and labels. Groups reference their parent plane; existing documents receive a default auto-fit plane.
 - Signed plane, group, and item elevation controls (`0` baseline, positive above, negative below), plus independently toggleable ground-grid visibility. Settings persist and export with the configuration.
 - Search and type filtering; keyboard-accessible directory and inspector. Left/right arrows browse objects while inspecting; Escape closes the inspector.
@@ -80,6 +81,7 @@ Changes are stored locally under `dimentionalizer.config.v1` for the browser's o
 
 ## Customize and extend
 
+- [Visibility switches and frame controls](docs/visibility.md)
 - [Spacing, overrides, and planning checklists](docs/spacing.md)
 - [Spaces, portals, and connector capacity](docs/spaces.md)
 - [Configuration reference](docs/configuration.md)
