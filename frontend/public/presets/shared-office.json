@@ -1,0 +1,214 @@
+{
+  "schemaVersion": 1,
+  "presentation": {
+    "title": "Outside and inside the office — Dimentionalizer",
+    "eyebrow": "WORK & STUDY",
+    "headline": "Outside and inside the office.",
+    "description": "View the workplace from outside, then click the office to enter a shared workspace. Desks, seating, windows, and shared facilities remain ordinary inspectable objects."
+  },
+  "spaces": [
+    {
+      "id": "campus",
+      "name": "Workplace campus"
+    },
+    {
+      "id": "office-interior",
+      "name": "Inside the office"
+    }
+  ],
+  "spaceView": {
+    "visible": [
+      "campus",
+      "office-interior"
+    ],
+    "active": "campus"
+  },
+  "planes": [
+    {
+      "id": "campus-plane",
+      "name": "Workplace campus plane",
+      "space": "campus",
+      "decoration": {
+        "grid": true,
+        "color": "#61d8ee"
+      }
+    },
+    {
+      "id": "office-interior-plane",
+      "name": "Inside the office plane",
+      "space": "office-interior",
+      "decoration": {
+        "grid": true,
+        "color": "#b8ff6c"
+      }
+    }
+  ],
+  "groups": [
+    {
+      "id": "arrival",
+      "name": "Arrival",
+      "plane": "campus-plane",
+      "color": "#61d8ee"
+    },
+    {
+      "id": "work",
+      "name": "Workstations",
+      "plane": "office-interior-plane",
+      "color": "#b8ff6c"
+    },
+    {
+      "id": "shared",
+      "name": "Shared facilities",
+      "plane": "office-interior-plane",
+      "color": "#ffb16c"
+    }
+  ],
+  "objects": [
+    {
+      "id": "people",
+      "name": "Colleagues",
+      "type": "usergroup",
+      "group": "arrival",
+      "description": "A team arriving at work."
+    },
+    {
+      "id": "bus",
+      "name": "Office shuttle",
+      "type": "bus",
+      "group": "arrival",
+      "description": "Shared transport to the campus."
+    },
+    {
+      "id": "office",
+      "name": "Office · click to enter",
+      "type": "office",
+      "group": "arrival",
+      "description": "Opens the interior workspace.",
+      "linkedSpace": "office-interior"
+    },
+    {
+      "id": "adult",
+      "name": "Team member",
+      "type": "adult",
+      "group": "work",
+      "description": "A colleague at a workstation."
+    },
+    {
+      "id": "desk",
+      "name": "Desk",
+      "type": "desk",
+      "group": "work",
+      "description": "A work surface."
+    },
+    {
+      "id": "chair",
+      "name": "Task chair",
+      "type": "chair",
+      "group": "work",
+      "description": "Individual seating."
+    },
+    {
+      "id": "window",
+      "name": "Window wall",
+      "type": "window-wall",
+      "group": "work",
+      "description": "A glazed edge of the workspace."
+    },
+    {
+      "id": "wall",
+      "name": "Room divider",
+      "type": "wall",
+      "group": "work",
+      "description": "A solid partition."
+    },
+    {
+      "id": "sofa",
+      "name": "Lounge sofa",
+      "type": "sofa",
+      "group": "shared",
+      "description": "Shared informal seating."
+    },
+    {
+      "id": "food",
+      "name": "Lunch",
+      "type": "food",
+      "group": "shared",
+      "description": "Food available in the shared area."
+    },
+    {
+      "id": "toilet",
+      "name": "Restroom",
+      "type": "toilet",
+      "group": "shared",
+      "description": "A shared restroom fixture."
+    }
+  ],
+  "connections": [
+    {
+      "from": "people",
+      "to": "bus",
+      "label": "Commutes",
+      "direction": "bidirectional",
+      "style": "normal",
+      "capacity": {
+        "out": 40,
+        "in": 40,
+        "unit": "people/hour"
+      },
+      "id": "connection-1"
+    },
+    {
+      "from": "bus",
+      "to": "office",
+      "label": "Arrives",
+      "direction": "bidirectional",
+      "style": "normal",
+      "capacity": {
+        "out": 80,
+        "in": 80,
+        "unit": "people/hour"
+      },
+      "id": "connection-2"
+    },
+    {
+      "from": "adult",
+      "to": "desk",
+      "label": "Works at",
+      "direction": "forward",
+      "style": "normal",
+      "id": "connection-3"
+    },
+    {
+      "from": "desk",
+      "to": "chair",
+      "label": "Paired seating",
+      "direction": "forward",
+      "style": "normal",
+      "id": "connection-4"
+    },
+    {
+      "from": "adult",
+      "to": "sofa",
+      "label": "Break",
+      "direction": "forward",
+      "style": "normal",
+      "id": "connection-5"
+    },
+    {
+      "from": "adult",
+      "to": "food",
+      "label": "Lunch break",
+      "direction": "forward",
+      "style": "normal",
+      "id": "connection-6"
+    },
+    {
+      "from": "adult",
+      "to": "toilet",
+      "label": "Uses facility",
+      "direction": "forward",
+      "style": "normal",
+      "id": "connection-7"
+    }
+  ]
+}

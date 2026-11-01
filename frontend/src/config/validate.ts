@@ -79,6 +79,20 @@ export function validateConfig(input: unknown): ValidationResult {
     if (v[key] !== undefined && typeof v[key] !== 'boolean') throw Error(`view.${key} must be true or false.`);
     view[key] = (v[key] as boolean | undefined) ?? viewDefaults[key];
   }
+  const spaces = array(value.spaces === undefined ? [{ id: 'main', name: 'Main space' }] : value.spaces, 'spaces', 50).map((entry, i) => {
+    const space = record(entry, `spaces[${i}]`);
+    return { id: string(space.id, `spaces[${i}].id`), name: string(space.name, `spaces[${i}].name`), description: optionalText(space.description, `spaces[${i}].description`) };
+  });
+  if (!spaces.length) throw Error('At least one space is required.');
+  unique(spaces.map(space => space.id), 'spaces');
+  const spaceIds = new Set(spaces.map(space => space.id));
+  const sv = record(value.spaceView === undefined ? {} : value.spaceView, 'spaceView');
+  const visible = array(sv.visible === undefined ? spaces.map(space => space.id) : sv.visible, 'spaceView.visible', 50).map((id, i) => string(id, `spaceView.visible[${i}]`));
+  if (!visible.length || visible.some(id => !spaceIds.has(id))) throw Error('spaceView.visible must contain existing space IDs and cannot be empty.');
+  unique(visible, 'spaceView.visible');
+  const active = sv.active === undefined || sv.active === null ? null : string(sv.active, 'spaceView.active');
+  if (active && !visible.includes(active)) throw Error('spaceView.active must be a visible space.');
+  const spaceView = { visible, active };
   const objectTypes: CustomObjectType[] = array(value.objectTypes === undefined ? [] : value.objectTypes, 'objectTypes', 50).map((entry, i) => {
     const path = `objectTypes[${i}]`;
     const type = record(entry, path);
@@ -101,11 +115,13 @@ export function validateConfig(input: unknown): ValidationResult {
   unique(objectTypes.map(type => type.id), 'objectTypes');
   const planes = array(value.planes === undefined ? [{ id: 'default', name: 'Default plane' }] : value.planes, 'planes', 50).map((entry, i) => {
     const plane = record(entry, `planes[${i}]`);
+    const space = string(plane.space, `planes[${i}].space`, spaces[0].id);
+    if (!spaceIds.has(space)) throw Error(`planes[${i}].space references an unknown space.`);
     const decoration = record(plane.decoration === undefined ? {} : plane.decoration, `planes[${i}].decoration`);
     const sizing = plane.sizing === undefined ? 'auto' : plane.sizing;
     if (sizing !== 'auto' && sizing !== 'locked') throw Error(`planes[${i}].sizing must be auto or locked.`);
     return {
-      id: string(plane.id, `planes[${i}].id`), name: string(plane.name, `planes[${i}].name`),
+      space, id: string(plane.id, `planes[${i}].id`), name: string(plane.name, `planes[${i}].name`),
       width: number(plane.width, `planes[${i}].width`, 20, 1, 10000),
       height: number(plane.height, `planes[${i}].height`, 20, 1, 10000),
       elevation: validateElevation(plane.elevation, `planes[${i}].elevation`),
@@ -133,9 +149,13 @@ export function validateConfig(input: unknown): ValidationResult {
     const o = record(entry, `objects[${i}]`);
     const group = string(o.group, `objects[${i}].group`);
     if (!groupIds.has(group)) throw Error(`objects[${i}].group references unknown group "${group}".`);
+    const linkedSpace = o.linkedSpace === undefined ? undefined : string(o.linkedSpace, `objects[${i}].linkedSpace`);
+    if (linkedSpace && !spaceIds.has(linkedSpace)) throw Error(`objects[${i}].linkedSpace references an unknown space.`);
+    const ownSpace = planes.find(plane => plane.id === groups.find(g => g.id === group)!.plane)!.space;
+    if (linkedSpace === ownSpace) throw Error(`objects[${i}].linkedSpace must reference a different space.`);
     const type = string(o.type, `objects[${i}].type`, 'container');
     if (!isKnownType(type, objectTypes)) warnings.push(`Object "${String(o.name)}": unknown type "${type}"; displayed as Container.`);
-    return { id: string(o.id, `objects[${i}].id`), name: string(o.name, `objects[${i}].name`), group, type, description: optionalText(o.description, `objects[${i}].description`), elevation: validateElevation(o.elevation, `objects[${i}].elevation`) };
+    return { ...(linkedSpace ? { linkedSpace } : {}), id: string(o.id, `objects[${i}].id`), name: string(o.name, `objects[${i}].name`), group, type, description: optionalText(o.description, `objects[${i}].description`), elevation: validateElevation(o.elevation, `objects[${i}].elevation`) };
   });
   unique(objects.map(o => o.id), 'objects');
   const objectIds = new Set(objects.map(o => o.id));
@@ -146,8 +166,8 @@ export function validateConfig(input: unknown): ValidationResult {
     }
     const ref = record(value, path);
     const id = string(ref.id, `${path}.id`);
-    if (ref.kind !== 'plane' && ref.kind !== 'group' && ref.kind !== 'object') throw Error(`${path}.kind must be plane, group, or object.`);
-    const ids = ref.kind === 'plane' ? planeIds : ref.kind === 'group' ? groupIds : objectIds;
+    if (ref.kind !== 'space' && ref.kind !== 'plane' && ref.kind !== 'group' && ref.kind !== 'object') throw Error(`${path}.kind must be space, plane, group, or object.`);
+    const ids = ref.kind === 'space' ? spaceIds : ref.kind === 'plane' ? planeIds : ref.kind === 'group' ? groupIds : objectIds;
     if (!ids.has(id)) throw Error(`${path} references an unknown ${ref.kind}.`);
     return { kind: ref.kind, id };
   }
@@ -158,10 +178,20 @@ export function validateConfig(input: unknown): ValidationResult {
     if (endpointKey(from) === endpointKey(to)) throw Error(`connections[${i}] connects an entity to itself; self-connections are not supported in v1.`);
     const direction = c.direction === undefined ? 'forward' : c.direction;
     if (direction !== 'forward' && direction !== 'bidirectional') throw Error(`connections[${i}].direction must be forward or bidirectional.`);
-    return { id: string(c.id, `connections[${i}].id`), from, to, label: optionalText(c.label, `connections[${i}].label`), direction: direction as 'forward' | 'bidirectional' };
+    const style = c.style === undefined ? 'normal' : c.style;
+    if (style !== 'normal' && style !== 'lightning' && style !== 'wobbly') throw Error(`connections[${i}].style must be normal, lightning, or wobbly.`);
+    let capacity: { out?: number; in?: number; unit: string } | undefined;
+    if (c.capacity !== undefined) {
+      const raw = record(c.capacity, `connections[${i}].capacity`);
+      capacity = { unit: optionalText(raw.unit, `connections[${i}].capacity.unit`) };
+      if (capacity.unit.length > 40) throw Error(`connections[${i}].capacity.unit is too long (maximum 40 characters).`);
+      for (const key of ['out', 'in'] as const) if (raw[key] !== undefined) capacity[key] = number(raw[key], `connections[${i}].capacity.${key}`, 0, 0, 1_000_000_000);
+      if (capacity.out === undefined && capacity.in === undefined) throw Error(`connections[${i}].capacity needs an in or out value.`);
+    }
+    return { style: style as 'normal' | 'lightning' | 'wobbly', ...(capacity ? { capacity } : {}), id: string(c.id, `connections[${i}].id`), from, to, label: optionalText(c.label, `connections[${i}].label`), direction: direction as 'forward' | 'bidirectional' };
   });
   unique(connections.map(c => c.id), 'connections');
-  const config: ArchitectureConfig = { schemaVersion: 1, presentation, view, objectTypes, planes, groups, objects, connections };
+  const config: ArchitectureConfig = { schemaVersion: 1, presentation, view, spaces, spaceView, objectTypes, planes, groups, objects, connections };
   return { config, warnings };
 }
 

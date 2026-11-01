@@ -159,6 +159,12 @@
             "maximum": 10000,
             "default": 0,
             "description": "Signed object elevation relative to its group."
+          },
+          "linkedSpace": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 10000,
+            "description": "Click the object to enter this other space."
           }
         },
         "additionalProperties": false
@@ -197,6 +203,7 @@
                 "properties": {
                   "kind": {
                     "enum": [
+                      "space",
                       "plane",
                       "group",
                       "object"
@@ -228,6 +235,7 @@
                 "properties": {
                   "kind": {
                     "enum": [
+                      "space",
                       "plane",
                       "group",
                       "object"
@@ -252,6 +260,47 @@
               "bidirectional"
             ],
             "default": "forward"
+          },
+          "style": {
+            "enum": [
+              "normal",
+              "lightning",
+              "wobbly"
+            ],
+            "default": "normal"
+          },
+          "capacity": {
+            "type": "object",
+            "additionalProperties": false,
+            "anyOf": [
+              {
+                "required": [
+                  "in"
+                ]
+              },
+              {
+                "required": [
+                  "out"
+                ]
+              }
+            ],
+            "properties": {
+              "in": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000000
+              },
+              "out": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000000
+              },
+              "unit": {
+                "type": "string",
+                "maxLength": 40,
+                "default": ""
+              }
+            }
           }
         },
         "additionalProperties": false
@@ -331,6 +380,12 @@
                 "default": true
               }
             }
+          },
+          "space": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 10000,
+            "description": "Parent space ID; omitted uses the first space."
           }
         }
       }
@@ -389,7 +444,25 @@
               "webhook",
               "api-call",
               "dataflow",
-              "message"
+              "message",
+              "human",
+              "family",
+              "adult",
+              "child",
+              "food",
+              "bed",
+              "shower",
+              "toilet",
+              "sofa",
+              "chair",
+              "desk",
+              "wall",
+              "window-wall",
+              "bus",
+              "train",
+              "airplane",
+              "office",
+              "home"
             ],
             "default": "container"
           },
@@ -423,6 +496,58 @@
               }
             }
           }
+        }
+      }
+    },
+    "spaces": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 50,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "name"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 10000
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 10000
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 10000
+          }
+        }
+      }
+    },
+    "spaceView": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "visible": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 50,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 10000
+          }
+        },
+        "active": {
+          "type": [
+            "string",
+            "null"
+          ]
         }
       }
     }

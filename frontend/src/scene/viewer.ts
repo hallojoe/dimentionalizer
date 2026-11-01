@@ -6,16 +6,18 @@ import { ModelLibrary } from '../catalog/models';
 import { disposeResources } from './resources';
 import type { ObjectVisual } from '../catalog/geometry';
 import type { ArchitectureConfig, ArchitectureConnection, ConnectionEndpoint, EntityRef } from '../config/types';
-import { endpointKey } from '../config/connections';
-import { connectionAnchor, packetProgress } from './connections';
-import { layoutGroups, groupViewBounds, planeViewBounds } from './layout';
-import type { PlacedGroup, PlacedPlane } from './layout';
+import { endpointKey, endpointSpace } from '../config/connections';
+import { capacityMaximum, capacityRadius, connectorPath, connectionAnchor, packetProgress } from './connections';
+import { layoutGroups, groupViewBounds, planeViewBounds, spaceViewBounds } from './layout';
+import type { PlacedGroup, PlacedPlane, PlacedSpace } from './layout';
 
 interface RenderedObject extends ObjectVisual { id: string; group: string; position: THREE.Vector3; label: HTMLButtonElement }
-interface Packet { dots: THREE.Mesh[]; path: THREE.CatmullRomCurve3; offset: number; from: ConnectionEndpoint; to: ConnectionEndpoint; direction: ArchitectureConnection['direction'] }
+interface Packet { dots: THREE.Mesh[]; path: THREE.Curve<THREE.Vector3>; reverse: boolean; enabled: boolean; offset: number; from: ConnectionEndpoint; to: ConnectionEndpoint; direction: ArchitectureConnection['direction'] }
 export interface SceneViewer {
   setConfig(config: ArchitectureConfig, preserveCamera?: boolean): void;
   focusObject(id: string): void;
+  focusSpace(id: string | null): void;
+  setSpaceView(visible: string[], active: string | null): void;
   focusGroup(id: string | null): void;
   focusPlane(id: string): void;
   setVisible(ids: Set<string>): void;
@@ -49,10 +51,34 @@ export function createViewer(host: HTMLElement, onSelect: (id: string) => void, 
   let objects: RenderedObject[] = [];
   let groups: PlacedGroup[] = [];
   let planes: PlacedPlane[] = [];
+  let spaces: PlacedSpace[] = [];
+  let configState: ArchitectureConfig;
+  let visibleSpaces = new Set<string>(), activeSpace: string | null = null;
+  let visibleObjects = new Set<string>();
+  const materialOpacity = new WeakMap<THREE.Material, number>();
+  function addToSpace(space: string, ...entries: THREE.Object3D[]): void {
+    entries.forEach(entry => { entry.userData.space = space; root.add(entry); });
+  }
+  function dimmed(space: string): boolean { return activeSpace !== null && activeSpace !== space; }
+  function applySpaceAppearance(): void {
+    for (const entry of root.children) {
+      const space = entry.userData.space as string | undefined;
+      const endpoints = entry.userData.endpoints as string[] | undefined;
+      if (space) entry.visible = visibleSpaces.has(space) && (!entry.userData.objectId || visibleObjects.has(entry.userData.objectId));
+      const dim = space ? dimmed(space) : endpoints?.some(dimmed) ?? false;
+      entry.traverse(child => {
+        if (!(child instanceof THREE.Mesh || child instanceof THREE.Line || child instanceof THREE.Points)) return;
+        for (const material of Array.isArray(child.material) ? child.material : [child.material]) {
+          if (!materialOpacity.has(material)) materialOpacity.set(material, material.opacity);
+          material.transparent = true; material.opacity = materialOpacity.get(material)! * (dim ? 0.12 : 1);
+        }
+      });
+    }
+  }
   let packets: Packet[] = [];
-  let links: { line: THREE.Line; from: ConnectionEndpoint; to: ConnectionEndpoint }[] = [];
+  let links: { line: THREE.Object3D; from: ConnectionEndpoint; to: ConnectionEndpoint }[] = [];
   let visibleEndpoints = new Set<string>();
-  let groupLabels: { element: HTMLElement; position: THREE.Vector3 }[] = [];
+  let groupLabels: { element: HTMLElement; position: THREE.Vector3; space: string }[] = [];
   let options = { showNames: true, effects: true, autoOrbit: false, showGrid: true };
   let selected = '', hovered = '', frame = 0;
   const home = new THREE.Vector3(30, 40, 50);
@@ -68,6 +94,8 @@ export function createViewer(host: HTMLElement, onSelect: (id: string) => void, 
   controls.addEventListener('start', cancelFlight);
 
   function setConfig(config: ArchitectureConfig, preserveCamera = false): void {
+    configState = config;
+    visibleSpaces = new Set(config.spaceView.visible); activeSpace = config.spaceView.active;
     const currentGeneration = ++generation;
     modelLibrary?.dispose();
     modelLibrary = new ModelLibrary(new URL(import.meta.env.BASE_URL, location.href).href);
@@ -81,15 +109,22 @@ export function createViewer(host: HTMLElement, onSelect: (id: string) => void, 
     scene.fog = new THREE.FogExp2(config.presentation.background, 0.003);
     const layout = layoutGroups(config);
     groups = layout.groups;
-    planes = layout.planes;
+    planes = layout.planes; spaces = layout.spaces;
+    if (spaces.length > 1) for (const space of spaces) {
+      const corners = [[-1,-1],[1,-1],[1,1],[-1,1],[-1,-1]].map(([x,z]) => new THREE.Vector3(space.x + x * (space.width / 2 + 4), -0.12, space.z + z * (space.depth / 2 + 4)));
+      addToSpace(space.id, new THREE.Line(new THREE.BufferGeometry().setFromPoints(corners), new THREE.LineBasicMaterial({ color: config.presentation.accent, transparent: true, opacity: 0.25 })));
+      const heading = document.createElement('button'); heading.className = 'platform-label space-label'; heading.textContent = space.name;
+      heading.tabIndex = -1; heading.onclick = () => onScopeSelect?.({ kind: 'space', id: space.id }); labelLayer.append(heading);
+      groupLabels.push({ element: heading, space: space.id, position: new THREE.Vector3(space.x, 0, space.z - space.depth / 2 - 5) });
+    }
     for (const plane of planes) {
       const { color, opacity, border, grid: showPlaneGrid, label } = plane.decoration;
       const surface = new THREE.Mesh(new THREE.PlaneGeometry(plane.width, plane.depth), new THREE.MeshBasicMaterial({ color, transparent: true, opacity, side: THREE.DoubleSide, depthWrite: false }));
       surface.rotation.x = -Math.PI / 2;
       surface.position.set(plane.x, plane.y - 0.04, plane.z);
-      root.add(surface);
+      addToSpace(plane.space, surface);
       const corners = [[-1, -1], [1, -1], [1, 1], [-1, 1], [-1, -1]].map(([x, z]) => new THREE.Vector3(plane.x + x * plane.width / 2, plane.y - 0.03, plane.z + z * plane.depth / 2));
-      if (border) root.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(corners), new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.6 })));
+      if (border) addToSpace(plane.space, new THREE.Line(new THREE.BufferGeometry().setFromPoints(corners), new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.6 })));
       if (showPlaneGrid) {
         const lines: THREE.Vector3[] = [];
         const nx = Math.min(80, Math.ceil(plane.width / 2.5)), nz = Math.min(80, Math.ceil(plane.depth / 2.5));
@@ -101,7 +136,7 @@ export function createViewer(host: HTMLElement, onSelect: (id: string) => void, 
           const z = plane.z - plane.depth / 2 + plane.depth * i / nz;
           lines.push(new THREE.Vector3(plane.x - plane.width / 2, plane.y - 0.02, z), new THREE.Vector3(plane.x + plane.width / 2, plane.y - 0.02, z));
         }
-        root.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(lines), new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.2, depthWrite: false })));
+        addToSpace(plane.space, new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(lines), new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.2, depthWrite: false })));
       }
       if (label) {
         const heading = document.createElement('button');
@@ -109,23 +144,24 @@ export function createViewer(host: HTMLElement, onSelect: (id: string) => void, 
         heading.textContent = `${plane.name.toUpperCase()} / PLANE`;
         heading.tabIndex = -1; heading.onclick = () => onScopeSelect?.({ kind: 'plane', id: plane.id });
         labelLayer.append(heading);
-        groupLabels.push({ element: heading, position: new THREE.Vector3(plane.x - plane.width / 2, plane.y + 0.1, plane.z - plane.depth / 2 - 1) });
+        groupLabels.push({ element: heading, space: plane.space, position: new THREE.Vector3(plane.x - plane.width / 2, plane.y + 0.1, plane.z - plane.depth / 2 - 1) });
       }
     }
     for (const group of groups) {
+      const space = planes.find(plane => plane.id === group.plane)!.space;
       const floor = new THREE.Mesh(new THREE.PlaneGeometry(group.width, group.depth), new THREE.MeshBasicMaterial({ color: group.color, transparent: true, opacity: 0.035, side: THREE.DoubleSide, depthWrite: false }));
       floor.rotation.x = -Math.PI / 2;
       floor.position.set(group.x, group.y, group.z);
-      root.add(floor);
+      addToSpace(space, floor);
       const bounds = [[-1, -1], [1, -1], [1, 1], [-1, 1], [-1, -1]].map(([x, z]) => new THREE.Vector3(group.x + x * group.width / 2, group.y + 0.02, group.z + z * group.depth / 2));
-      root.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(bounds), new THREE.LineBasicMaterial({ color: group.color, transparent: true, opacity: 0.5 })));
+      addToSpace(space, new THREE.Line(new THREE.BufferGeometry().setFromPoints(bounds), new THREE.LineBasicMaterial({ color: group.color, transparent: true, opacity: 0.5 })));
       const heading = document.createElement('button');
       heading.className = 'platform-label';
       heading.tabIndex = -1; heading.onclick = () => onScopeSelect?.({ kind: 'group', id: group.id });
       heading.textContent = group.name.toUpperCase();
       heading.style.color = group.color;
       labelLayer.append(heading);
-      groupLabels.push({ element: heading, position: new THREE.Vector3(group.x - group.width / 2, group.y + 0.1, group.z + group.depth / 2 + 1.2) });
+      groupLabels.push({ element: heading, space, position: new THREE.Vector3(group.x - group.width / 2, group.y + 0.1, group.z + group.depth / 2 + 1.2) });
       for (const entry of group.objects) {
         const visual = createObjectVisual(entry.object.type, group.color, config.objectTypes);
         const type = resolveType(entry.object.type, config.objectTypes);
@@ -136,7 +172,7 @@ export function createViewer(host: HTMLElement, onSelect: (id: string) => void, 
             const fallback = new THREE.Group();
             for (const child of [...visual.root.children]) if (child !== visual.hit) fallback.add(child);
             disposeResources(fallback);
-            visual.root.add(model);
+            visual.root.add(model); applySpaceAppearance();
           }).catch(error => {
             if (generation !== currentGeneration || modelErrors.has(type.id)) return;
             modelErrors.add(type.id);
@@ -145,11 +181,12 @@ export function createViewer(host: HTMLElement, onSelect: (id: string) => void, 
         }
         visual.root.position.set(entry.x, entry.y + 0.35, entry.z);
         visual.hit.userData.id = entry.object.id;
-        root.add(visual.root);
+        visual.root.userData.objectId = entry.object.id;
+        addToSpace(space, visual.root);
         const label = document.createElement('button');
         label.className = 'object-label';
-        label.textContent = entry.object.name;
-        label.title = `Inspect ${entry.object.name}`;
+        label.textContent = `${entry.object.name}${entry.object.linkedSpace ? ' ↳' : ''}`;
+        label.title = entry.object.linkedSpace ? `Enter ${config.spaces.find(s => s.id === entry.object.linkedSpace)!.name} and inspect ${entry.object.name}` : `Inspect ${entry.object.name}`;
         label.style.setProperty('--group-color', group.color);
         label.onclick = () => onSelect(entry.object.id);
         // The permanent directory is the ordered keyboard equivalent of these moving labels.
@@ -161,15 +198,23 @@ export function createViewer(host: HTMLElement, onSelect: (id: string) => void, 
     config.connections.forEach((connection, index) => {
       const start = new THREE.Vector3(...connectionAnchor(layout, connection.from));
       const end = new THREE.Vector3(...connectionAnchor(layout, connection.to));
-      const middle = start.clone().lerp(end, 0.5);
-      middle.y += Math.max(1, Math.min(start.distanceTo(end) * 0.13, 5));
-      if (start.distanceTo(end) < 0.01) middle.x += 3;
-      const path = new THREE.CatmullRomCurve3([start, middle, end]);
-      const line = new THREE.Line(new THREE.BufferGeometry().setFromPoints(path.getPoints(40)), new THREE.LineBasicMaterial({ color: config.presentation.accent, transparent: true, opacity: 0.18 }));
-      const dots = packetProgress(0, connection.direction).map(() => new THREE.Mesh(new THREE.SphereGeometry(0.09, 6, 6), new THREE.MeshBasicMaterial({ color: config.presentation.accent })));
-      root.add(line, ...dots);
-      links.push({ line, from: connection.from, to: connection.to });
-      packets.push({ dots, path, offset: index * 0.13, from: connection.from, to: connection.to, direction: connection.direction });
+      const decorated = !!connection.capacity;
+      const lanes = connection.direction === 'bidirectional' ? [false, true] : [false];
+      for (const reverse of lanes) {
+        const value = reverse ? connection.capacity?.in : connection.capacity?.out;
+        const radius = capacityRadius(value, capacityMaximum(config.connections, connection.capacity?.unit ?? ''));
+        const path = connectorPath(start, end, connection.style, decorated && lanes.length === 2 ? (reverse ? -0.2 : 0.2) : 0);
+        // Undecorated bidirectional lanes share the same thin geometry.
+        if (!reverse || decorated) {
+          const line = new THREE.Mesh(new THREE.TubeGeometry(path, 64, radius, 5, false), new THREE.MeshBasicMaterial({ color: config.presentation.accent, transparent: true, opacity: decorated ? 0.45 : 0.25 }));
+          line.userData.endpoints = [endpointSpace(config, connection.from), endpointSpace(config, connection.to)];
+          root.add(line); links.push({ line, from: connection.from, to: connection.to });
+        }
+        const dot = new THREE.Mesh(new THREE.SphereGeometry(Math.max(0.09, radius * 1.1), 6, 6), new THREE.MeshBasicMaterial({ color: config.presentation.accent }));
+        dot.userData.endpoints = [endpointSpace(config, connection.from), endpointSpace(config, connection.to)];
+        root.add(dot);
+        packets.push({ dots: [dot], path, offset: index * 0.13, from: connection.from, to: connection.to, direction: 'forward', reverse, enabled: value !== 0 });
+      }
     });
     homeTarget.set(0, layout.centerY, 0);
     home.set(layout.size * 0.85, layout.centerY + layout.size * 0.95, layout.size * 1.2);
@@ -193,7 +238,7 @@ export function createViewer(host: HTMLElement, onSelect: (id: string) => void, 
   function focusGroup(id: string | null): void {
     selected = '';
     const group = groups.find(g => g.id === id);
-    if (!group) { fly(home.clone(), homeTarget.clone()); return; }
+    if (!group) { focusSpace(activeSpace); return; }
     const { size, centerY } = groupViewBounds(group);
     fly(new THREE.Vector3(group.x + size * 0.85, centerY + size * 1.2, group.z + size * 1.35), new THREE.Vector3(group.x, centerY, group.z));
   }
@@ -210,16 +255,28 @@ export function createViewer(host: HTMLElement, onSelect: (id: string) => void, 
     const { size, centerY } = planeViewBounds(plane);
     fly(new THREE.Vector3(plane.x + size * 0.85, centerY + size * 1.2, plane.z + size * 1.35), new THREE.Vector3(plane.x, centerY, plane.z));
   }
+  function focusSpace(id: string | null): void {
+    selected = '';
+    const bounds = spaceViewBounds(spaces.filter(space => id ? space.id === id : visibleSpaces.has(space.id)));
+    const target = new THREE.Vector3(bounds.x, bounds.centerY, bounds.z);
+    fly(target.clone().add(new THREE.Vector3(bounds.size * 0.85, bounds.size * 0.95, bounds.size * 1.2)), target);
+  }
+  function setSpaceView(visible: string[], active: string | null): void {
+    visibleSpaces = new Set(visible); activeSpace = active;
+    setVisible(visibleObjects);
+  }
   function setVisible(ids: Set<string>): void {
-    objects.forEach(object => { object.root.visible = ids.has(object.id); });
-    visibleEndpoints = new Set([...ids].map(id => endpointKey(id)));
+    visibleObjects = new Set([...ids].filter(id => visibleSpaces.has(endpointSpace(configState, id))));
+    visibleEndpoints = new Set([...visibleObjects].map(id => endpointKey(id)));
     groups.forEach(group => {
-      if (!group.objects.length || group.objects.some(entry => ids.has(entry.object.id))) visibleEndpoints.add(endpointKey({ kind: 'group', id: group.id }));
+      if (visibleSpaces.has(endpointSpace(configState, { kind: 'group', id: group.id })) && (!group.objects.length || group.objects.some(entry => visibleObjects.has(entry.object.id)))) visibleEndpoints.add(endpointKey({ kind: 'group', id: group.id }));
     });
     planes.forEach(plane => {
-      if (!plane.groups.length || plane.groups.some(group => visibleEndpoints.has(endpointKey({ kind: 'group', id: group.id })))) visibleEndpoints.add(endpointKey({ kind: 'plane', id: plane.id }));
+      if (visibleSpaces.has(plane.space) && (!plane.groups.length || plane.groups.some(group => visibleEndpoints.has(endpointKey({ kind: 'group', id: group.id }))))) visibleEndpoints.add(endpointKey({ kind: 'plane', id: plane.id }));
     });
+    visibleSpaces.forEach(id => visibleEndpoints.add(endpointKey({ kind: 'space', id })));
     links.forEach(link => { link.line.visible = visibleEndpoints.has(endpointKey(link.from)) && visibleEndpoints.has(endpointKey(link.to)); });
+    applySpaceAppearance();
   }
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
@@ -270,21 +327,22 @@ export function createViewer(host: HTMLElement, onSelect: (id: string) => void, 
       const active = object.id === selected || object.id === hovered;
       object.highlight(active);
       object.label.classList.toggle('selected', active);
+      object.label.style.opacity = dimmed(object.root.userData.space) ? '0.12' : '1';
       positionLabel(object.label, object.position.clone().add(new THREE.Vector3(0, 1.9, 0)), options.showNames && object.root.visible);
     }
-    groupLabels.forEach(label => positionLabel(label.element, label.position, true));
+    groupLabels.forEach(label => { label.element.style.opacity = dimmed(label.space) ? '0.12' : '1'; positionLabel(label.element, label.position, visibleSpaces.has(label.space)); });
     packets.forEach(packet => {
       const progress = packetProgress(reducedMotion ? 0.25 : now * 0.00008 + packet.offset, packet.direction);
       packet.dots.forEach((dot, i) => {
-        dot.visible = options.effects && visibleEndpoints.has(endpointKey(packet.from)) && visibleEndpoints.has(endpointKey(packet.to));
-        dot.position.copy(packet.path.getPoint(progress[i]));
+        dot.visible = packet.enabled && options.effects && visibleEndpoints.has(endpointKey(packet.from)) && visibleEndpoints.has(endpointKey(packet.to));
+        dot.position.copy(packet.path.getPointAt(packet.reverse ? 1 - progress[i] : progress[i]));
       });
     });
     renderer.render(scene, camera);
   }
   frame = requestAnimationFrame(render);
   return {
-    setConfig, focusGroup, focusObject, focusPlane, setVisible, setOptions,
+    setConfig, focusGroup, focusObject, focusPlane, focusSpace, setSpaceView, setVisible, setOptions,
     dispose() {
       generation++; modelLibrary?.dispose();
       cancelAnimationFrame(frame);

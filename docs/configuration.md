@@ -40,6 +40,8 @@ Start with `frontend/public/examples/minimal.json`. `architecture.schema.json` c
 | `presentation.accent`, `background` | Six-digit hex colors; group colors are independent |
 | `view` | Optional boolean settings; reduced-motion preference suppresses automatic motion |
 | `view.showGrid` | Show/hide the world ground grid; defaults to `true`; does not hide group platforms |
+| `spaces` | Optional array of 1–50 spaces; omitted creates Main space; each needs unique `id` and `name` |
+| `spaceView` | Optional `{ visible: [space IDs], active: space ID or null }`; defaults to all spaces in combined view |
 | `objectTypes` | Optional array of up to 50 custom type definitions; see [object types and models](object-types.md) |
 | `planes` | Optional array, up to 50 entries; omitted creates one default auto-fit plane at world zero |
 | Plane fields | See **Planes** below |
@@ -50,11 +52,14 @@ Start with `frontend/public/examples/minimal.json`. `architecture.schema.json` c
 | Group `elevation` | Signed height relative to its parent plane; defaults to `0` |
 | `objects` | Required array, up to 500 entries; an empty architecture is allowed |
 | Object `id`, `name`, `group` | Required; `group` must match a group ID; object IDs must be unique |
+| Object `linkedSpace` | Optional portal target; must be another existing space; clicking pans there and keeps the inspector |
 | Object `type` | Optional; defaults to `container`; built-in or custom type ID; unknown types are retained and displayed as Container |
 | Object `description` | Optional plain text, supports line breaks |
 | Object `elevation` | Signed offset relative to its group; defaults to `0` |
 | `connections` | Optional array, up to 2,000 edges |
 | Connection `id`, `from`, `to` | Required; IDs must be unique; endpoints must exist; no self-connections in v1 |
+| Connection `style` | `normal` (default), `lightning`, or `wobbly` |
+| Connection `capacity` | Optional `{ out?, in?, unit? }`; see [spaces and connector guide](spaces.md) |
 | Connection `direction` | `forward` (default) or `bidirectional` |
 | Connection `label` | Optional plain-text relationship description |
 
@@ -64,12 +69,17 @@ Built-in types cover infrastructure, people, business entities, and workflow ste
 
 Duplicate display names are allowed. Stable IDs keep relationships unambiguous. Connections default to one-way from `from` to `to`. Set `direction: "bidirectional"` to animate two particles traveling in opposite directions. Every entity inspector lists its connections and lets you change their direction. These particles illustrate the configuration and do not represent traffic measurements.
 
+## Spaces
+
+See [spaces, portals, and capacity](spaces.md) for the creation controls, combined views, navigation behavior, duplication rules, and configuration example. Each plane belongs to a space; existing plane/group/item semantics are retained. IDs remain unique across the whole document within each entity kind.
+
 ## Planes
 
 Planes are an additional level above groups. Each group belongs to exactly one plane through `group.plane`; objects still belong to groups. Existing documents and the original eight presets work without modification: omitting `planes` creates a default auto-fit plane at elevation `0`. With explicit planes, groups without a `plane` use the first entry. Plane IDs must be unique within the plane catalog; group and object IDs have their own namespaces.
 
 | Plane field | Meaning and default |
 | --- | --- |
+| `space` | Parent space ID; omitted uses the first space |
 | `id`, `name` | Required stable ID and display name |
 | `width`, `height` | Horizontal X/Z footprint in scene units; each defaults to `20`, valid from `1` to `10000` |
 | `elevation` | Height above world zero; defaults to `0` |
@@ -129,7 +139,7 @@ The **Grid** view button toggles the world reference grid at zero. Each plane ha
 
 ## Connection endpoints and direction
 
-A string endpoint remains shorthand for an object ID, preserving existing documents. Typed endpoints use `{ "kind": "plane" | "group" | "object", "id": "..." }`. Any combination is supported, including plane-to-plane, group-to-group, object-to-object, and mixed levels. The referenced entity must exist. Self-connections are rejected, including a shorthand object linked to its equivalent typed reference.
+A string endpoint remains shorthand for an object ID, preserving existing documents. Typed endpoints use `{ "kind": "space" | "plane" | "group" | "object", "id": "..." }`. Any combination is supported, including space-to-object, plane-to-plane, group-to-group, object-to-object, and mixed levels. The referenced entity must exist. Self-connections are rejected, including a shorthand object linked to its equivalent typed reference.
 
 `direction: "forward"` draws one animated dot from `from` to `to`; `"bidirectional"` draws two opposing dots on the same path. To reverse a one-way connection, swap its endpoints in Configure. The Effects toggle hides dots without hiding connection lines. Reduced-motion preference freezes particles. These effects describe the document rather than measured traffic.
 

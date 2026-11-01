@@ -15,9 +15,16 @@ export function mountPresetPicker(onLoadDraft: (config: ArchitectureConfig, name
     grid.removeAttribute('aria-busy');
     buttons.forEach(button => { button.disabled = false; button.textContent = 'Open editable preset ↗'; });
   }
+  const categories = [...new Set(presetCatalog.map(preset => preset.category))];
+  const categorySelect = get<HTMLSelectElement>('preset-category');
+  const all = element('option', '', 'All categories'); all.value = ''; categorySelect.append(all);
+  categories.forEach(category => { const option = element('option', '', category); option.value = category; categorySelect.append(option); });
+  categorySelect.onchange = () => { for (const child of grid.children) (child as HTMLElement).hidden = !!categorySelect.value && (child as HTMLElement).dataset.category !== categorySelect.value; };
+  let lastCategory = '';
   get('presets-button').onclick = () => { error.textContent = ''; dialog.showModal(); };
   for (const preset of presetCatalog) {
-    const card = element('article', 'preset-card');
+    if (preset.category !== lastCategory) { const heading = element('h3', 'preset-category-heading', preset.category); heading.dataset.category = preset.category; grid.append(heading); lastCategory = preset.category; }
+    const card = element('article', 'preset-card'); card.dataset.category = preset.category;
     card.append(element('div', 'eyebrow', preset.category.toUpperCase()), element('h3', '', preset.name), element('p', '', preset.summary));
     card.append(element('div', 'preset-counts', `${preset.groups} groups · ${preset.objects} objects · ${preset.connections} connections`));
     if (preset.source) {

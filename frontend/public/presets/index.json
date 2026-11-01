@@ -1,8 +1,80 @@
 [
   {
+    "id": "home-neighborhood",
+    "name": "Home and neighborhood",
+    "category": "Home & family",
+    "summary": "Start outside with a family, home, shop, and bus. Click Home to enter its rooms while the neighborhood stays dimmed. Illustrative capacities, not measurements.",
+    "groups": 4,
+    "objects": 13,
+    "connections": 10
+  },
+  {
+    "id": "family-morning",
+    "name": "Family morning",
+    "category": "Home & family",
+    "summary": "A household morning: waking, washing, breakfast, study, and departure. Objects describe people, furniture, food, and the relationships between activities.",
+    "groups": 4,
+    "objects": 10,
+    "connections": 9
+  },
+  {
+    "id": "shared-office",
+    "name": "Outside and inside the office",
+    "category": "Work & study",
+    "summary": "View the workplace from outside, then click the office to enter a shared workspace. Desks, seating, windows, and shared facilities remain ordinary inspectable objects.",
+    "groups": 3,
+    "objects": 11,
+    "connections": 7
+  },
+  {
+    "id": "daily-commute",
+    "name": "Daily commute",
+    "category": "Travel & mobility",
+    "summary": "Compare walking, bus, and rail legs on a daily journey. Optional in/out capacities distinguish a small walking route from larger shared transport links.",
+    "groups": 3,
+    "objects": 6,
+    "connections": 5
+  },
+  {
+    "id": "family-trip",
+    "name": "Family trip",
+    "category": "Travel & mobility",
+    "summary": "Follow a family from home to airport transport, a flight, and a place to stay. An illustrative travel structure with bidirectional route capacities.",
+    "groups": 3,
+    "objects": 10,
+    "connections": 7
+  },
+  {
+    "id": "retail-operations",
+    "name": "Retail operations",
+    "summary": "Follow customers, products, shops, and fulfillment across three planes. Includes a custom parcel-locker model alongside the built-in business objects.",
+    "category": "Business & workflows",
+    "groups": 4,
+    "objects": 12,
+    "connections": 15
+  },
+  {
+    "id": "event-launch",
+    "name": "Event launch",
+    "summary": "Map an event from its people and ticket offering to registration, confirmation, and channel notifications. A business and communication model.",
+    "category": "Business & workflows",
+    "groups": 4,
+    "objects": 13,
+    "connections": 15
+  },
+  {
+    "id": "order-workflow",
+    "name": "Order approval workflow",
+    "summary": "Follow a request through validation, human approval, an API call, an event, and notifications. Includes a custom Approval type that reuses a built-in shape.",
+    "category": "Business & workflows",
+    "groups": 4,
+    "objects": 14,
+    "connections": 15
+  },
+  {
     "id": "web-application",
     "name": "Three-tier web application",
-    "category": "Web application",
+    "category": "Infrastructure",
     "summary": "A familiar web stack: browser, reverse proxy, application, relational data, cache, and background e-mail. An editable reference pattern.",
     "groups": 4,
     "objects": 10,
@@ -11,7 +83,7 @@
   {
     "id": "multi-tenant-saas",
     "name": "Multi-tenant SaaS",
-    "category": "SaaS platform",
+    "category": "Infrastructure",
     "summary": "A shared application with explicit tenant context, identity, subscription billing, and asynchronous notifications. Illustrates shared infrastructure, not a complete tenant-isolation design.",
     "groups": 4,
     "objects": 12,
@@ -20,7 +92,7 @@
   {
     "id": "ecommerce",
     "name": "E-commerce platform",
-    "category": "Commerce",
+    "category": "Infrastructure",
     "summary": "A storefront with catalog, cart, checkout, external payment processing, and asynchronous fulfillment. Service boundaries are illustrative and can be consolidated.",
     "groups": 4,
     "objects": 16,
@@ -29,7 +101,7 @@
   {
     "id": "background-processing",
     "name": "Background job processing",
-    "category": "Asynchronous work",
+    "category": "Infrastructure",
     "summary": "An API and scheduler feed workers through a queue, with retry and dead-letter paths. Useful for document conversion, reports, and long-running tasks.",
     "groups": 4,
     "objects": 12,
@@ -38,7 +110,7 @@
   {
     "id": "headless-publishing",
     "name": "Headless content publishing",
-    "category": "Content platform",
+    "category": "Infrastructure",
     "summary": "Editors publish through a CMS while an independent delivery frontend consumes a content API. Media uses object storage and a CDN; publishing jobs refresh delivery artifacts.",
     "groups": 4,
     "objects": 11,
@@ -47,7 +119,7 @@
   {
     "id": "realtime-collaboration",
     "name": "Real-time collaboration",
-    "category": "Interactive systems",
+    "category": "Infrastructure",
     "summary": "Two real-time servers share durable messages and fan-out work while clients keep WebSocket connections. Includes presence, attachments, and offline notifications.",
     "groups": 4,
     "objects": 13,
@@ -56,7 +128,7 @@
   {
     "id": "analytics-pipeline",
     "name": "Analytics data pipeline",
-    "category": "Data platform",
+    "category": "Infrastructure",
     "summary": "Operational events and batch extracts flow through ingestion, raw storage, transformation, and a warehouse to dashboards. A logical reference for analytical workloads.",
     "groups": 4,
     "objects": 14,
@@ -65,7 +137,7 @@
   {
     "id": "umbraco-topology",
     "name": "Umbraco local Cluster",
-    "category": "Repository snapshot",
+    "category": "Repository snapshots",
     "summary": "The checked-in Umbraco demo: CM + two CDs, YARP, SQL-backed cache, shared filesystem media, and Aspire tools. Local development; the Astro frontend is independent of Umbraco.",
     "groups": 4,
     "objects": 16,
@@ -75,32 +147,5 @@
       "url": "https://github.com/hallojoe/umbraco-topology/tree/3ce66024ac9e5dc603d42185001656c092a5b425/demo/Example.UmbracoSite",
       "revision": "3ce66024ac9e5dc603d42185001656c092a5b425"
     }
-  },
-  {
-    "id": "retail-operations",
-    "name": "Retail operations",
-    "summary": "Follow customers, products, shops, and fulfillment across three planes. Includes a custom parcel-locker model alongside the built-in business objects.",
-    "category": "Business structures",
-    "groups": 4,
-    "objects": 12,
-    "connections": 15
-  },
-  {
-    "id": "event-launch",
-    "name": "Event launch",
-    "summary": "Map an event from its people and ticket offering to registration, confirmation, and channel notifications. A business and communication model.",
-    "category": "People & events",
-    "groups": 4,
-    "objects": 13,
-    "connections": 15
-  },
-  {
-    "id": "order-workflow",
-    "name": "Order approval workflow",
-    "summary": "Follow a request through validation, human approval, an API call, an event, and notifications. Includes a custom Approval type that reuses a built-in shape.",
-    "category": "Workflows & dataflows",
-    "groups": 4,
-    "objects": 14,
-    "connections": 15
   }
 ]

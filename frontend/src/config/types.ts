@@ -13,6 +13,8 @@ export interface ArchitectureConfig {
     background: string;
   };
   view: { showNames: boolean; effects: boolean; autoOrbit: boolean; showGrid: boolean };
+  spaces: ArchitectureSpace[];
+  spaceView: SpaceView;
   objectTypes: CustomObjectType[];
   planes: ArchitecturePlane[];
   groups: ArchitectureGroup[];
@@ -20,7 +22,11 @@ export interface ArchitectureConfig {
   connections: ArchitectureConnection[];
 }
 
+export interface ArchitectureSpace { id: string; name: string; description: string }
+export interface SpaceView { visible: string[]; active: string | null }
+
 export interface ArchitecturePlane {
+  space: string;
   id: string;
   name: string;
   /** Horizontal X/Z footprint; auto mode treats these as minimum dimensions. */
@@ -38,6 +44,8 @@ export interface ArchitectureGroup {
   elevation?: number;
 }
 export interface ArchitectureObject {
+  /** Clicking the object enters this space, without changing its parent group. */
+  linkedSpace?: string;
   id: string;
   name: string;
   group: string;
@@ -53,8 +61,10 @@ export interface ArchitectureConnection {
   to: ConnectionEndpoint;
   label?: string;
   direction: 'forward' | 'bidirectional';
+  style: 'normal' | 'lightning' | 'wobbly';
+  capacity?: { out?: number; in?: number; unit: string };
 }
-export interface EntityRef { kind: 'plane' | 'group' | 'object'; id: string }
+export interface EntityRef { kind: 'space' | 'plane' | 'group' | 'object'; id: string }
 /** Strings retain the version 1 shorthand for object endpoints. */
 export type ConnectionEndpoint = string | EntityRef;
 export interface ValidationResult { config: ArchitectureConfig; warnings: string[] }

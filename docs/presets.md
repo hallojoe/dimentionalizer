@@ -1,13 +1,20 @@
 # Structure presets
 
-Choose **Presets** in the header, then **Open editable preset**. The document opens in Configure as a draft. Review or change it, then choose **Apply configuration** to replace the active architecture. Closing the editor keeps the active configuration unchanged. Export the current configuration first if you want to retain a separate copy before applying another one.
+Choose **Presets** in the header, filter by category, then **Open editable preset**. The document opens in Configure as a draft. Review or change it, then choose **Apply configuration** to replace the active architecture. Closing the editor keeps the active configuration unchanged. Export the current configuration first if you want to retain a separate copy before applying another one.
 
 Presets use the existing version 1 document format. All normal controls work after applying one: group focus, object inspection, connection navigation, search, type filtering, view options, JSON import/export, and browser-local saving. No separate preset renderer or backend is involved. Preset loading also works in the WebGL fallback directory.
+
+The 16 presets are grouped into **Home & family**, **Work & study**, **Travel & mobility**, **Business & workflows**, **Infrastructure**, and **Repository snapshots**. To add a preset without replacing the current document, use **Spaces → Add a space → A preset template**.
 
 ## Included setups
 
 | Preset | What it illustrates |
 | --- | --- |
+| Home and neighborhood | A family, shop, bus, and Home portal leading to living, sleeping, and bathroom spaces |
+| Family morning | Waking, washing, breakfast, study, and departure with everyday people and furniture |
+| Outside and inside the office | Campus and Office portal, workstations, partitions, lounge, and shared facilities |
+| Daily commute | Human, home, bus, train, office, and visually distinct in/out transport capacities |
+| Family trip | Family, airport bus, airplane, and an accommodation portal with beds and facilities |
 | Three-tier web application | Browser/CDN, proxy, application, relational database, cache, files, worker and e-mail |
 | Multi-tenant SaaS | Tenant clients, shared tenant-aware API/data, external identity and billing, background notifications |
 | E-commerce platform | Storefront, catalog, cart, checkout, payment callbacks, transactional outbox, fulfillment |
@@ -20,9 +27,9 @@ Presets use the existing version 1 document format. All normal controls work aft
 | Event launch | Organizers, attendees, event, ticket shop, registration, e-mail, and Slack-style notifications |
 | Order approval workflow | Request, validation, custom Approval type, human review, API call, webhook, response, event, and dataflow |
 
-The first seven are illustrative reference architectures, not claims about a particular deployment or production-readiness guarantees. Components can be consolidated, renamed, or replaced to match your real system. Their descriptions call out logical components and relevant assumptions. For example, a replayable event stream is represented as a generic Container rather than pretending it is a work queue.
+The seven Infrastructure presets are illustrative reference architectures, not claims about a particular deployment or production-readiness guarantees. Components can be consolidated, renamed, or replaced to match your real system. Their descriptions call out logical components and relevant assumptions. For example, a replayable event stream is represented as a generic Container rather than pretending it is a work queue.
 
-The three business/workflow examples are illustrative models. Email, Slack, webhooks, and API calls are visual nodes; no integrations execute. Retail operations loads its original model from `models/parcel-locker.gltf`; the others need no model assets. Existing infrastructure presets retain their original types and relationships.
+The business/workflow and human-situation examples are illustrative models. Transport capacities are examples, not measured schedules or service capacities. Portal examples keep the outside space visible and dimmed while the interior comes into focus. Email, Slack, webhooks, and API calls are visual nodes; no integrations execute. Retail operations loads its original model from `models/parcel-locker.gltf`; the others need no model assets. Existing infrastructure presets retain their original types and relationships.
 
 ## Umbraco source and scope
 

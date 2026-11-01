@@ -1,6 +1,6 @@
 # Dimentionalizer
 
-A configurable 3D structure explorer for systems, people, products, places, and workflows. Describe your model in JSON, then explore its planes, groups, objects, and connections. Every object is a container by default; choose a specialized type when its shape communicates more.
+A configurable 3D structure explorer for systems, people, products, places, and workflows. Describe your model in JSON, then explore its spaces, planes, groups, objects, and connections. Every object is a container by default; choose a specialized type when its shape communicates more.
 
 Version 1 builds on the original container explorer's grouped platforms, luminous wire geometry, orbit navigation, and object inspection. It is product-neutral: branding, page title, headline, description, colors, and architecture all come from configuration.
 
@@ -30,7 +30,7 @@ npm run preview   # Serve the production build locally
 | --- | --- |
 | `frontend/public/architecture.json` | Default architecture and presentation settings; edit this to customize a deployment |
 | `frontend/public/examples/` | Small importable starting documents |
-| `frontend/public/presets/` | Eleven selectable structure presets and their metadata index |
+| `frontend/public/presets/` | Sixteen categorized structure presets and their metadata index |
 | `frontend/public/architecture.schema.json` | JSON Schema for editor assistance |
 | `frontend/src/config/` | Document types, defaults, runtime validation, migration, and browser persistence |
 | `frontend/src/catalog/` | Built-in and custom type resolution, geometry builders, and glTF/GLB loading |
@@ -46,20 +46,25 @@ The frontend uses **TypeScript, Vite, and Three.js**, with native DOM components
 
 ## Version 1
 
-- **22 built-in types** covering infrastructure, people, business entities, and workflows. New business shapes: **User, User group, Event, Product, Shop, Warehouse**.
+- **40 built-in types** covering infrastructure, people, business entities, and workflows. New business shapes: **User, User group, Event, Product, Shop, Warehouse**.
+- Everyday shapes include Human, Family, Adult, Child, Food, Bed, Shower, Toilet, Sofa, Chair, Desk, Wall, Window wall, Bus, Train, Airplane, Office, and Home.
 - Workflow, Request, Response, Processing, Webhook, API call, Dataflow, and Message types; use E-mail for send-mail steps and Message for Slack notifications. These describe a process; they do not execute it.
 - Custom `objectTypes` with names, symbols, and reusable built-in shapes or self-contained **glTF 2.0 / GLB** models. Imported geometry fits the existing wire style and layout; loading failures retain a fallback shape.
 - Omitted types default to Container; unknown types retain their identifier but render as Container with a warning.
 - Configurable brand text, browser title, eyebrow, headline, description, accent, background, group names and colors.
 - Grouped 3D platforms, orbit/pan/zoom, group and object focus, labels, automatic orbit, and animated directional connection packets.
+- Multiple spaces: create blank, start from a preset template, or duplicate an existing space; show one, several, or all together. Object portals pan into a linked space, dim the surrounding context, and retain the inspector. Back restores the previous view.
+- Connector styles **Normal, Lightning, Wobbly**, with optional independent in/out capacities expressed as lane thickness.
 - Configurable planes with auto-fit or locked dimensions, color, opacity, border, grid, and labels. Groups reference their parent plane; existing documents receive a default auto-fit plane.
 - Signed plane, group, and item elevation controls (`0` baseline, positive above, negative below), plus independently toggleable ground-grid visibility. Settings persist and export with the configuration.
 - Search and type filtering; keyboard-accessible directory and inspector. Left/right arrows browse objects while inspecting; Escape closes the inspector.
 - Connections between planes, groups, and items, with one-way or bidirectional animated dots and inspector controls. Explicit labels and incoming/outgoing inspection. Only configured connections are displayed; no dependencies are inferred from proximity.
 - JSON editing, import, validated export, default restoration, and browser-local persistence.
-- Preset picker with seven common system setups, a source-grounded Umbraco Cluster snapshot, and three business/workflow examples; open any preset as an editable draft before applying it.
+- Preset picker with seven common system setups, a source-grounded Umbraco Cluster snapshot, three business/workflow examples, and five human-situation examples; open any preset as an editable draft before applying it.
 - Migration of the original `{ name, group, text }[]` format into a version 1 document.
 - Responsive layout, reduced-motion support, and a usable WebGL fallback.
+
+Try **Presets → Home & family → Home and neighborhood**. Click the Home object to move from outside to inside, then use **Back to outer view**. **Spaces** manages creation and visible spaces; the directory’s **Space** selector changes focus.
 
 Elevation composes as **world → plane → group → item**: plane `10` + group `-3` + item `-2` = world `5`. Choose a plane in the directory to inspect its properties; inspect a group to change its parent plane. Try the [three-plane example](frontend/public/examples/planes.json) through **Configure → Import JSON**.
 
@@ -71,6 +76,7 @@ Changes are stored locally under `dimentionalizer.config.v1` for the browser's o
 
 ## Customize and extend
 
+- [Spaces, portals, and connector capacity](docs/spaces.md)
 - [Configuration reference](docs/configuration.md)
 - [Presets and source mapping](docs/presets.md)
 - [Built-in types, custom vocabulary, and glTF/GLB models](docs/object-types.md)
@@ -84,7 +90,7 @@ Decorators (such as `sqlite` or `file-system`) are intentionally deferred. They 
 
 ## Verification limits
 
-Automated checks cover configuration validation/migration, presets, catalog geometry, plane layout, glTF/GLB parsing, model fit, loading failures, cancellation, disposal, and JSON/browser-storage round trips. The production build includes TypeScript validation. Interactive browser and visual QA could not be completed in the creation environment because its managed preview service was unavailable. The GPU rendering path still needs a smoke test in a WebGL-capable browser.
+Automated checks cover configuration validation/migration, presets, catalog geometry, space duplication, portal references, connector styles/capacities, plane layout, glTF/GLB parsing, model fit, loading failures, cancellation, disposal, and JSON/browser-storage round trips. The production build includes TypeScript validation. Interactive browser and visual QA could not be completed in the creation environment because its managed preview service was unavailable. The GPU rendering path still needs a smoke test in a WebGL-capable browser.
 
 ## Third-party software
 

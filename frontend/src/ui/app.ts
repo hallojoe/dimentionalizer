@@ -1,8 +1,8 @@
 import { getObjectCatalog, resolveType } from '../catalog/catalog';
 import { parseConfig } from '../config/validate';
 import { loadSaved, saveConfig } from '../config/storage';
-import type { ArchitectureConfig, ArchitectureGroup, ArchitectureObject, ConnectionEndpoint, EntityRef } from '../config/types';
-import { endpointKey, endpointName, endpointRef } from '../config/connections';
+import type { ArchitectureConfig, ArchitectureGroup, ArchitectureObject, ConnectionEndpoint, EntityRef, SpaceView } from '../config/types';
+import { endpointKey, endpointName, endpointRef, endpointSpace } from '../config/connections';
 import { layoutGroups } from '../scene/layout';
 import { createViewer } from '../scene/viewer';
 import type { SceneViewer } from '../scene/viewer';
@@ -10,6 +10,9 @@ import { element, get } from './dom';
 import { shell } from './shell';
 import { mountPresetPicker } from './presets';
 import { elevationControl } from './elevation';
+import { mountSpaces } from './spaces';
+import { enterSpace } from '../config/spaces';
+import { connectorControls } from './connectors';
 import { planeControls } from './planes';
 
 export async function startApp(): Promise<() => void> {
@@ -24,6 +27,7 @@ export async function startApp(): Promise<() => void> {
   let selected: string | null = null;
   let selectedScope: EntityRef | null = null;
   let query = '', typeFilter = 'all';
+  const spaceHistory: SpaceView[] = [];
   let viewer: SceneViewer | undefined;
   const modelErrors = new Map<string, string>();
   function clearModelErrors(): void { modelErrors.clear(); get('model-notice').hidden = true; }
@@ -43,6 +47,28 @@ export async function startApp(): Promise<() => void> {
   function persist(): void {
     if (!saveConfig(config)) notify('Changes are active, but browser storage is unavailable. Export your configuration to keep them.');
   }
+  function spaceContains(space: string): boolean {
+    return config.spaceView.visible.includes(space) && (!config.spaceView.active || config.spaceView.active === space);
+  }
+  function renderSpaceNavigation(): void {
+    const select = get<HTMLSelectElement>('space-focus'); select.replaceChildren();
+    const overview = element('option', '', 'Combined view'); overview.value = ''; select.append(overview);
+    config.spaces.forEach(space => { const option = element('option', '', space.name); option.value = space.id; select.append(option); });
+    select.value = config.spaceView.active ?? '';
+    get<HTMLButtonElement>('space-back').disabled = !spaceHistory.length;
+    get('space-context').textContent = config.spaceView.active
+      ? `${config.spaces.find(s => s.id === config.spaceView.active)!.name} in focus · other visible spaces dimmed`
+      : `${config.spaceView.visible.length} spaces in view`;
+  }
+  function changeSpaceView(view: SpaceView, remember = true, focus = true): void {
+    if (remember && JSON.stringify(view) !== JSON.stringify(config.spaceView)) spaceHistory.push(structuredClone(config.spaceView));
+    config.spaceView = view; activeGroup = null; activePlane = null; query = ''; typeFilter = 'all';
+    get<HTMLInputElement>('search').value = ''; get<HTMLSelectElement>('type-filter').value = 'all';
+    renderDirectory();
+    if (focus) viewer?.focusSpace(view.active);
+    persist();
+  }
+  function navigateSpace(id: string): void { changeSpaceView(enterSpace(config.spaceView, id)); }
   function refreshConfiguration(): void {
     clearModelErrors();
     viewer?.setConfig(config, true);
@@ -56,16 +82,17 @@ export async function startApp(): Promise<() => void> {
   }
   function matches(object: ArchitectureObject): boolean {
     const type = resolveType(object.type, config.objectTypes);
-    return (!activeGroup || object.group === activeGroup)
+    return spaceContains(endpointSpace(config, object.id)) && (!activeGroup || object.group === activeGroup)
       && (!activePlane || config.groups.find(group => group.id === object.group)?.plane === activePlane)
       && (typeFilter === 'all' || type.id === typeFilter)
       && `${object.name} ${object.description ?? ''} ${object.type ?? 'container'} ${type.name}`.toLowerCase().includes(query);
   }
   function renderDirectory(): void {
+    renderSpaceNavigation();
     const planes = get<HTMLSelectElement>('plane-filter');
     planes.replaceChildren();
     const all = element('option', '', 'All planes'); all.value = ''; planes.append(all);
-    config.planes.forEach(plane => {
+    config.planes.filter(plane => spaceContains(plane.space)).forEach(plane => {
       const option = element('option', '', plane.name); option.value = plane.id; planes.append(option);
     });
     planes.value = activePlane ?? '';
@@ -83,8 +110,8 @@ export async function startApp(): Promise<() => void> {
       button.onclick = () => { activeGroup = id; closeInspector(); renderDirectory(); if (!id && activePlane) viewer?.focusPlane(activePlane); else viewer?.focusGroup(id); };
       groups.append(button);
     }
-    groupButton(null, activePlane ? 'Entire plane' : 'Entire network', config.objects.filter(o => !activePlane || config.groups.find(g => g.id === o.group)?.plane === activePlane).length, config.presentation.accent);
-    config.groups.filter(group => !activePlane || group.plane === activePlane).forEach(group => groupButton(group.id, group.name, config.objects.filter(o => o.group === group.id).length, group.color));
+    groupButton(null, activePlane ? 'Entire plane' : 'Entire network', config.objects.filter(o => spaceContains(endpointSpace(config, o.id)) && (!activePlane || config.groups.find(g => g.id === o.group)?.plane === activePlane)).length, config.presentation.accent);
+    config.groups.filter(group => spaceContains(endpointSpace(config, { kind: 'group', id: group.id })) && (!activePlane || group.plane === activePlane)).forEach(group => groupButton(group.id, group.name, config.objects.filter(o => o.group === group.id).length, group.color));
     const groupEditor = get('group-elevation-controls');
     groupEditor.replaceChildren();
     const currentGroup = config.groups.find(group => group.id === activeGroup);
@@ -104,20 +131,25 @@ export async function startApp(): Promise<() => void> {
     objects.forEach(object => {
       const type = resolveType(object.type, config.objectTypes);
       const button = element('button', `object-row${object.id === selected ? ' selected' : ''}`);
-      button.setAttribute('aria-label', `Inspect ${object.name}, ${type.name}`);
+      button.setAttribute('aria-label', object.linkedSpace ? `Enter ${config.spaces.find(s => s.id === object.linkedSpace)!.name} and inspect ${object.name}` : `Inspect ${object.name}, ${type.name}`);
       button.setAttribute('aria-pressed', String(object.id === selected));
       const symbol = element('span', 'object-symbol', type.symbol);
       symbol.style.color = config.groups.find(g => g.id === object.group)!.color;
       const text = element('span', 'object-row-text');
-      text.append(element('span', '', object.name), element('small', '', type.name));
+      text.append(element('span', '', object.name), element('small', '', object.linkedSpace ? `${type.name} · opens ${config.spaces.find(s => s.id === object.linkedSpace)!.name}` : type.name));
       button.append(symbol, text, element('span', 'row-arrow', '↗'));
       button.onclick = () => inspect(object.id);
       list.append(button);
     });
-    if (!objects.length) list.append(element('p', 'empty-list', config.objects.length ? 'No objects match these filters.' : 'No objects yet. Add some in Configure.'));
+    if (!objects.length) list.append(element('p', 'empty-list', !config.objects.some(o => spaceContains(endpointSpace(config, o.id))) ? 'This space is empty. Add objects in Configure or create a space from a template.' : config.objects.length ? 'No objects match these filters.' : 'No objects yet. Add some in Configure.'));
     get('visible-count').textContent = `${objects.length} / ${config.objects.length}`;
-    get('scene-context').textContent = (config.groups.find(g => g.id === activeGroup)?.name ?? config.planes.find(p => p.id === activePlane)?.name ?? 'Entire network').toUpperCase();
-    viewer?.setVisible(new Set(objects.map(o => o.id)));
+    get('scene-context').textContent = (config.groups.find(g => g.id === activeGroup)?.name ?? config.planes.find(p => p.id === activePlane)?.name ?? config.spaces.find(s => s.id === config.spaceView.active)?.name ?? 'Combined view').toUpperCase();
+    viewer?.setSpaceView(config.spaceView.visible, config.spaceView.active);
+    const sceneObjects = config.objects.filter(object => {
+      const space = endpointSpace(config, object.id);
+      return config.spaceView.visible.includes(space) && (config.spaceView.active && config.spaceView.active !== space || matches(object));
+    });
+    viewer?.setVisible(new Set(sceneObjects.map(o => o.id)));
     renderFallback(objects);
   }
   function renderFallback(objects: ArchitectureObject[]): void {
@@ -146,6 +178,7 @@ export async function startApp(): Promise<() => void> {
   function inspect(id: string, moveFocus = true): void {
     const object = config.objects.find(o => o.id === id);
     if (!object) return;
+    if (moveFocus && !object.linkedSpace) changeSpaceView(enterSpace(config.spaceView, endpointSpace(config, id)), true, false);
     // Connections can lead to an object outside the current group or search.
     if (!matches(object)) {
       activeGroup = null; activePlane = null; query = ''; typeFilter = 'all';
@@ -177,6 +210,13 @@ export async function startApp(): Promise<() => void> {
     typeSelect.onchange = () => { object.type = typeSelect.value; refreshConfiguration(); };
     typeLabel.append(typeSelect); panel.append(typeLabel);
     if (type.custom) panel.append(element('p', 'muted', type.model ? `Custom model: ${type.model.url}` : `Custom type using the ${type.shape} shape.`));
+    const portal = element('label', 'property-field', 'Open space when clicked'), target = element('select');
+    const none = element('option', '', 'No linked space'); none.value = ''; target.append(none);
+    config.spaces.filter(space => space.id !== plane.space).forEach(space => { const option = element('option', '', space.name); option.value = space.id; target.append(option); });
+    target.value = object.linkedSpace ?? '';
+    target.onchange = () => { if (target.value) object.linkedSpace = target.value; else delete object.linkedSpace; refreshConfiguration(); };
+    portal.append(target); panel.append(portal);
+    if (object.linkedSpace) { const open = element('button', 'scope-button', `Enter ${config.spaces.find(s => s.id === object.linkedSpace)!.name} ↗`); open.onclick = () => navigateSpace(object.linkedSpace!); panel.append(open); }
     const elevations = element('section', 'inspector-elevations');
     elevations.append(
       elevationControl('inspect-group-elevation', 'Group elevation', group.elevation ?? 0, 'Moves this group and its objects relative to the parent plane.', value => {
@@ -195,7 +235,8 @@ export async function startApp(): Promise<() => void> {
     get('object-position').textContent = `${config.objects.indexOf(object) + 1} / ${config.objects.length}`;
     openInspector();
     renderDirectory();
-    viewer?.focusObject(id);
+    if (moveFocus && object.linkedSpace) navigateSpace(object.linkedSpace);
+    else if (moveFocus) viewer?.focusObject(id);
     if (moveFocus) get<HTMLButtonElement>('close-inspector').focus({ preventScroll: true });
   }
   function selectEntity(endpoint: ConnectionEndpoint): void {
@@ -222,7 +263,7 @@ export async function startApp(): Promise<() => void> {
       }
       select.value = connection.direction;
       select.onchange = () => { connection.direction = select.value as typeof connection.direction; refreshConfiguration(); };
-      label.append(select); panel.append(label);
+      label.append(select); panel.append(label, connectorControls(connection, refreshConfiguration));
     });
   }
   function groupPlaneControl(group: ArchitectureGroup): HTMLElement {
@@ -230,11 +271,17 @@ export async function startApp(): Promise<() => void> {
     const select = element('select'); select.setAttribute('aria-label', 'Group parent plane');
     config.planes.forEach(plane => { const option = element('option', '', plane.name); option.value = plane.id; select.append(option); });
     select.value = group.plane;
-    select.onchange = () => { group.plane = select.value; activePlane = select.value; refreshConfiguration(); };
+    select.onchange = () => {
+      const target = config.planes.find(plane => plane.id === select.value)!;
+      if (config.objects.some(object => object.group === group.id && object.linkedSpace === target.space)) { select.value = group.plane; notify('This move would make a linked object open its own space. Change that object’s linked space first.'); return; }
+      group.plane = target.id; changeSpaceView(enterSpace(config.spaceView, target.space), false, false); activePlane = target.id; refreshConfiguration();
+    };
     label.append(select); return label;
   }
   function inspectScope(ref: EntityRef, moveFocus = true): void {
+    if (ref.kind === 'space') { navigateSpace(ref.id); return; }
     if (ref.kind === 'object') { inspect(ref.id, moveFocus); return; }
+    if (moveFocus) changeSpaceView(enterSpace(config.spaceView, endpointSpace(config, ref)), true, false);
     const entity = (ref.kind === 'plane' ? config.planes : config.groups).find(entry => entry.id === ref.id);
     if (!entity) return;
     selected = null; selectedScope = ref;
@@ -284,13 +331,13 @@ export async function startApp(): Promise<() => void> {
     }
   }
   function apply(next: ArchitectureConfig): void {
-    config = next; activeGroup = null; activePlane = null; query = ''; typeFilter = 'all';
+    config = next; spaceHistory.length = 0; activeGroup = null; activePlane = null; query = ''; typeFilter = 'all';
     get<HTMLInputElement>('search').value = '';
     get<HTMLSelectElement>('type-filter').value = 'all';
     closeInspector();
     clearModelErrors(); renderCatalog();
     viewer?.setConfig(config);
-    renderPresentation(); renderDirectory();
+    renderPresentation(); renderDirectory(); viewer?.focusSpace(config.spaceView.active);
     persist();
   }
 
@@ -318,6 +365,9 @@ export async function startApp(): Promise<() => void> {
     filter.value = typeFilter;
   }
   renderCatalog();
+  const disposeSpaces = mountSpaces(() => config, apply, changeSpaceView);
+  get<HTMLSelectElement>('space-focus').onchange = event => { const id = (event.target as HTMLSelectElement).value; changeSpaceView(id ? enterSpace(config.spaceView, id) : { ...config.spaceView, active: null }); };
+  get('space-back').onclick = () => { const previous = spaceHistory.pop(); if (previous) changeSpaceView(previous, false); };
   get<HTMLInputElement>('search').oninput = event => {
     query = (event.target as HTMLInputElement).value.trim().toLowerCase(); closeInspector(); renderDirectory();
   };
@@ -400,7 +450,7 @@ export async function startApp(): Promise<() => void> {
     if (event.key === 'ArrowRight' && selected) { event.preventDefault(); step(1); }
   };
   window.addEventListener('keydown', keyboard);
-  renderPresentation(); renderDirectory();
+  renderPresentation(); renderDirectory(); viewer?.focusSpace(config.spaceView.active);
   if (saved.notice) notify(saved.notice);
-  return () => { disposePresets(); viewer?.dispose(); clearTimeout(noticeTimer); window.removeEventListener('keydown', keyboard); };
+  return () => { disposeSpaces(); disposePresets(); viewer?.dispose(); clearTimeout(noticeTimer); window.removeEventListener('keydown', keyboard); };
 }

@@ -1,0 +1,212 @@
+{
+  "schemaVersion": 1,
+  "presentation": {
+    "title": "Family morning — Dimentionalizer",
+    "eyebrow": "HOME & FAMILY",
+    "headline": "Family morning.",
+    "description": "A household morning: waking, washing, breakfast, study, and departure. Objects describe people, furniture, food, and the relationships between activities."
+  },
+  "spaces": [
+    {
+      "id": "morning",
+      "name": "Morning at home"
+    }
+  ],
+  "spaceView": {
+    "visible": [
+      "morning"
+    ],
+    "active": "morning"
+  },
+  "planes": [
+    {
+      "id": "morning-plane",
+      "name": "Morning at home plane",
+      "space": "morning",
+      "decoration": {
+        "grid": true,
+        "color": "#61d8ee"
+      }
+    }
+  ],
+  "groups": [
+    {
+      "id": "sleep",
+      "name": "Wake up",
+      "plane": "morning-plane",
+      "color": "#61d8ee"
+    },
+    {
+      "id": "wash",
+      "name": "Get ready",
+      "plane": "morning-plane",
+      "color": "#b8ff6c"
+    },
+    {
+      "id": "breakfast",
+      "name": "Breakfast",
+      "plane": "morning-plane",
+      "color": "#ffb16c"
+    },
+    {
+      "id": "depart",
+      "name": "Study & departure",
+      "plane": "morning-plane",
+      "color": "#b9a0ff"
+    }
+  ],
+  "objects": [
+    {
+      "id": "parent",
+      "name": "Parent",
+      "type": "adult",
+      "group": "sleep",
+      "description": "An adult starting the day."
+    },
+    {
+      "id": "child",
+      "name": "Child",
+      "type": "child",
+      "group": "sleep",
+      "description": "A child preparing for the day."
+    },
+    {
+      "id": "bed",
+      "name": "Beds",
+      "type": "bed",
+      "group": "sleep",
+      "description": "The starting point for rest and waking."
+    },
+    {
+      "id": "shower",
+      "name": "Shower",
+      "type": "shower",
+      "group": "wash",
+      "description": "A shared bathroom facility."
+    },
+    {
+      "id": "toilet",
+      "name": "Toilet",
+      "type": "toilet",
+      "group": "wash",
+      "description": "A restroom fixture."
+    },
+    {
+      "id": "food",
+      "name": "Breakfast",
+      "type": "food",
+      "group": "breakfast",
+      "description": "The morning meal."
+    },
+    {
+      "id": "family",
+      "name": "Breakfast together",
+      "type": "family",
+      "group": "breakfast",
+      "description": "The household sharing a meal."
+    },
+    {
+      "id": "chair",
+      "name": "Breakfast chair",
+      "type": "chair",
+      "group": "breakfast",
+      "description": "Seating at breakfast."
+    },
+    {
+      "id": "desk",
+      "name": "Study desk",
+      "type": "desk",
+      "group": "depart",
+      "description": "A place to gather school materials."
+    },
+    {
+      "id": "bus",
+      "name": "School bus",
+      "type": "bus",
+      "group": "depart",
+      "description": "The departure transport."
+    }
+  ],
+  "connections": [
+    {
+      "from": "bed",
+      "to": "parent",
+      "label": "Wakes",
+      "direction": "forward",
+      "style": "normal",
+      "id": "connection-1"
+    },
+    {
+      "from": "bed",
+      "to": "child",
+      "label": "Wakes",
+      "direction": "forward",
+      "style": "normal",
+      "id": "connection-2"
+    },
+    {
+      "from": "parent",
+      "to": "shower",
+      "label": "Gets ready",
+      "direction": "forward",
+      "style": "normal",
+      "capacity": {
+        "out": 6,
+        "unit": "people/hour"
+      },
+      "id": "connection-3"
+    },
+    {
+      "from": "child",
+      "to": "toilet",
+      "label": "Gets ready",
+      "direction": "forward",
+      "style": "normal",
+      "id": "connection-4"
+    },
+    {
+      "from": "parent",
+      "to": "food",
+      "label": "Prepares",
+      "direction": "forward",
+      "style": "normal",
+      "id": "connection-5"
+    },
+    {
+      "from": "food",
+      "to": "family",
+      "label": "Shared breakfast",
+      "direction": "forward",
+      "style": "normal",
+      "id": "connection-6"
+    },
+    {
+      "from": "family",
+      "to": "chair",
+      "label": "Seated meal",
+      "direction": "forward",
+      "style": "normal",
+      "id": "connection-7"
+    },
+    {
+      "from": "child",
+      "to": "desk",
+      "label": "Collects materials",
+      "direction": "forward",
+      "style": "normal",
+      "id": "connection-8"
+    },
+    {
+      "from": "desk",
+      "to": "bus",
+      "label": "Leaves for school",
+      "direction": "forward",
+      "style": "wobbly",
+      "capacity": {
+        "out": 40,
+        "unit": "people/hour"
+      },
+      "id": "connection-9"
+    }
+  ]
+}

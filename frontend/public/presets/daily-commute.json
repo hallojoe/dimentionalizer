@@ -1,0 +1,153 @@
+{
+  "schemaVersion": 1,
+  "presentation": {
+    "title": "Daily commute — Dimentionalizer",
+    "eyebrow": "TRAVEL & MOBILITY",
+    "headline": "Daily commute.",
+    "description": "Compare walking, bus, and rail legs on a daily journey. Optional in/out capacities distinguish a small walking route from larger shared transport links."
+  },
+  "spaces": [
+    {
+      "id": "commute",
+      "name": "Daily journey"
+    }
+  ],
+  "spaceView": {
+    "visible": [
+      "commute"
+    ],
+    "active": "commute"
+  },
+  "planes": [
+    {
+      "id": "commute-plane",
+      "name": "Daily journey plane",
+      "space": "commute",
+      "decoration": {
+        "grid": true,
+        "color": "#61d8ee"
+      }
+    }
+  ],
+  "groups": [
+    {
+      "id": "home-area",
+      "name": "Start",
+      "plane": "commute-plane",
+      "color": "#61d8ee"
+    },
+    {
+      "id": "transit",
+      "name": "Shared transport",
+      "plane": "commute-plane",
+      "color": "#b8ff6c"
+    },
+    {
+      "id": "destination",
+      "name": "Destination",
+      "plane": "commute-plane",
+      "color": "#ffb16c"
+    }
+  ],
+  "objects": [
+    {
+      "id": "commuter",
+      "name": "Commuter",
+      "type": "human",
+      "group": "home-area",
+      "description": "A person traveling to work."
+    },
+    {
+      "id": "home",
+      "name": "Home",
+      "type": "home",
+      "group": "home-area",
+      "description": "The origin of the journey."
+    },
+    {
+      "id": "bus",
+      "name": "Local bus",
+      "type": "bus",
+      "group": "transit",
+      "description": "A road transport leg."
+    },
+    {
+      "id": "train",
+      "name": "Commuter train",
+      "type": "train",
+      "group": "transit",
+      "description": "A rail transport leg."
+    },
+    {
+      "id": "office",
+      "name": "Office",
+      "type": "office",
+      "group": "destination",
+      "description": "The destination workplace."
+    },
+    {
+      "id": "desk",
+      "name": "Work desk",
+      "type": "desk",
+      "group": "destination",
+      "description": "The place where the workday begins."
+    }
+  ],
+  "connections": [
+    {
+      "from": "home",
+      "to": "commuter",
+      "label": "Starts journey",
+      "direction": "forward",
+      "style": "normal",
+      "id": "connection-1"
+    },
+    {
+      "from": "commuter",
+      "to": "bus",
+      "label": "Walk to bus",
+      "direction": "bidirectional",
+      "style": "wobbly",
+      "capacity": {
+        "out": 60,
+        "in": 60,
+        "unit": "people/hour"
+      },
+      "id": "connection-2"
+    },
+    {
+      "from": "bus",
+      "to": "train",
+      "label": "Transfer",
+      "direction": "bidirectional",
+      "style": "normal",
+      "capacity": {
+        "out": 300,
+        "in": 200,
+        "unit": "people/hour"
+      },
+      "id": "connection-3"
+    },
+    {
+      "from": "train",
+      "to": "office",
+      "label": "Rail corridor",
+      "direction": "bidirectional",
+      "style": "lightning",
+      "capacity": {
+        "out": 1200,
+        "in": 900,
+        "unit": "people/hour"
+      },
+      "id": "connection-4"
+    },
+    {
+      "from": "office",
+      "to": "desk",
+      "label": "Arrives",
+      "direction": "forward",
+      "style": "normal",
+      "id": "connection-5"
+    }
+  ]
+}

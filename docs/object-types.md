@@ -9,6 +9,9 @@ An object can represent a person, place, product, event, action, data stream, se
 | General | `container` |
 | Infrastructure | `database`, `email`, `cache`, `reverse-proxy`, `queue`, `storage`, `cdn` |
 | People and business | `user`, `usergroup`, `event`, `product`, `shop`, `warehouse` |
+| Everyday people | `human`, `family`, `adult`, `child` |
+| Home and furniture | `home`, `food`, `bed`, `shower`, `toilet`, `sofa`, `chair`, `desk`, `wall`, `window-wall` |
+| Travel and work | `bus`, `train`, `airplane`, `office` |
 | Workflows and communication | `workflow`, `request`, `response`, `processing`, `webhook`, `api-call`, `dataflow`, `message` |
 
 Use `email` for a Send e-mail step and `message` for a Slack or chat notification. `warehouse` depicts a physical location; an analytical data warehouse can use `database`. Labels and descriptions provide the context. These are visual model elements: they do not execute workflows, make API calls, send e-mails, or post Slack messages. Animated connection dots illustrate direction rather than live execution or measured traffic.
@@ -88,5 +91,7 @@ JSON export includes the model reference, not the model file. Keep referenced as
 2. Add a geometry builder in `frontend/src/catalog/geometry.ts`, receiving a group color and returning a new `THREE.Group`.
 3. Register it in `builders`. `Record<ObjectType, Builder>` checks completeness.
 4. Add the new ID to the JSON Schema's custom `shape` enum, add an example, and run `npm test` and `npm run build`.
+
+Everyday geometry lives in `catalog/everyday.ts`; shared `wire()`, `box()`, and `trace()` helpers live in `catalog/geometry-helpers.ts`.
 
 Built-in geometry uses a base at Y = 0 and is centered at X/Z = 0. Keep it inside the common hit envelope (approximately 4.7 × 2.5 × 2.5 units), and return independently disposable geometry and materials. Reuse `wire()`, `box()`, and `trace()` for the visual style. Leave camera movement, labels, selection, connections, and persistence to their existing modules.

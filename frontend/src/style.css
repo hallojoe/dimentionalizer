@@ -198,3 +198,16 @@ button.platform-label { pointer-events: auto; padding: 2px 4px; border: none; ba
   .dialog-bottom { align-items: flex-end; }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+.space-navigation { border: 1px solid var(--line); border-radius: 6px; padding: 10px; margin: 20px 0; }
+.space-navigation .type-filter { gap: 8px; margin-top: 0; }
+.space-navigation select { min-width: 0; max-width: 190px; }
+.space-navigation button { width: 100%; font-size: 10px; }
+.space-navigation p { margin: 10px 0 0; font-size: 10px; }
+.space-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--line); }
+.space-row label { overflow-wrap: anywhere; }
+.space-row button { flex-shrink: 0; font-size: 10px; }
+#space-create-form { margin-top: 24px; border-top: 1px solid var(--line); padding-top: 12px; }
+.preset-category-heading { grid-column: 1 / -1; color: var(--accent); font-size: 14px; margin: 20px 0 0; }
+.connector-controls { border-left: 1px solid var(--line); padding-left: 12px; margin-bottom: 24px; }
+.space-label { text-transform: uppercase; letter-spacing: 2px; color: var(--accent); font-weight: 600; }

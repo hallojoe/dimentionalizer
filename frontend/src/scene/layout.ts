@@ -1,4 +1,4 @@
-import type { ArchitectureConfig, ArchitectureGroup, ArchitectureObject, ArchitecturePlane } from '../config/types';
+import type { ArchitectureConfig, ArchitectureGroup, ArchitectureObject, ArchitecturePlane, ArchitectureSpace } from '../config/types';
 
 export interface PlacedGroup extends ArchitectureGroup {
   x: number; y: number; z: number; width: number; depth: number;
@@ -9,7 +9,11 @@ export interface PlacedPlane extends ArchitecturePlane {
   groups: PlacedGroup[];
   overflow: boolean;
 }
+export interface PlacedSpace extends ArchitectureSpace {
+  x: number; z: number; width: number; depth: number; planes: PlacedPlane[];
+}
 export interface SceneLayout {
+  spaces: PlacedSpace[];
   planes: PlacedPlane[];
   groups: PlacedGroup[];
   size: number;
@@ -67,8 +71,13 @@ export function layoutGroups(config: ArchitectureConfig): SceneLayout {
       overflow: plane.sizing === 'locked' && (layout.width > width || layout.depth > depth),
     };
   });
-  const world = pack(specs, 16);
-  const planes: PlacedPlane[] = world.entries.map(spec => {
+  const spaceSpecs = config.spaces.map(space => {
+    const packed = pack(specs.filter(spec => spec.plane.space === space.id), 16);
+    return { ...space, packed, width: Math.max(packed.width, 22), depth: Math.max(packed.depth, 22) };
+  });
+  const world = pack(spaceSpecs, 35);
+  const planeSpecs = world.entries.flatMap(space => space.packed.entries.map(spec => ({ ...spec, x: spec.x + space.x, z: spec.z + space.z })));
+  const planes: PlacedPlane[] = planeSpecs.map(spec => {
     const groups: PlacedGroup[] = spec.layout.entries.map(group => {
       const x = spec.x + group.x, z = spec.z + group.z;
       const y = spec.plane.elevation + (group.elevation ?? 0);
@@ -87,10 +96,21 @@ export function layoutGroups(config: ArchitectureConfig): SceneLayout {
   const groups = planes.flatMap(plane => plane.groups);
   const heights = planes.flatMap(plane => [plane.y, ...plane.groups.flatMap(group => [group.y, ...group.objects.flatMap(entry => [entry.y, entry.y + 3.4])])]);
   const minY = Math.min(0, ...heights), maxY = Math.max(0, ...heights);
+  const spaces = world.entries.map(space => ({ id: space.id, name: space.name, description: space.description, x: space.x, z: space.z, width: space.width, depth: space.depth, planes: planes.filter(plane => plane.space === space.id) }));
   return {
-    planes, groups,
+    spaces, planes, groups,
     size: Math.max(world.width, world.depth, maxY - minY, 22),
     centerY: (minY + maxY) / 2,
     warnings: planes.filter(plane => plane.overflow).map(plane => `Contents extend beyond locked plane "${plane.name}". Increase its size or choose auto-fit.`),
   };
+}
+
+/** Frame only the chosen spaces, including their elevated and overflowing contents. */
+export function spaceViewBounds(spaces: PlacedSpace[]): { x: number; z: number; centerY: number; size: number } {
+  if (!spaces.length) return { x: 0, z: 0, centerY: 0, size: 22 };
+  const minX = Math.min(...spaces.map(s => s.x - s.width / 2)), maxX = Math.max(...spaces.map(s => s.x + s.width / 2));
+  const minZ = Math.min(...spaces.map(s => s.z - s.depth / 2)), maxZ = Math.max(...spaces.map(s => s.z + s.depth / 2));
+  const heights = spaces.flatMap(s => s.planes.flatMap(p => [p.y, ...p.groups.flatMap(g => [g.y, ...g.objects.flatMap(o => [o.y, o.y + 3.4])])]));
+  const minY = Math.min(0, ...heights), maxY = Math.max(0, ...heights);
+  return { x: (minX + maxX) / 2, z: (minZ + maxZ) / 2, centerY: (minY + maxY) / 2, size: Math.max(22, maxX - minX, maxZ - minZ, maxY - minY) };
 }

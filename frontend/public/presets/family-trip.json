@@ -1,0 +1,207 @@
+{
+  "schemaVersion": 1,
+  "presentation": {
+    "title": "Family trip — Dimentionalizer",
+    "eyebrow": "TRAVEL & MOBILITY",
+    "headline": "Family trip.",
+    "description": "Follow a family from home to airport transport, a flight, and a place to stay. An illustrative travel structure with bidirectional route capacities."
+  },
+  "spaces": [
+    {
+      "id": "journey",
+      "name": "Travel"
+    },
+    {
+      "id": "stay",
+      "name": "Place to stay"
+    }
+  ],
+  "spaceView": {
+    "visible": [
+      "journey",
+      "stay"
+    ],
+    "active": "journey"
+  },
+  "planes": [
+    {
+      "id": "journey-plane",
+      "name": "Travel plane",
+      "space": "journey",
+      "decoration": {
+        "grid": true,
+        "color": "#61d8ee"
+      }
+    },
+    {
+      "id": "stay-plane",
+      "name": "Place to stay plane",
+      "space": "stay",
+      "decoration": {
+        "grid": true,
+        "color": "#b8ff6c"
+      }
+    }
+  ],
+  "groups": [
+    {
+      "id": "departure",
+      "name": "Departure",
+      "plane": "journey-plane",
+      "color": "#61d8ee"
+    },
+    {
+      "id": "flight",
+      "name": "Flight",
+      "plane": "journey-plane",
+      "color": "#b8ff6c"
+    },
+    {
+      "id": "lodging",
+      "name": "Accommodation",
+      "plane": "stay-plane",
+      "color": "#ffb16c"
+    }
+  ],
+  "objects": [
+    {
+      "id": "family",
+      "name": "Traveling family",
+      "type": "family",
+      "group": "departure",
+      "description": "The people taking the trip."
+    },
+    {
+      "id": "home",
+      "name": "Departure home",
+      "type": "home",
+      "group": "departure",
+      "description": "The starting location."
+    },
+    {
+      "id": "bus",
+      "name": "Airport bus",
+      "type": "bus",
+      "group": "departure",
+      "description": "Ground transport to the airport."
+    },
+    {
+      "id": "airplane",
+      "name": "Flight",
+      "type": "airplane",
+      "group": "flight",
+      "description": "The flight leg of the journey."
+    },
+    {
+      "id": "stay",
+      "name": "Accommodation · click to enter",
+      "type": "home",
+      "group": "flight",
+      "description": "Opens the accommodation space.",
+      "linkedSpace": "stay"
+    },
+    {
+      "id": "bed",
+      "name": "Beds",
+      "type": "bed",
+      "group": "lodging",
+      "description": "Sleeping places at the destination."
+    },
+    {
+      "id": "shower",
+      "name": "Shower",
+      "type": "shower",
+      "group": "lodging",
+      "description": "A bathing facility."
+    },
+    {
+      "id": "toilet",
+      "name": "Toilet",
+      "type": "toilet",
+      "group": "lodging",
+      "description": "A restroom fixture."
+    },
+    {
+      "id": "food",
+      "name": "Welcome meal",
+      "type": "food",
+      "group": "lodging",
+      "description": "Food after arrival."
+    },
+    {
+      "id": "child",
+      "name": "Child traveler",
+      "type": "child",
+      "group": "lodging",
+      "description": "A younger family member settling in."
+    }
+  ],
+  "connections": [
+    {
+      "from": "family",
+      "to": "home",
+      "label": "Departs from",
+      "direction": "forward",
+      "style": "normal",
+      "id": "connection-1"
+    },
+    {
+      "from": "home",
+      "to": "bus",
+      "label": "Ground transfer",
+      "direction": "bidirectional",
+      "style": "wobbly",
+      "capacity": {
+        "out": 40,
+        "in": 40,
+        "unit": "people/hour"
+      },
+      "id": "connection-2"
+    },
+    {
+      "from": "bus",
+      "to": "airplane",
+      "label": "Flight connection",
+      "direction": "bidirectional",
+      "style": "normal",
+      "capacity": {
+        "out": 180,
+        "in": 180,
+        "unit": "people/hour"
+      },
+      "id": "connection-3"
+    },
+    {
+      "from": "airplane",
+      "to": "stay",
+      "label": "Arrives",
+      "direction": "forward",
+      "style": "normal",
+      "id": "connection-4"
+    },
+    {
+      "from": "child",
+      "to": "food",
+      "label": "Eats",
+      "direction": "forward",
+      "style": "normal",
+      "id": "connection-5"
+    },
+    {
+      "from": "child",
+      "to": "bed",
+      "label": "Rests",
+      "direction": "forward",
+      "style": "normal",
+      "id": "connection-6"
+    },
+    {
+      "from": "bed",
+      "to": "shower",
+      "label": "Morning routine",
+      "direction": "forward",
+      "style": "normal",
+      "id": "connection-7"
+    }
+  ]
+}

@@ -1,0 +1,261 @@
+{
+  "schemaVersion": 1,
+  "presentation": {
+    "title": "Home and neighborhood — Dimentionalizer",
+    "eyebrow": "HOME & FAMILY",
+    "headline": "Home and neighborhood.",
+    "description": "Start outside with a family, home, shop, and bus. Click Home to enter its rooms while the neighborhood stays dimmed. Illustrative capacities, not measurements."
+  },
+  "spaces": [
+    {
+      "id": "neighborhood",
+      "name": "Neighborhood"
+    },
+    {
+      "id": "inside-home",
+      "name": "Inside the home"
+    }
+  ],
+  "spaceView": {
+    "visible": [
+      "neighborhood",
+      "inside-home"
+    ],
+    "active": "neighborhood"
+  },
+  "planes": [
+    {
+      "id": "neighborhood-plane",
+      "name": "Neighborhood plane",
+      "space": "neighborhood",
+      "decoration": {
+        "grid": true,
+        "color": "#61d8ee"
+      }
+    },
+    {
+      "id": "inside-home-plane",
+      "name": "Inside the home plane",
+      "space": "inside-home",
+      "decoration": {
+        "grid": true,
+        "color": "#b8ff6c"
+      }
+    }
+  ],
+  "groups": [
+    {
+      "id": "outside",
+      "name": "Around the neighborhood",
+      "plane": "neighborhood-plane",
+      "color": "#61d8ee"
+    },
+    {
+      "id": "living",
+      "name": "Living & dining",
+      "plane": "inside-home-plane",
+      "color": "#b8ff6c"
+    },
+    {
+      "id": "bedroom",
+      "name": "Bedroom",
+      "plane": "inside-home-plane",
+      "color": "#ffb16c"
+    },
+    {
+      "id": "bathroom",
+      "name": "Bathroom",
+      "plane": "inside-home-plane",
+      "color": "#b9a0ff"
+    }
+  ],
+  "objects": [
+    {
+      "id": "family",
+      "name": "The family",
+      "type": "family",
+      "group": "outside",
+      "description": "A household living in the neighborhood."
+    },
+    {
+      "id": "home",
+      "name": "Home · click to enter",
+      "type": "home",
+      "group": "outside",
+      "description": "Opens the interior space while preserving this inspector.",
+      "linkedSpace": "inside-home"
+    },
+    {
+      "id": "shop",
+      "name": "Local grocery shop",
+      "type": "shop",
+      "group": "outside",
+      "description": "A neighborhood shop supplying daily essentials."
+    },
+    {
+      "id": "bus",
+      "name": "Neighborhood bus",
+      "type": "bus",
+      "group": "outside",
+      "description": "A shared transport option."
+    },
+    {
+      "id": "adult",
+      "name": "Adult",
+      "type": "adult",
+      "group": "living",
+      "description": "An adult household member."
+    },
+    {
+      "id": "child",
+      "name": "Child",
+      "type": "child",
+      "group": "living",
+      "description": "A younger household member."
+    },
+    {
+      "id": "sofa",
+      "name": "Living-room sofa",
+      "type": "sofa",
+      "group": "living",
+      "description": "Shared seating for the household."
+    },
+    {
+      "id": "food",
+      "name": "Dinner",
+      "type": "food",
+      "group": "living",
+      "description": "A shared meal."
+    },
+    {
+      "id": "window",
+      "name": "Window wall",
+      "type": "window-wall",
+      "group": "living",
+      "description": "A glazed boundary between inside and outside."
+    },
+    {
+      "id": "bed",
+      "name": "Bed",
+      "type": "bed",
+      "group": "bedroom",
+      "description": "A place for sleep and rest."
+    },
+    {
+      "id": "wall",
+      "name": "Bedroom wall",
+      "type": "wall",
+      "group": "bedroom",
+      "description": "A room partition."
+    },
+    {
+      "id": "shower",
+      "name": "Shower",
+      "type": "shower",
+      "group": "bathroom",
+      "description": "A bathing fixture."
+    },
+    {
+      "id": "toilet",
+      "name": "Toilet",
+      "type": "toilet",
+      "group": "bathroom",
+      "description": "A restroom fixture."
+    }
+  ],
+  "connections": [
+    {
+      "from": "family",
+      "to": "home",
+      "label": "Lives in",
+      "direction": "forward",
+      "style": "normal",
+      "id": "connection-1"
+    },
+    {
+      "from": "family",
+      "to": "shop",
+      "label": "Walk for groceries",
+      "direction": "bidirectional",
+      "style": "wobbly",
+      "capacity": {
+        "out": 4,
+        "in": 4,
+        "unit": "people/hour"
+      },
+      "id": "connection-2"
+    },
+    {
+      "from": "family",
+      "to": "bus",
+      "label": "Travel",
+      "direction": "bidirectional",
+      "style": "normal",
+      "capacity": {
+        "out": 30,
+        "in": 30,
+        "unit": "people/hour"
+      },
+      "id": "connection-3"
+    },
+    {
+      "from": "adult",
+      "to": "food",
+      "label": "Prepares meal",
+      "direction": "forward",
+      "style": "normal",
+      "id": "connection-4"
+    },
+    {
+      "from": "child",
+      "to": "food",
+      "label": "Shares meal",
+      "direction": "forward",
+      "style": "normal",
+      "id": "connection-5"
+    },
+    {
+      "from": "family",
+      "to": {
+        "kind": "space",
+        "id": "inside-home"
+      },
+      "label": "Household activities",
+      "direction": "forward",
+      "style": "normal",
+      "id": "connection-6"
+    },
+    {
+      "from": "adult",
+      "to": "sofa",
+      "label": "Relaxes",
+      "direction": "forward",
+      "style": "normal",
+      "id": "connection-7"
+    },
+    {
+      "from": "child",
+      "to": "bed",
+      "label": "Rests",
+      "direction": "forward",
+      "style": "normal",
+      "id": "connection-8"
+    },
+    {
+      "from": "adult",
+      "to": "shower",
+      "label": "Bathes",
+      "direction": "forward",
+      "style": "normal",
+      "id": "connection-9"
+    },
+    {
+      "from": "child",
+      "to": "toilet",
+      "label": "Uses bathroom",
+      "direction": "forward",
+      "style": "normal",
+      "id": "connection-10"
+    }
+  ]
+}

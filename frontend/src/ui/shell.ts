@@ -3,12 +3,13 @@ export const shell = `
   <header class="app-header">
     <a href="./" class="brand"><span class="brand-mark" aria-hidden="true">◇</span><span id="brand-name">Dimentionalizer</span><span class="version">v1.0</span></a>
     <span class="header-caption">STRUCTURE, IN PERSPECTIVE</span>
-    <div class="header-actions"><button id="presets-button">Presets <span>▦</span></button><button id="catalog-button">Object catalog <span>↗</span></button><button id="config-button" class="primary">Configure <span>⌘</span></button></div>
+    <div class="header-actions"><button id="spaces-button">Spaces <span>▱</span></button><button id="presets-button">Presets <span>▦</span></button><button id="catalog-button">Object catalog <span>↗</span></button><button id="config-button" class="primary">Configure <span>⌘</span></button></div>
   </header>
   <main class="workspace">
     <aside class="sidebar" aria-label="Structure directory">
       <section class="intro"><div id="eyebrow" class="eyebrow"></div><h1 id="headline"></h1><p id="description"></p></section>
       <div class="stats"><div><strong id="group-count">0</strong><span>GROUPS</span></div><div><strong id="object-count">0</strong><span>OBJECTS</span></div><div><strong id="connection-count">0</strong><span>LINKS</span></div></div>
+      <div class="space-navigation"><label class="type-filter">Space<select id="space-focus" aria-label="Current space"></select></label><button id="space-back" disabled>← Back to outer view</button><p id="space-context" class="muted"></p></div>
       <div class="section-heading">NETWORK DIRECTORY <span id="visible-count"></span></div>
       <label class="type-filter">Plane<select id="plane-filter" aria-label="Plane filter"></select></label>
       <button id="inspect-plane" class="scope-button" disabled>Inspect plane & connections ↗</button>
@@ -57,7 +58,21 @@ export const shell = `
     <h2 id="presets-title">Real patterns. Your perspective.</h2>
     <p>Infrastructure patterns, an Umbraco repository snapshot, and business and workflow examples. Open a preset, make it yours, then apply it. Your current architecture stays active until you apply the draft.</p>
     <div id="preset-error" class="error" role="alert"></div>
+    <label class="type-filter">Category<select id="preset-category" aria-label="Preset category"></select></label>
     <div id="preset-grid" class="preset-grid"></div>
     <div class="dialog-bottom"><span>All presets use the same editable version 1 format.</span><button data-close="presets">Back to explorer</button></div>
+  </dialog>
+  <dialog id="spaces-dialog" aria-labelledby="spaces-title">
+    <div class="dialog-heading"><span class="eyebrow">OUTSIDE AND INSIDE</span><button data-close="spaces-dialog" aria-label="Close spaces">×</button></div>
+    <h2 id="spaces-title">Your spaces.</h2><p>Choose spaces to show together, or view one alone. Link an object to a space in its inspector to open that space when clicked.</p>
+    <div id="space-list"></div><button id="spaces-show-all">Show all spaces together</button>
+    <form id="space-create-form">
+      <h3>Add a space</h3>
+      <label class="property-field">Name<input id="space-create-name" required maxlength="100" placeholder="Home, office, inside the shop…" /></label>
+      <label class="property-field">Start with<select id="space-create-mode"><option value="blank">Blank space</option><option value="template">A preset template</option><option value="duplicate">Duplicate an existing space</option></select></label>
+      <label id="space-source-label" class="property-field" hidden>Source<select id="space-create-source"></select></label>
+      <p class="muted">Templates add their spaces and contents. Duplicates copy one space and its internal connectors. Existing spaces stay in this document.</p>
+      <div id="spaces-error" class="error" role="alert"></div><button id="space-create-button" class="primary" type="submit">Create space ↗</button>
+    </form>
   </dialog>
 `;
