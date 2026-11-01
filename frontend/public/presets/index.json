@@ -1,0 +1,79 @@
+[
+  {
+    "id": "web-application",
+    "name": "Three-tier web application",
+    "category": "Web application",
+    "summary": "A familiar web stack: browser, reverse proxy, application, relational data, cache, and background e-mail. An editable reference pattern.",
+    "groups": 4,
+    "objects": 10,
+    "connections": 11
+  },
+  {
+    "id": "multi-tenant-saas",
+    "name": "Multi-tenant SaaS",
+    "category": "SaaS platform",
+    "summary": "A shared application with explicit tenant context, identity, subscription billing, and asynchronous notifications. Illustrates shared infrastructure, not a complete tenant-isolation design.",
+    "groups": 4,
+    "objects": 12,
+    "connections": 15
+  },
+  {
+    "id": "ecommerce",
+    "name": "E-commerce platform",
+    "category": "Commerce",
+    "summary": "A storefront with catalog, cart, checkout, external payment processing, and asynchronous fulfillment. Service boundaries are illustrative and can be consolidated.",
+    "groups": 4,
+    "objects": 16,
+    "connections": 18
+  },
+  {
+    "id": "background-processing",
+    "name": "Background job processing",
+    "category": "Asynchronous work",
+    "summary": "An API and scheduler feed workers through a queue, with retry and dead-letter paths. Useful for document conversion, reports, and long-running tasks.",
+    "groups": 4,
+    "objects": 12,
+    "connections": 21
+  },
+  {
+    "id": "headless-publishing",
+    "name": "Headless content publishing",
+    "category": "Content platform",
+    "summary": "Editors publish through a CMS while an independent delivery frontend consumes a content API. Media uses object storage and a CDN; publishing jobs refresh delivery artifacts.",
+    "groups": 4,
+    "objects": 11,
+    "connections": 13
+  },
+  {
+    "id": "realtime-collaboration",
+    "name": "Real-time collaboration",
+    "category": "Interactive systems",
+    "summary": "Two real-time servers share durable messages and fan-out work while clients keep WebSocket connections. Includes presence, attachments, and offline notifications.",
+    "groups": 4,
+    "objects": 13,
+    "connections": 19
+  },
+  {
+    "id": "analytics-pipeline",
+    "name": "Analytics data pipeline",
+    "category": "Data platform",
+    "summary": "Operational events and batch extracts flow through ingestion, raw storage, transformation, and a warehouse to dashboards. A logical reference for analytical workloads.",
+    "groups": 4,
+    "objects": 14,
+    "connections": 14
+  },
+  {
+    "id": "umbraco-topology",
+    "name": "Umbraco local Cluster",
+    "category": "Repository snapshot",
+    "summary": "The checked-in Umbraco demo: CM + two CDs, YARP, SQL-backed cache, shared filesystem media, and Aspire tools. Local development; the Astro frontend is independent of Umbraco.",
+    "groups": 4,
+    "objects": 16,
+    "connections": 33,
+    "source": {
+      "label": "hallojoe/umbraco-topology · demo Cluster",
+      "url": "https://github.com/hallojoe/umbraco-topology/tree/3ce66024ac9e5dc603d42185001656c092a5b425/demo/Example.UmbracoSite",
+      "revision": "3ce66024ac9e5dc603d42185001656c092a5b425"
+    }
+  }
+]

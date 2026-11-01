@@ -30,9 +30,11 @@ npm run preview   # Serve the production build locally
 | --- | --- |
 | `frontend/public/architecture.json` | Default architecture and presentation settings; edit this to customize a deployment |
 | `frontend/public/examples/` | Small importable starting documents |
+| `frontend/public/presets/` | Eight selectable architecture presets and their metadata index |
 | `frontend/public/architecture.schema.json` | JSON Schema for editor assistance |
 | `frontend/src/config/` | Document types, defaults, runtime validation, migration, and browser persistence |
 | `frontend/src/catalog/` | Predefined object metadata and independent 3D geometry builders |
+| `frontend/src/presets/` | Preset catalog contract and validated, cancellable document loading |
 | `frontend/src/scene/` | Deterministic group layout, camera, selection, connections, and GPU lifecycle |
 | `frontend/src/ui/` | Directory, inspector, configuration editor, and app coordination |
 | `frontend/src/style.css` | Responsive application styling |
@@ -50,16 +52,20 @@ The frontend uses **TypeScript, Vite, and Three.js**, with native DOM components
 - Search and type filtering; keyboard-accessible directory and inspector. Left/right arrows browse objects while inspecting; Escape closes the inspector.
 - Explicit connections with labels and incoming/outgoing inspection. Only configured connections are displayed; no dependencies are inferred from proximity.
 - JSON editing, import, validated export, default restoration, and browser-local persistence.
+- Preset picker with seven common system setups plus a source-grounded Umbraco Cluster snapshot; open any preset as an editable draft before applying it.
 - Migration of the original `{ name, group, text }[]` format into a version 1 document.
 - Responsive layout, reduced-motion support, and a usable WebGL fallback.
 
 Open **Configure** to edit the active document. Imported files and **Load default** update the editor draft; only **Apply configuration** changes the explorer. **Export draft** validates and downloads the document currently in the editor.
+
+Open **Presets** to choose a three-tier web application, multi-tenant SaaS, e-commerce platform, background job system, headless publishing platform, real-time collaboration system, analytics pipeline, or the linked Umbraco local Cluster. The current architecture remains active until you apply the selected draft. See [preset details and Umbraco source mapping](docs/presets.md).
 
 Changes are stored locally under `dimentionalizer.config.v1` for the browser's origin. They are **not** committed to GitHub or saved on a server. To share a configuration, export it and replace `frontend/public/architecture.json` in your checkout. If an old local override hides changes to that file, choose **Configure → Load default → Apply configuration**.
 
 ## Customize and extend
 
 - [Configuration reference](docs/configuration.md)
+- [Presets and source mapping](docs/presets.md)
 - [Adding an object type](docs/object-types.md)
 - [Design and scope](docs/architecture.md)
 

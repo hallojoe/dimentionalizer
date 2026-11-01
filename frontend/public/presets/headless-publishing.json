@@ -1,0 +1,192 @@
+{
+  "schemaVersion": 1,
+  "presentation": {
+    "title": "Headless content publishing — Dimentionalizer",
+    "brand": "Dimentionalizer",
+    "eyebrow": "CONTENT PLATFORM",
+    "headline": "Headless content publishing.",
+    "description": "Editors publish through a CMS while an independent delivery frontend consumes a content API. Media uses object storage and a CDN; publishing jobs refresh delivery artifacts.",
+    "accent": "#b8ff6c",
+    "background": "#090f14"
+  },
+  "view": {
+    "showNames": true,
+    "effects": true,
+    "autoOrbit": false
+  },
+  "groups": [
+    {
+      "id": "authoring",
+      "name": "Authoring",
+      "color": "#b8ff6c"
+    },
+    {
+      "id": "delivery",
+      "name": "Public delivery",
+      "color": "#61d8ee"
+    },
+    {
+      "id": "data",
+      "name": "Content & media",
+      "color": "#b9a0ff"
+    },
+    {
+      "id": "publishing",
+      "name": "Publishing pipeline",
+      "color": "#ffb16c"
+    }
+  ],
+  "objects": [
+    {
+      "id": "editor",
+      "name": "Content editor",
+      "group": "authoring",
+      "description": "Authors and previews content through the CMS backoffice."
+    },
+    {
+      "id": "cms",
+      "name": "CMS backoffice",
+      "group": "authoring",
+      "description": "Manages drafts, permissions, and publication state."
+    },
+    {
+      "id": "api",
+      "name": "Content delivery API",
+      "group": "delivery",
+      "description": "Exposes published content for the delivery frontend."
+    },
+    {
+      "id": "web",
+      "name": "Delivery frontend",
+      "group": "delivery",
+      "description": "Renders pages from published content. This reference uses runtime API reads plus cache invalidation."
+    },
+    {
+      "id": "visitor",
+      "name": "Website visitor",
+      "group": "delivery",
+      "description": "Requests public pages and media."
+    },
+    {
+      "id": "cdn",
+      "name": "Public media CDN",
+      "group": "delivery",
+      "description": "Caches published public media and frontend assets.",
+      "type": "cdn"
+    },
+    {
+      "id": "db",
+      "name": "Content database",
+      "group": "data",
+      "description": "Stores editorial records and publication state.",
+      "type": "database"
+    },
+    {
+      "id": "media",
+      "name": "Media storage",
+      "group": "data",
+      "description": "Holds uploaded images and documents; only approved public objects are delivered by the CDN.",
+      "type": "storage"
+    },
+    {
+      "id": "cache",
+      "name": "Published content cache",
+      "group": "data",
+      "description": "Caches published API responses and is invalidated after publication.",
+      "type": "cache"
+    },
+    {
+      "id": "queue",
+      "name": "Publishing queue",
+      "group": "publishing",
+      "description": "Carries work generated when content is published or withdrawn.",
+      "type": "queue"
+    },
+    {
+      "id": "worker",
+      "name": "Publishing worker",
+      "group": "publishing",
+      "description": "Processes publication changes and refreshes cached content and derived artifacts."
+    }
+  ],
+  "connections": [
+    {
+      "id": "headless-publishing-01",
+      "from": "editor",
+      "to": "cms",
+      "label": "Author / publish"
+    },
+    {
+      "id": "headless-publishing-02",
+      "from": "cms",
+      "to": "db",
+      "label": "Save drafts and publication state"
+    },
+    {
+      "id": "headless-publishing-03",
+      "from": "cms",
+      "to": "media",
+      "label": "Upload media"
+    },
+    {
+      "id": "headless-publishing-04",
+      "from": "cms",
+      "to": "queue",
+      "label": "Enqueue publication work"
+    },
+    {
+      "id": "headless-publishing-05",
+      "from": "queue",
+      "to": "worker",
+      "label": "Deliver publishing job"
+    },
+    {
+      "id": "headless-publishing-06",
+      "from": "worker",
+      "to": "cache",
+      "label": "Invalidate published entries"
+    },
+    {
+      "id": "headless-publishing-07",
+      "from": "worker",
+      "to": "web",
+      "label": "Request revalidation"
+    },
+    {
+      "id": "headless-publishing-08",
+      "from": "visitor",
+      "to": "web",
+      "label": "Request page"
+    },
+    {
+      "id": "headless-publishing-09",
+      "from": "web",
+      "to": "api",
+      "label": "Read published content"
+    },
+    {
+      "id": "headless-publishing-10",
+      "from": "api",
+      "to": "cache",
+      "label": "Read-through cache"
+    },
+    {
+      "id": "headless-publishing-11",
+      "from": "api",
+      "to": "db",
+      "label": "Read published records"
+    },
+    {
+      "id": "headless-publishing-12",
+      "from": "visitor",
+      "to": "cdn",
+      "label": "Request public media"
+    },
+    {
+      "id": "headless-publishing-13",
+      "from": "cdn",
+      "to": "media",
+      "label": "Fetch media origin"
+    }
+  ]
+}

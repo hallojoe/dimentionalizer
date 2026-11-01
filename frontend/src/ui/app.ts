@@ -6,6 +6,7 @@ import { createViewer } from '../scene/viewer';
 import type { SceneViewer } from '../scene/viewer';
 import { element, get } from './dom';
 import { shell } from './shell';
+import { mountPresetPicker } from './presets';
 
 export async function startApp(): Promise<() => void> {
   get('app').innerHTML = shell;
@@ -199,6 +200,7 @@ export async function startApp(): Promise<() => void> {
   get('next-object').onclick = () => step(1);
   get('config-button').onclick = () => {
     editor.value = JSON.stringify(config, null, 2);
+    get('draft-notice').hidden = true;
     get('config-error').textContent = '';
     configDialog.showModal();
   };
@@ -206,7 +208,14 @@ export async function startApp(): Promise<() => void> {
   document.querySelectorAll<HTMLButtonElement>('[data-close]').forEach(button => {
     button.onclick = () => get<HTMLDialogElement>(button.dataset.close!).close();
   });
-  get('restore-button').onclick = () => { editor.value = JSON.stringify(defaults, null, 2); get('config-error').textContent = ''; };
+  const disposePresets = mountPresetPicker((draft, name) => {
+    editor.value = JSON.stringify(draft, null, 2);
+    get('config-error').textContent = '';
+    get('draft-notice').textContent = `${name} is ready to edit. Apply configuration to replace your current architecture, or close to keep it.`;
+    get('draft-notice').hidden = false;
+    configDialog.showModal();
+  });
+  get('restore-button').onclick = () => { editor.value = JSON.stringify(defaults, null, 2); get('config-error').textContent = ''; get('draft-notice').hidden = true; };
   get('apply-button').onclick = () => {
     try {
       const result = parseConfig(editor.value);
@@ -233,7 +242,7 @@ export async function startApp(): Promise<() => void> {
       if (file.size > 2_000_000) throw Error('Configuration must be smaller than 2 MB.');
       const text = await file.text();
       parseConfig(text);
-      editor.value = text; get('config-error').textContent = '';
+      editor.value = text; get('config-error').textContent = ''; get('draft-notice').hidden = true;
     } catch (error) { get('config-error').textContent = (error as Error).message; }
     fileInput.value = '';
   };
@@ -246,5 +255,5 @@ export async function startApp(): Promise<() => void> {
   window.addEventListener('keydown', keyboard);
   renderPresentation(); renderDirectory();
   if (saved.notice) notify(saved.notice);
-  return () => { viewer?.dispose(); clearTimeout(noticeTimer); window.removeEventListener('keydown', keyboard); };
+  return () => { disposePresets(); viewer?.dispose(); clearTimeout(noticeTimer); window.removeEventListener('keydown', keyboard); };
 }

@@ -1,0 +1,242 @@
+{
+  "schemaVersion": 1,
+  "presentation": {
+    "title": "Real-time collaboration — Dimentionalizer",
+    "brand": "Dimentionalizer",
+    "eyebrow": "INTERACTIVE SYSTEMS",
+    "headline": "Real-time collaboration.",
+    "description": "Two real-time servers share durable messages and fan-out work while clients keep WebSocket connections. Includes presence, attachments, and offline notifications.",
+    "accent": "#b8ff6c",
+    "background": "#090f14"
+  },
+  "view": {
+    "showNames": true,
+    "effects": true,
+    "autoOrbit": false
+  },
+  "groups": [
+    {
+      "id": "clients",
+      "name": "Clients",
+      "color": "#b8ff6c"
+    },
+    {
+      "id": "realtime",
+      "name": "Real-time services",
+      "color": "#61d8ee"
+    },
+    {
+      "id": "data",
+      "name": "Shared state",
+      "color": "#b9a0ff"
+    },
+    {
+      "id": "background",
+      "name": "Async notifications",
+      "color": "#ffb16c"
+    }
+  ],
+  "objects": [
+    {
+      "id": "web",
+      "name": "Web client",
+      "group": "clients",
+      "description": "Maintains an authenticated WebSocket session and displays shared updates."
+    },
+    {
+      "id": "mobile",
+      "name": "Mobile client",
+      "group": "clients",
+      "description": "Connects to the same collaboration service and reconnects after interruptions."
+    },
+    {
+      "id": "proxy",
+      "name": "WebSocket ingress",
+      "group": "realtime",
+      "description": "Routes long-lived connections to real-time service instances.",
+      "type": "reverse-proxy"
+    },
+    {
+      "id": "server-a",
+      "name": "Realtime server A",
+      "group": "realtime",
+      "description": "Validates sessions, persists messages, and publishes fan-out work."
+    },
+    {
+      "id": "server-b",
+      "name": "Realtime server B",
+      "group": "realtime",
+      "description": "A second real-time instance serving a different set of active connections."
+    },
+    {
+      "id": "presence",
+      "name": "Presence cache",
+      "group": "data",
+      "description": "Stores expiring presence and connection ownership. Presence is ephemeral, not an authoritative user record.",
+      "type": "cache"
+    },
+    {
+      "id": "messages",
+      "name": "Message database",
+      "group": "data",
+      "description": "Stores durable messages and cursor positions so clients can catch up.",
+      "type": "database"
+    },
+    {
+      "id": "attachments",
+      "name": "Attachment storage",
+      "group": "data",
+      "description": "Stores shared files with authorization on uploads and downloads.",
+      "type": "storage"
+    },
+    {
+      "id": "fanout",
+      "name": "Fan-out dispatcher",
+      "group": "background",
+      "description": "Routes committed message notifications to per-instance delivery queues. It is a logical service, not a specialized object type."
+    },
+    {
+      "id": "queue-a",
+      "name": "Instance A delivery queue",
+      "group": "background",
+      "description": "Buffers deliveries for connections currently served by instance A.",
+      "type": "queue"
+    },
+    {
+      "id": "queue-b",
+      "name": "Instance B delivery queue",
+      "group": "background",
+      "description": "Buffers deliveries for connections currently served by instance B.",
+      "type": "queue"
+    },
+    {
+      "id": "offline",
+      "name": "Offline notification worker",
+      "group": "background",
+      "description": "Decides whether disconnected recipients need an e-mail notification."
+    },
+    {
+      "id": "email",
+      "name": "Notification e-mail",
+      "group": "background",
+      "description": "Sends offline summaries and account notifications.",
+      "type": "email"
+    }
+  ],
+  "connections": [
+    {
+      "id": "realtime-collaboration-01",
+      "from": "web",
+      "to": "proxy",
+      "label": "WebSocket / HTTPS"
+    },
+    {
+      "id": "realtime-collaboration-02",
+      "from": "mobile",
+      "to": "proxy",
+      "label": "WebSocket / HTTPS"
+    },
+    {
+      "id": "realtime-collaboration-03",
+      "from": "proxy",
+      "to": "server-a",
+      "label": "Route connection"
+    },
+    {
+      "id": "realtime-collaboration-04",
+      "from": "proxy",
+      "to": "server-b",
+      "label": "Route connection"
+    },
+    {
+      "id": "realtime-collaboration-05",
+      "from": "server-a",
+      "to": "messages",
+      "label": "Persist / catch up messages"
+    },
+    {
+      "id": "realtime-collaboration-06",
+      "from": "server-b",
+      "to": "messages",
+      "label": "Persist / catch up messages"
+    },
+    {
+      "id": "realtime-collaboration-07",
+      "from": "server-a",
+      "to": "presence",
+      "label": "Update presence"
+    },
+    {
+      "id": "realtime-collaboration-08",
+      "from": "server-b",
+      "to": "presence",
+      "label": "Update presence"
+    },
+    {
+      "id": "realtime-collaboration-09",
+      "from": "server-a",
+      "to": "attachments",
+      "label": "Authorized file access"
+    },
+    {
+      "id": "realtime-collaboration-10",
+      "from": "server-b",
+      "to": "attachments",
+      "label": "Authorized file access"
+    },
+    {
+      "id": "realtime-collaboration-11",
+      "from": "server-a",
+      "to": "fanout",
+      "label": "Committed message notification"
+    },
+    {
+      "id": "realtime-collaboration-12",
+      "from": "server-b",
+      "to": "fanout",
+      "label": "Committed message notification"
+    },
+    {
+      "id": "realtime-collaboration-13",
+      "from": "fanout",
+      "to": "queue-a",
+      "label": "Route instance A recipients"
+    },
+    {
+      "id": "realtime-collaboration-14",
+      "from": "fanout",
+      "to": "queue-b",
+      "label": "Route instance B recipients"
+    },
+    {
+      "id": "realtime-collaboration-15",
+      "from": "queue-a",
+      "to": "server-a",
+      "label": "Deliver to active connections"
+    },
+    {
+      "id": "realtime-collaboration-16",
+      "from": "queue-b",
+      "to": "server-b",
+      "label": "Deliver to active connections"
+    },
+    {
+      "id": "realtime-collaboration-17",
+      "from": "fanout",
+      "to": "offline",
+      "label": "Notify disconnected recipients"
+    },
+    {
+      "id": "realtime-collaboration-18",
+      "from": "offline",
+      "to": "presence",
+      "label": "Check current presence"
+    },
+    {
+      "id": "realtime-collaboration-19",
+      "from": "offline",
+      "to": "email",
+      "label": "Send offline notification"
+    }
+  ]
+}

@@ -1,0 +1,176 @@
+{
+  "schemaVersion": 1,
+  "presentation": {
+    "title": "Three-tier web application — Dimentionalizer",
+    "brand": "Dimentionalizer",
+    "eyebrow": "WEB APPLICATION",
+    "headline": "Three-tier web application.",
+    "description": "A familiar web stack: browser, reverse proxy, application, relational data, cache, and background e-mail. An editable reference pattern.",
+    "accent": "#b8ff6c",
+    "background": "#090f14"
+  },
+  "view": {
+    "showNames": true,
+    "effects": true,
+    "autoOrbit": false
+  },
+  "groups": [
+    {
+      "id": "access",
+      "name": "Client & edge",
+      "color": "#b8ff6c"
+    },
+    {
+      "id": "app",
+      "name": "Application",
+      "color": "#61d8ee"
+    },
+    {
+      "id": "data",
+      "name": "Persistence",
+      "color": "#b9a0ff"
+    },
+    {
+      "id": "async",
+      "name": "Background work",
+      "color": "#ffb16c"
+    }
+  ],
+  "objects": [
+    {
+      "id": "browser",
+      "name": "Web browser",
+      "group": "access",
+      "description": "Renders pages and makes authenticated HTTPS requests. Represents a client, not a deployed server."
+    },
+    {
+      "id": "cdn",
+      "name": "Static asset CDN",
+      "group": "access",
+      "description": "Caches versioned JavaScript, stylesheets, and public images at the edge.",
+      "type": "cdn"
+    },
+    {
+      "id": "proxy",
+      "name": "Reverse proxy",
+      "group": "access",
+      "description": "Terminates public traffic and forwards dynamic requests to the application.",
+      "type": "reverse-proxy"
+    },
+    {
+      "id": "app",
+      "name": "Web application",
+      "group": "app",
+      "description": "Handles page rendering, business rules, and database transactions in one deployable application."
+    },
+    {
+      "id": "db",
+      "name": "Application database",
+      "group": "data",
+      "description": "Stores users, application records, and transactional state.",
+      "type": "database"
+    },
+    {
+      "id": "cache",
+      "name": "Session & response cache",
+      "group": "data",
+      "description": "Stores short-lived sessions and selected response data. The database remains authoritative.",
+      "type": "cache"
+    },
+    {
+      "id": "assets",
+      "name": "File storage",
+      "group": "data",
+      "description": "Stores public assets and user uploads; private files require authorization before delivery.",
+      "type": "storage"
+    },
+    {
+      "id": "jobs",
+      "name": "Job queue",
+      "group": "async",
+      "description": "Buffers slow work so interactive requests do not wait for delivery.",
+      "type": "queue"
+    },
+    {
+      "id": "worker",
+      "name": "Background worker",
+      "group": "async",
+      "description": "Consumes queued work and sends transactional notifications."
+    },
+    {
+      "id": "email",
+      "name": "E-mail provider",
+      "group": "async",
+      "description": "Delivers account and application notifications through an external provider.",
+      "type": "email"
+    }
+  ],
+  "connections": [
+    {
+      "id": "web-application-01",
+      "from": "browser",
+      "to": "cdn",
+      "label": "GET static assets"
+    },
+    {
+      "id": "web-application-02",
+      "from": "cdn",
+      "to": "assets",
+      "label": "Fetch origin on cache miss"
+    },
+    {
+      "id": "web-application-03",
+      "from": "browser",
+      "to": "proxy",
+      "label": "HTTPS requests"
+    },
+    {
+      "id": "web-application-04",
+      "from": "proxy",
+      "to": "app",
+      "label": "Forward dynamic traffic"
+    },
+    {
+      "id": "web-application-05",
+      "from": "app",
+      "to": "db",
+      "label": "Read / write records"
+    },
+    {
+      "id": "web-application-06",
+      "from": "app",
+      "to": "cache",
+      "label": "Session and response lookup"
+    },
+    {
+      "id": "web-application-07",
+      "from": "app",
+      "to": "assets",
+      "label": "Upload / retrieve files"
+    },
+    {
+      "id": "web-application-08",
+      "from": "app",
+      "to": "jobs",
+      "label": "Enqueue notification"
+    },
+    {
+      "id": "web-application-09",
+      "from": "jobs",
+      "to": "worker",
+      "label": "Deliver job"
+    },
+    {
+      "id": "web-application-10",
+      "from": "worker",
+      "to": "db",
+      "label": "Read job context"
+    },
+    {
+      "id": "web-application-11",
+      "from": "worker",
+      "to": "email",
+      "label": "Send transactional e-mail"
+    }
+  ]
+}

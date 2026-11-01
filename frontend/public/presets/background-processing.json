@@ -1,0 +1,247 @@
+{
+  "schemaVersion": 1,
+  "presentation": {
+    "title": "Background job processing — Dimentionalizer",
+    "brand": "Dimentionalizer",
+    "eyebrow": "ASYNCHRONOUS WORK",
+    "headline": "Background job processing.",
+    "description": "An API and scheduler feed workers through a queue, with retry and dead-letter paths. Useful for document conversion, reports, and long-running tasks.",
+    "accent": "#b8ff6c",
+    "background": "#090f14"
+  },
+  "view": {
+    "showNames": true,
+    "effects": true,
+    "autoOrbit": false
+  },
+  "groups": [
+    {
+      "id": "producers",
+      "name": "Work producers",
+      "color": "#b8ff6c"
+    },
+    {
+      "id": "messaging",
+      "name": "Queues & recovery",
+      "color": "#61d8ee"
+    },
+    {
+      "id": "workers",
+      "name": "Processing",
+      "color": "#b9a0ff"
+    },
+    {
+      "id": "data",
+      "name": "State & output",
+      "color": "#ffb16c"
+    }
+  ],
+  "objects": [
+    {
+      "id": "client",
+      "name": "Client application",
+      "group": "producers",
+      "description": "Submits work and checks job status without holding a long-running request open."
+    },
+    {
+      "id": "api",
+      "name": "Job API",
+      "group": "producers",
+      "description": "Creates a job record, accepts uploads, and submits work for processing."
+    },
+    {
+      "id": "scheduler",
+      "name": "Recurring scheduler",
+      "group": "producers",
+      "description": "Submits periodic jobs with stable identifiers so duplicate schedules can be detected."
+    },
+    {
+      "id": "queue",
+      "name": "Ready queue",
+      "group": "messaging",
+      "description": "Buffers pending work and redelivers unacknowledged jobs.",
+      "type": "queue"
+    },
+    {
+      "id": "retry",
+      "name": "Delayed retry queue",
+      "group": "messaging",
+      "description": "Holds transient failures until their next attempt; delay mechanics depend on the broker.",
+      "type": "queue"
+    },
+    {
+      "id": "dead",
+      "name": "Dead-letter queue",
+      "group": "messaging",
+      "description": "Retains exhausted or invalid jobs for operator review.",
+      "type": "queue"
+    },
+    {
+      "id": "worker-a",
+      "name": "Worker A",
+      "group": "workers",
+      "description": "Competes for jobs, reads input, writes output, and records completion."
+    },
+    {
+      "id": "worker-b",
+      "name": "Worker B",
+      "group": "workers",
+      "description": "A second worker instance for throughput and resilience. Handlers must be idempotent."
+    },
+    {
+      "id": "review",
+      "name": "Failure review tool",
+      "group": "workers",
+      "description": "Lets an operator inspect dead letters and deliberately replay corrected jobs."
+    },
+    {
+      "id": "db",
+      "name": "Job status database",
+      "group": "data",
+      "description": "Tracks accepted, running, retrying, failed, and completed jobs.",
+      "type": "database"
+    },
+    {
+      "id": "input",
+      "name": "Input files",
+      "group": "data",
+      "description": "Stores source documents or data submitted by clients.",
+      "type": "storage"
+    },
+    {
+      "id": "output",
+      "name": "Generated output",
+      "group": "data",
+      "description": "Stores generated reports, thumbnails, or transformed documents.",
+      "type": "storage"
+    }
+  ],
+  "connections": [
+    {
+      "id": "background-processing-01",
+      "from": "client",
+      "to": "api",
+      "label": "Submit work / poll status"
+    },
+    {
+      "id": "background-processing-02",
+      "from": "api",
+      "to": "db",
+      "label": "Create job / read status"
+    },
+    {
+      "id": "background-processing-03",
+      "from": "api",
+      "to": "input",
+      "label": "Store input"
+    },
+    {
+      "id": "background-processing-04",
+      "from": "api",
+      "to": "queue",
+      "label": "Enqueue job"
+    },
+    {
+      "id": "background-processing-05",
+      "from": "scheduler",
+      "to": "queue",
+      "label": "Enqueue scheduled work"
+    },
+    {
+      "id": "background-processing-06",
+      "from": "queue",
+      "to": "worker-a",
+      "label": "Deliver competing job"
+    },
+    {
+      "id": "background-processing-07",
+      "from": "queue",
+      "to": "worker-b",
+      "label": "Deliver competing job"
+    },
+    {
+      "id": "background-processing-08",
+      "from": "worker-a",
+      "to": "input",
+      "label": "Read input"
+    },
+    {
+      "id": "background-processing-09",
+      "from": "worker-b",
+      "to": "input",
+      "label": "Read input"
+    },
+    {
+      "id": "background-processing-10",
+      "from": "worker-a",
+      "to": "output",
+      "label": "Write output"
+    },
+    {
+      "id": "background-processing-11",
+      "from": "worker-b",
+      "to": "output",
+      "label": "Write output"
+    },
+    {
+      "id": "background-processing-12",
+      "from": "worker-a",
+      "to": "db",
+      "label": "Update job status"
+    },
+    {
+      "id": "background-processing-13",
+      "from": "worker-b",
+      "to": "db",
+      "label": "Update job status"
+    },
+    {
+      "id": "background-processing-14",
+      "from": "worker-a",
+      "to": "retry",
+      "label": "Transient failure"
+    },
+    {
+      "id": "background-processing-15",
+      "from": "worker-b",
+      "to": "retry",
+      "label": "Transient failure"
+    },
+    {
+      "id": "background-processing-16",
+      "from": "retry",
+      "to": "queue",
+      "label": "Requeue when delay expires"
+    },
+    {
+      "id": "background-processing-17",
+      "from": "worker-a",
+      "to": "dead",
+      "label": "Exhausted / invalid job"
+    },
+    {
+      "id": "background-processing-18",
+      "from": "worker-b",
+      "to": "dead",
+      "label": "Exhausted / invalid job"
+    },
+    {
+      "id": "background-processing-19",
+      "from": "review",
+      "to": "dead",
+      "label": "Inspect failed job"
+    },
+    {
+      "id": "background-processing-20",
+      "from": "review",
+      "to": "queue",
+      "label": "Replay corrected job"
+    },
+    {
+      "id": "background-processing-21",
+      "from": "api",
+      "to": "output",
+      "label": "Provide authorized download"
+    }
+  ]
+}

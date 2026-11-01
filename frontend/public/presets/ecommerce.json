@@ -1,0 +1,255 @@
+{
+  "schemaVersion": 1,
+  "presentation": {
+    "title": "E-commerce platform — Dimentionalizer",
+    "brand": "Dimentionalizer",
+    "eyebrow": "COMMERCE",
+    "headline": "E-commerce platform.",
+    "description": "A storefront with catalog, cart, checkout, external payment processing, and asynchronous fulfillment. Service boundaries are illustrative and can be consolidated.",
+    "accent": "#b8ff6c",
+    "background": "#090f14"
+  },
+  "view": {
+    "showNames": true,
+    "effects": true,
+    "autoOrbit": false
+  },
+  "groups": [
+    {
+      "id": "edge",
+      "name": "Shopping experience",
+      "color": "#b8ff6c"
+    },
+    {
+      "id": "services",
+      "name": "Commerce services",
+      "color": "#61d8ee"
+    },
+    {
+      "id": "data",
+      "name": "Commerce data",
+      "color": "#b9a0ff"
+    },
+    {
+      "id": "fulfillment",
+      "name": "Fulfillment & integrations",
+      "color": "#ffb16c"
+    }
+  ],
+  "objects": [
+    {
+      "id": "shopper",
+      "name": "Shopper browser",
+      "group": "edge",
+      "description": "The customer-facing browser for product discovery and checkout."
+    },
+    {
+      "id": "cdn",
+      "name": "Storefront CDN",
+      "group": "edge",
+      "description": "Delivers storefront assets and product images close to shoppers.",
+      "type": "cdn"
+    },
+    {
+      "id": "storefront",
+      "name": "Storefront application",
+      "group": "edge",
+      "description": "Renders the shopping experience and calls commerce APIs."
+    },
+    {
+      "id": "gateway",
+      "name": "Commerce gateway",
+      "group": "services",
+      "description": "Routes API requests to catalog, cart, and checkout services.",
+      "type": "reverse-proxy"
+    },
+    {
+      "id": "catalog",
+      "name": "Product catalog",
+      "group": "services",
+      "description": "Serves product descriptions, availability views, and prices."
+    },
+    {
+      "id": "cart",
+      "name": "Cart service",
+      "group": "services",
+      "description": "Maintains active shopping baskets and recalculates their display totals."
+    },
+    {
+      "id": "checkout",
+      "name": "Checkout service",
+      "group": "services",
+      "description": "Validates the order, coordinates payment, and persists an order before fulfillment."
+    },
+    {
+      "id": "products",
+      "name": "Product database",
+      "group": "data",
+      "description": "Stores product and inventory reference records.",
+      "type": "database"
+    },
+    {
+      "id": "orders",
+      "name": "Order database",
+      "group": "data",
+      "description": "Stores order status, payment references, and an outbox for reliable publication.",
+      "type": "database"
+    },
+    {
+      "id": "cart-cache",
+      "name": "Cart cache",
+      "group": "data",
+      "description": "Holds short-lived baskets. Recovery and retention policy depend on the actual product.",
+      "type": "cache"
+    },
+    {
+      "id": "images",
+      "name": "Product media",
+      "group": "data",
+      "description": "Origin storage for product images and static assets.",
+      "type": "storage"
+    },
+    {
+      "id": "payment",
+      "name": "Payment provider",
+      "group": "fulfillment",
+      "description": "External payment processor. The preset includes API calls and callback direction, not payment implementation."
+    },
+    {
+      "id": "outbox",
+      "name": "Outbox publisher",
+      "group": "fulfillment",
+      "description": "Publishes committed order events from the outbox; consumers must handle redelivery."
+    },
+    {
+      "id": "queue",
+      "name": "Order queue",
+      "group": "fulfillment",
+      "description": "Buffers accepted orders for downstream fulfillment.",
+      "type": "queue"
+    },
+    {
+      "id": "worker",
+      "name": "Fulfillment worker",
+      "group": "fulfillment",
+      "description": "Consumes order work, coordinates shipment, and records progress."
+    },
+    {
+      "id": "email",
+      "name": "Order e-mail",
+      "group": "fulfillment",
+      "description": "Delivers confirmations and fulfillment updates.",
+      "type": "email"
+    }
+  ],
+  "connections": [
+    {
+      "id": "ecommerce-01",
+      "from": "shopper",
+      "to": "cdn",
+      "label": "Fetch assets"
+    },
+    {
+      "id": "ecommerce-02",
+      "from": "cdn",
+      "to": "images",
+      "label": "Fetch origin"
+    },
+    {
+      "id": "ecommerce-03",
+      "from": "shopper",
+      "to": "storefront",
+      "label": "Browse and checkout"
+    },
+    {
+      "id": "ecommerce-04",
+      "from": "storefront",
+      "to": "gateway",
+      "label": "Commerce API calls"
+    },
+    {
+      "id": "ecommerce-05",
+      "from": "gateway",
+      "to": "catalog",
+      "label": "Catalog requests"
+    },
+    {
+      "id": "ecommerce-06",
+      "from": "gateway",
+      "to": "cart",
+      "label": "Cart requests"
+    },
+    {
+      "id": "ecommerce-07",
+      "from": "gateway",
+      "to": "checkout",
+      "label": "Checkout requests"
+    },
+    {
+      "id": "ecommerce-08",
+      "from": "catalog",
+      "to": "products",
+      "label": "Read products"
+    },
+    {
+      "id": "ecommerce-09",
+      "from": "cart",
+      "to": "cart-cache",
+      "label": "Read / write basket"
+    },
+    {
+      "id": "ecommerce-10",
+      "from": "checkout",
+      "to": "products",
+      "label": "Validate price / inventory"
+    },
+    {
+      "id": "ecommerce-11",
+      "from": "checkout",
+      "to": "orders",
+      "label": "Persist order and outbox"
+    },
+    {
+      "id": "ecommerce-12",
+      "from": "checkout",
+      "to": "payment",
+      "label": "Create payment"
+    },
+    {
+      "id": "ecommerce-13",
+      "from": "payment",
+      "to": "gateway",
+      "label": "Signed payment callback"
+    },
+    {
+      "id": "ecommerce-14",
+      "from": "outbox",
+      "to": "orders",
+      "label": "Read unpublished outbox rows"
+    },
+    {
+      "id": "ecommerce-15",
+      "from": "outbox",
+      "to": "queue",
+      "label": "Publish committed order"
+    },
+    {
+      "id": "ecommerce-16",
+      "from": "queue",
+      "to": "worker",
+      "label": "Deliver fulfillment job"
+    },
+    {
+      "id": "ecommerce-17",
+      "from": "worker",
+      "to": "orders",
+      "label": "Update fulfillment status"
+    },
+    {
+      "id": "ecommerce-18",
+      "from": "worker",
+      "to": "email",
+      "label": "Send order update"
+    }
+  ]
+}

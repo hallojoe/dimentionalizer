@@ -1,0 +1,216 @@
+{
+  "schemaVersion": 1,
+  "presentation": {
+    "title": "Analytics data pipeline — Dimentionalizer",
+    "brand": "Dimentionalizer",
+    "eyebrow": "DATA PLATFORM",
+    "headline": "Analytics data pipeline.",
+    "description": "Operational events and batch extracts flow through ingestion, raw storage, transformation, and a warehouse to dashboards. A logical reference for analytical workloads.",
+    "accent": "#b8ff6c",
+    "background": "#090f14"
+  },
+  "view": {
+    "showNames": true,
+    "effects": true,
+    "autoOrbit": false
+  },
+  "groups": [
+    {
+      "id": "sources",
+      "name": "Operational sources",
+      "color": "#b8ff6c"
+    },
+    {
+      "id": "ingestion",
+      "name": "Ingestion",
+      "color": "#61d8ee"
+    },
+    {
+      "id": "processing",
+      "name": "Transformation",
+      "color": "#b9a0ff"
+    },
+    {
+      "id": "serving",
+      "name": "Analytics delivery",
+      "color": "#ffb16c"
+    }
+  ],
+  "objects": [
+    {
+      "id": "app",
+      "name": "Operational application",
+      "group": "sources",
+      "description": "Produces business events as application activity occurs."
+    },
+    {
+      "id": "source-db",
+      "name": "Operational database",
+      "group": "sources",
+      "description": "Holds transactional data used by periodic extracts.",
+      "type": "database"
+    },
+    {
+      "id": "collector",
+      "name": "Event collector",
+      "group": "ingestion",
+      "description": "Validates incoming events and attaches ingestion metadata."
+    },
+    {
+      "id": "stream",
+      "name": "Durable event stream",
+      "group": "ingestion",
+      "description": "A replayable event log. Kept as Container because a stream is not the same semantic type as a work queue."
+    },
+    {
+      "id": "landing",
+      "name": "Landing writer",
+      "group": "ingestion",
+      "description": "Consumes events and writes partitioned files into raw object storage."
+    },
+    {
+      "id": "extract",
+      "name": "Batch extractor",
+      "group": "ingestion",
+      "description": "Reads incremental snapshots from the operational database."
+    },
+    {
+      "id": "raw",
+      "name": "Raw data storage",
+      "group": "processing",
+      "description": "Keeps untransformed input for replay and investigation.",
+      "type": "storage"
+    },
+    {
+      "id": "scheduler",
+      "name": "Pipeline orchestrator",
+      "group": "processing",
+      "description": "Schedules extracts and transformation stages and tracks their dependencies."
+    },
+    {
+      "id": "transform",
+      "name": "Transform workers",
+      "group": "processing",
+      "description": "Validate, deduplicate, and transform raw records into analytical models."
+    },
+    {
+      "id": "quarantine",
+      "name": "Rejected records",
+      "group": "processing",
+      "description": "Retains invalid records and validation context for investigation.",
+      "type": "storage"
+    },
+    {
+      "id": "warehouse",
+      "name": "Analytical warehouse",
+      "group": "serving",
+      "description": "Stores curated tables optimized for analytical queries.",
+      "type": "database"
+    },
+    {
+      "id": "query",
+      "name": "Analytics API",
+      "group": "serving",
+      "description": "Applies access rules and exposes aggregate results to dashboards."
+    },
+    {
+      "id": "cache",
+      "name": "Query result cache",
+      "group": "serving",
+      "description": "Caches selected aggregates for a bounded period.",
+      "type": "cache"
+    },
+    {
+      "id": "dashboard",
+      "name": "BI dashboards",
+      "group": "serving",
+      "description": "Displays business metrics and analytical views to authorized users."
+    }
+  ],
+  "connections": [
+    {
+      "id": "analytics-pipeline-01",
+      "from": "app",
+      "to": "collector",
+      "label": "Publish business events"
+    },
+    {
+      "id": "analytics-pipeline-02",
+      "from": "collector",
+      "to": "stream",
+      "label": "Append validated events"
+    },
+    {
+      "id": "analytics-pipeline-03",
+      "from": "stream",
+      "to": "landing",
+      "label": "Consume replayable events"
+    },
+    {
+      "id": "analytics-pipeline-04",
+      "from": "landing",
+      "to": "raw",
+      "label": "Write event files"
+    },
+    {
+      "id": "analytics-pipeline-05",
+      "from": "scheduler",
+      "to": "extract",
+      "label": "Schedule extract"
+    },
+    {
+      "id": "analytics-pipeline-06",
+      "from": "extract",
+      "to": "source-db",
+      "label": "Read incremental data"
+    },
+    {
+      "id": "analytics-pipeline-07",
+      "from": "extract",
+      "to": "raw",
+      "label": "Write batch files"
+    },
+    {
+      "id": "analytics-pipeline-08",
+      "from": "scheduler",
+      "to": "transform",
+      "label": "Schedule transformations"
+    },
+    {
+      "id": "analytics-pipeline-09",
+      "from": "transform",
+      "to": "raw",
+      "label": "Read raw partitions"
+    },
+    {
+      "id": "analytics-pipeline-10",
+      "from": "transform",
+      "to": "quarantine",
+      "label": "Write rejected records"
+    },
+    {
+      "id": "analytics-pipeline-11",
+      "from": "transform",
+      "to": "warehouse",
+      "label": "Load curated tables"
+    },
+    {
+      "id": "analytics-pipeline-12",
+      "from": "dashboard",
+      "to": "query",
+      "label": "Request metrics"
+    },
+    {
+      "id": "analytics-pipeline-13",
+      "from": "query",
+      "to": "warehouse",
+      "label": "Query curated data"
+    },
+    {
+      "id": "analytics-pipeline-14",
+      "from": "query",
+      "to": "cache",
+      "label": "Read / populate result cache"
+    }
+  ]
+}

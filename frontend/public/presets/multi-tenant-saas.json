@@ -1,0 +1,211 @@
+{
+  "schemaVersion": 1,
+  "presentation": {
+    "title": "Multi-tenant SaaS — Dimentionalizer",
+    "brand": "Dimentionalizer",
+    "eyebrow": "SAAS PLATFORM",
+    "headline": "Multi-tenant SaaS.",
+    "description": "A shared application with explicit tenant context, identity, subscription billing, and asynchronous notifications. Illustrates shared infrastructure, not a complete tenant-isolation design.",
+    "accent": "#b8ff6c",
+    "background": "#090f14"
+  },
+  "view": {
+    "showNames": true,
+    "effects": true,
+    "autoOrbit": false
+  },
+  "groups": [
+    {
+      "id": "clients",
+      "name": "Tenant clients",
+      "color": "#b8ff6c"
+    },
+    {
+      "id": "services",
+      "name": "Application services",
+      "color": "#61d8ee"
+    },
+    {
+      "id": "data",
+      "name": "Shared infrastructure",
+      "color": "#b9a0ff"
+    },
+    {
+      "id": "integrations",
+      "name": "External integrations",
+      "color": "#ffb16c"
+    }
+  ],
+  "objects": [
+    {
+      "id": "tenant-a",
+      "name": "Tenant A workspace",
+      "group": "clients",
+      "description": "A browser session scoped to tenant A. Tenant isolation must be enforced by application and data access rules."
+    },
+    {
+      "id": "tenant-b",
+      "name": "Tenant B workspace",
+      "group": "clients",
+      "description": "A separate tenant session using the same application deployment."
+    },
+    {
+      "id": "gateway",
+      "name": "API entry point",
+      "group": "services",
+      "description": "Routes requests to the application API and applies ingress limits.",
+      "type": "reverse-proxy"
+    },
+    {
+      "id": "api",
+      "name": "Tenant-aware API",
+      "group": "services",
+      "description": "Validates identity and tenant membership before accessing tenant-scoped data."
+    },
+    {
+      "id": "identity",
+      "name": "Identity provider",
+      "group": "integrations",
+      "description": "Authenticates users and issues tokens. The API still authorizes access to tenant resources."
+    },
+    {
+      "id": "db",
+      "name": "Tenant-scoped database",
+      "group": "data",
+      "description": "Shared relational store with tenant identifiers on relevant records. Isolation rules are part of the application design.",
+      "type": "database"
+    },
+    {
+      "id": "cache",
+      "name": "Namespaced cache",
+      "group": "data",
+      "description": "Uses tenant-scoped keys for cached results to avoid cross-tenant reuse.",
+      "type": "cache"
+    },
+    {
+      "id": "files",
+      "name": "Tenant file storage",
+      "group": "data",
+      "description": "Stores files under tenant-specific paths with access checks on every private operation.",
+      "type": "storage"
+    },
+    {
+      "id": "queue",
+      "name": "Work queue",
+      "group": "data",
+      "description": "Carries jobs with explicit tenant context and idempotency identifiers.",
+      "type": "queue"
+    },
+    {
+      "id": "worker",
+      "name": "Tenant job worker",
+      "group": "services",
+      "description": "Restores and verifies tenant context before running background work."
+    },
+    {
+      "id": "billing",
+      "name": "Subscription provider",
+      "group": "integrations",
+      "description": "External billing service receiving subscription changes and sending signed lifecycle callbacks."
+    },
+    {
+      "id": "email",
+      "name": "Notification service",
+      "group": "integrations",
+      "description": "Sends invitations, billing updates, and account notifications.",
+      "type": "email"
+    }
+  ],
+  "connections": [
+    {
+      "id": "multi-tenant-saas-01",
+      "from": "tenant-a",
+      "to": "gateway",
+      "label": "Tenant A HTTPS"
+    },
+    {
+      "id": "multi-tenant-saas-02",
+      "from": "tenant-b",
+      "to": "gateway",
+      "label": "Tenant B HTTPS"
+    },
+    {
+      "id": "multi-tenant-saas-03",
+      "from": "tenant-a",
+      "to": "identity",
+      "label": "Sign in"
+    },
+    {
+      "id": "multi-tenant-saas-04",
+      "from": "tenant-b",
+      "to": "identity",
+      "label": "Sign in"
+    },
+    {
+      "id": "multi-tenant-saas-05",
+      "from": "gateway",
+      "to": "api",
+      "label": "Forward API requests"
+    },
+    {
+      "id": "multi-tenant-saas-06",
+      "from": "api",
+      "to": "identity",
+      "label": "Obtain signing keys / validate identity"
+    },
+    {
+      "id": "multi-tenant-saas-07",
+      "from": "api",
+      "to": "db",
+      "label": "Tenant-scoped transactions"
+    },
+    {
+      "id": "multi-tenant-saas-08",
+      "from": "api",
+      "to": "cache",
+      "label": "Tenant-scoped cache access"
+    },
+    {
+      "id": "multi-tenant-saas-09",
+      "from": "api",
+      "to": "files",
+      "label": "Authorized file access"
+    },
+    {
+      "id": "multi-tenant-saas-10",
+      "from": "api",
+      "to": "queue",
+      "label": "Enqueue tenant job"
+    },
+    {
+      "id": "multi-tenant-saas-11",
+      "from": "queue",
+      "to": "worker",
+      "label": "Deliver tenant job"
+    },
+    {
+      "id": "multi-tenant-saas-12",
+      "from": "worker",
+      "to": "db",
+      "label": "Read / update tenant data"
+    },
+    {
+      "id": "multi-tenant-saas-13",
+      "from": "worker",
+      "to": "email",
+      "label": "Send notification"
+    },
+    {
+      "id": "multi-tenant-saas-14",
+      "from": "api",
+      "to": "billing",
+      "label": "Manage subscription"
+    },
+    {
+      "id": "multi-tenant-saas-15",
+      "from": "billing",
+      "to": "gateway",
+      "label": "Signed billing webhook"
+    }
+  ]
+}
