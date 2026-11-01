@@ -4,7 +4,7 @@ Choose **Presets** in the header, filter by category, then **Open editable prese
 
 Presets use the existing version 1 document format. All normal controls work after applying one: group focus, object inspection, connection navigation, search, type filtering, view options, JSON import/export, and browser-local saving. No separate preset renderer or backend is involved. Preset loading also works in the WebGL fallback directory.
 
-The 20 presets are grouped into **Planning & learning**, **Home & family**, **Work & study**, **Travel & mobility**, **Business & workflows**, **Infrastructure**, and **Repository snapshots**. To add a preset without replacing the current document, use **Spaces → Add a space → A preset template**.
+The 21 presets are grouped into **Planning & learning**, **Home & family**, **Work & study**, **Travel & mobility**, **Business & workflows**, **Infrastructure**, and **Repository snapshots**. To add a preset without replacing the current document, use **Spaces → Add a space → A preset template**.
 
 ## Included setups
 
@@ -16,6 +16,7 @@ The 20 presets are grouped into **Planning & learning**, **Home & family**, **Wo
 | Plan a household week | Commitments, ownership, meals, work, home tasks, downtime, replanning, and reflection |
 | Home and neighborhood | A family, shop, bus, and Home portal leading to living, sleeping, and bathroom spaces |
 | Family morning | Waking, washing, breakfast, study, and departure with everyday people and furniture |
+| A CV in layers · 16 years | Six employment planes rising by start year across 2010–2025, grouped responsibilities, and three concurrent private businesses; see [CV walkthrough](career-cv.md) |
 | Outside and inside the office | Campus and Office portal, workstations, partitions, lounge, and shared facilities |
 | Daily commute | Human, home, bus, train, office, and visually distinct in/out transport capacities |
 | Family trip | Family, airport bus, airplane, and an accommodation portal with beds and facilities |

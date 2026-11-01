@@ -30,7 +30,7 @@ npm run preview   # Serve the production build locally
 | --- | --- |
 | `frontend/public/architecture.json` | Default architecture and presentation settings; edit this to customize a deployment |
 | `frontend/public/examples/` | Small importable starting documents |
-| `frontend/public/presets/` | Twenty categorized structure presets and their metadata index |
+| `frontend/public/presets/` | Twenty-one categorized structure presets and their metadata index |
 | `frontend/public/architecture.schema.json` | JSON Schema for editor assistance |
 | `frontend/src/config/` | Document types, defaults, runtime validation, migration, and browser persistence |
 | `frontend/src/catalog/` | Built-in and custom type resolution, geometry builders, and glTF/GLB loading |
@@ -63,9 +63,11 @@ The frontend uses **TypeScript, Vite, and Three.js**, with native DOM components
 - Search and type filtering; keyboard-accessible directory and inspector. Left/right arrows browse objects while inspecting; Escape closes the inspector.
 - Connections between planes, groups, and items, with one-way or bidirectional animated dots and inspector controls. Explicit labels and incoming/outgoing inspection. Only configured connections are displayed; no dependencies are inferred from proximity.
 - JSON editing, import, validated export, default restoration, and browser-local persistence.
-- Preset picker with seven common system setups, a source-grounded Umbraco Cluster snapshot, three business/workflow examples, five human-situation examples, and four detailed planning/workflow walkthroughs; open any preset as an editable draft before applying it.
+- Preset picker with seven common system setups, a source-grounded Umbraco Cluster snapshot, three business/workflow examples, five human-situation examples, four detailed planning/workflow walkthroughs, and a fictional 16-year CV; open any preset as an editable draft before applying it.
 - Migration of the original `{ name, group, text }[]` format into a version 1 document.
 - Responsive layout, reduced-motion support, and a usable WebGL fallback.
+
+Try **Presets → Work & study → A CV in layers · 16 years** for six chronological employment planes and three parallel private side businesses. See the [CV walkthrough](docs/career-cv.md).
 
 Try **Presets → Planning & learning → A whole day, outside and inside** for an elevated workflow with a workday portal and saved checklists.
 

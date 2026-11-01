@@ -45,6 +45,15 @@
     "connections": 9
   },
   {
+    "id": "career-cv",
+    "name": "A CV in layers · 16 years",
+    "summary": "A fictional CV for Alex Rowan: six consecutive employments from January 2010 to December 2025, plus three overlapping private side businesses. Each engagement has its own plane, grouped responsibilities, and an inspectable role summary. Higher planes start later; wobbly links mark concurrent private work.",
+    "category": "Work & study",
+    "groups": 18,
+    "objects": 45,
+    "connections": 47
+  },
+  {
     "id": "shared-office",
     "name": "Outside and inside the office",
     "category": "Work & study",

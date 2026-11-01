@@ -1,0 +1,1245 @@
+{
+  "schemaVersion": 1,
+  "presentation": {
+    "title": "A CV in layers · 16 years — Dimentionalizer",
+    "brand": "Dimentionalizer",
+    "eyebrow": "FICTIONAL CV · 2010–2025",
+    "headline": "Alex Rowan.\nSix roles. Sixteen years.",
+    "description": "A fictional CV for Alex Rowan: six consecutive employments from January 2010 to December 2025, plus three overlapping private side businesses. Each engagement has its own plane, grouped responsibilities, and an inspectable role summary. Higher planes start later; wobbly links mark concurrent private work.",
+    "accent": "#61d8ee"
+  },
+  "view": {
+    "showNames": true,
+    "showGrid": false,
+    "showPlaneFrames": true,
+    "showGroupFrames": true,
+    "effects": false,
+    "autoOrbit": false
+  },
+  "spaces": [
+    {
+      "id": "career",
+      "name": "Alex Rowan · fictional career",
+      "description": "Six sequential employments spanning exactly 16 calendar years, with three parallel private businesses. All people, organizations, responsibilities, and outcomes in this example are invented."
+    }
+  ],
+  "spaceView": {
+    "visible": [
+      "career"
+    ],
+    "active": "career"
+  },
+  "objectTypes": [
+    {
+      "id": "career-role",
+      "name": "Employment / contract",
+      "symbol": "▦",
+      "shape": "office",
+      "description": "An inspectable role summary within one employment plane."
+    },
+    {
+      "id": "private-business",
+      "name": "Private side business",
+      "symbol": "▧",
+      "shape": "shop",
+      "description": "An independently owned business operated alongside employment."
+    }
+  ],
+  "planes": [
+    {
+      "id": "job-1",
+      "space": "career",
+      "name": "Employment 01 · Juniper Pixel Studio · 2010–2011",
+      "elevation": 0,
+      "sizing": "auto",
+      "spacing": {
+        "mode": "padding",
+        "target": "children",
+        "value": 1
+      },
+      "decoration": {
+        "color": "#61d8ee",
+        "opacity": 0.025,
+        "border": true,
+        "grid": false,
+        "label": true
+      }
+    },
+    {
+      "id": "job-2",
+      "space": "career",
+      "name": "Employment 02 · Harborline Systems · 2012–2014",
+      "elevation": 10,
+      "sizing": "auto",
+      "spacing": {
+        "mode": "padding",
+        "target": "children",
+        "value": 1
+      },
+      "decoration": {
+        "color": "#77ebc4",
+        "opacity": 0.025,
+        "border": true,
+        "grid": false,
+        "label": true
+      }
+    },
+    {
+      "id": "job-3",
+      "space": "career",
+      "name": "Employment 03 · MeadowCart · 2015–2017",
+      "elevation": 25,
+      "sizing": "auto",
+      "spacing": {
+        "mode": "padding",
+        "target": "children",
+        "value": 1
+      },
+      "decoration": {
+        "color": "#b8ff6c",
+        "opacity": 0.025,
+        "border": true,
+        "grid": false,
+        "label": true
+      }
+    },
+    {
+      "id": "job-4",
+      "space": "career",
+      "name": "Employment 04 · Cobalt Forge Labs · 2018–2020",
+      "elevation": 40,
+      "sizing": "auto",
+      "spacing": {
+        "mode": "padding",
+        "target": "children",
+        "value": 1
+      },
+      "decoration": {
+        "color": "#b9a0ff",
+        "opacity": 0.025,
+        "border": true,
+        "grid": false,
+        "label": true
+      }
+    },
+    {
+      "id": "job-5",
+      "space": "career",
+      "name": "Employment 05 · LanternCloud · 2021–2023",
+      "elevation": 55,
+      "sizing": "auto",
+      "spacing": {
+        "mode": "padding",
+        "target": "children",
+        "value": 1
+      },
+      "decoration": {
+        "color": "#8bafff",
+        "opacity": 0.025,
+        "border": true,
+        "grid": false,
+        "label": true
+      }
+    },
+    {
+      "id": "job-6",
+      "space": "career",
+      "name": "Employment 06 · OpenTrail Products · 2024–2025",
+      "elevation": 70,
+      "sizing": "auto",
+      "spacing": {
+        "mode": "padding",
+        "target": "children",
+        "value": 1
+      },
+      "decoration": {
+        "color": "#f488b5",
+        "opacity": 0.025,
+        "border": true,
+        "grid": false,
+        "label": true
+      }
+    },
+    {
+      "id": "side-1",
+      "space": "career",
+      "name": "Private 01 · Weekend Webcraft · 2013–2016",
+      "elevation": 15,
+      "sizing": "auto",
+      "spacing": {
+        "mode": "padding",
+        "target": "children",
+        "value": 1
+      },
+      "decoration": {
+        "color": "#ffb16c",
+        "opacity": 0.035,
+        "border": true,
+        "grid": false,
+        "label": true
+      }
+    },
+    {
+      "id": "side-2",
+      "space": "career",
+      "name": "Private 02 · Small Batch Goods · 2018–2021",
+      "elevation": 40,
+      "sizing": "auto",
+      "spacing": {
+        "mode": "padding",
+        "target": "children",
+        "value": 1
+      },
+      "decoration": {
+        "color": "#ffb16c",
+        "opacity": 0.035,
+        "border": true,
+        "grid": false,
+        "label": true
+      }
+    },
+    {
+      "id": "side-3",
+      "space": "career",
+      "name": "Private 03 · Practical Code Sessions · 2022–2025",
+      "elevation": 60,
+      "sizing": "auto",
+      "spacing": {
+        "mode": "padding",
+        "target": "children",
+        "value": 1
+      },
+      "decoration": {
+        "color": "#ffb16c",
+        "opacity": 0.035,
+        "border": true,
+        "grid": false,
+        "label": true
+      }
+    }
+  ],
+  "groups": [
+    {
+      "id": "job-1-area-1",
+      "name": "Website delivery",
+      "plane": "job-1",
+      "color": "#61d8ee",
+      "elevation": 0,
+      "spacing": {
+        "mode": "margin",
+        "target": "children",
+        "value": 0.5
+      }
+    },
+    {
+      "id": "job-1-area-2",
+      "name": "Quality and support",
+      "plane": "job-1",
+      "color": "#61d8ee",
+      "elevation": 0,
+      "spacing": {
+        "mode": "margin",
+        "target": "children",
+        "value": 0.5
+      }
+    },
+    {
+      "id": "job-2-area-1",
+      "name": "Application engineering",
+      "plane": "job-2",
+      "color": "#77ebc4",
+      "elevation": 0,
+      "spacing": {
+        "mode": "margin",
+        "target": "children",
+        "value": 0.5
+      }
+    },
+    {
+      "id": "job-2-area-2",
+      "name": "Delivery and discovery",
+      "plane": "job-2",
+      "color": "#77ebc4",
+      "elevation": 0,
+      "spacing": {
+        "mode": "margin",
+        "target": "children",
+        "value": 0.5
+      }
+    },
+    {
+      "id": "job-3-area-1",
+      "name": "Commerce journeys",
+      "plane": "job-3",
+      "color": "#b8ff6c",
+      "elevation": 0,
+      "spacing": {
+        "mode": "margin",
+        "target": "children",
+        "value": 0.5
+      }
+    },
+    {
+      "id": "job-3-area-2",
+      "name": "Reliability and insight",
+      "plane": "job-3",
+      "color": "#b8ff6c",
+      "elevation": 0,
+      "spacing": {
+        "mode": "margin",
+        "target": "children",
+        "value": 0.5
+      }
+    },
+    {
+      "id": "job-4-area-1",
+      "name": "Architecture and modernization",
+      "plane": "job-4",
+      "color": "#b9a0ff",
+      "elevation": 0,
+      "spacing": {
+        "mode": "margin",
+        "target": "children",
+        "value": 0.5
+      }
+    },
+    {
+      "id": "job-4-area-2",
+      "name": "Client enablement",
+      "plane": "job-4",
+      "color": "#b9a0ff",
+      "elevation": 0,
+      "spacing": {
+        "mode": "margin",
+        "target": "children",
+        "value": 0.5
+      }
+    },
+    {
+      "id": "job-5-area-1",
+      "name": "Developer platform",
+      "plane": "job-5",
+      "color": "#8bafff",
+      "elevation": 0,
+      "spacing": {
+        "mode": "margin",
+        "target": "children",
+        "value": 0.5
+      }
+    },
+    {
+      "id": "job-5-area-2",
+      "name": "Technical leadership",
+      "plane": "job-5",
+      "color": "#8bafff",
+      "elevation": 0,
+      "spacing": {
+        "mode": "margin",
+        "target": "children",
+        "value": 0.5
+      }
+    },
+    {
+      "id": "job-6-area-1",
+      "name": "Product and architecture",
+      "plane": "job-6",
+      "color": "#f488b5",
+      "elevation": 0,
+      "spacing": {
+        "mode": "margin",
+        "target": "children",
+        "value": 0.5
+      }
+    },
+    {
+      "id": "job-6-area-2",
+      "name": "Delivery and people",
+      "plane": "job-6",
+      "color": "#f488b5",
+      "elevation": 0,
+      "spacing": {
+        "mode": "margin",
+        "target": "children",
+        "value": 0.5
+      }
+    },
+    {
+      "id": "side-1-area-1",
+      "name": "Client services",
+      "plane": "side-1",
+      "color": "#ffb16c",
+      "elevation": 0,
+      "spacing": {
+        "mode": "margin",
+        "target": "children",
+        "value": 0.5
+      }
+    },
+    {
+      "id": "side-1-area-2",
+      "name": "Business operations",
+      "plane": "side-1",
+      "color": "#ffb16c",
+      "elevation": 0,
+      "spacing": {
+        "mode": "margin",
+        "target": "children",
+        "value": 0.5
+      }
+    },
+    {
+      "id": "side-2-area-1",
+      "name": "Store and fulfillment",
+      "plane": "side-2",
+      "color": "#ffb16c",
+      "elevation": 0,
+      "spacing": {
+        "mode": "margin",
+        "target": "children",
+        "value": 0.5
+      }
+    },
+    {
+      "id": "side-2-area-2",
+      "name": "Customer and commercial work",
+      "plane": "side-2",
+      "color": "#ffb16c",
+      "elevation": 0,
+      "spacing": {
+        "mode": "margin",
+        "target": "children",
+        "value": 0.5
+      }
+    },
+    {
+      "id": "side-3-area-1",
+      "name": "Learning products",
+      "plane": "side-3",
+      "color": "#ffb16c",
+      "elevation": 0,
+      "spacing": {
+        "mode": "margin",
+        "target": "children",
+        "value": 0.5
+      }
+    },
+    {
+      "id": "side-3-area-2",
+      "name": "Business development",
+      "plane": "side-3",
+      "color": "#ffb16c",
+      "elevation": 0,
+      "spacing": {
+        "mode": "margin",
+        "target": "children",
+        "value": 0.5
+      }
+    }
+  ],
+  "objects": [
+    {
+      "id": "job-1-role",
+      "name": "Junior web developer",
+      "group": "job-1-area-1",
+      "type": "career-role",
+      "description": "Alex Rowan · fictional CV\nJuniper Pixel Studio\nJan 2010 – Dec 2011 · 2 years\nBuilt and maintained small business websites under senior supervision. Delivered a reusable page template and a documented support handover.\n\nPlane height = 5 × (start year − 2010). Height encodes chronology, not seniority, importance, or duration. All grouped functions belong to this engagement.",
+      "elevation": 0
+    },
+    {
+      "id": "job-1-area-1-function-1",
+      "name": "Responsive page implementation",
+      "group": "job-1-area-1",
+      "type": "processing",
+      "description": "Juniper Pixel Studio · Junior web developer\nJan 2010 – Dec 2011\n\nImplemented semantic HTML, CSS layouts, and browser interactions from approved designs. Delivered reusable page components for client sites.\n\nFictional responsibility fulfilled within this engagement.",
+      "elevation": 0
+    },
+    {
+      "id": "job-1-area-1-function-2",
+      "name": "CMS content setup",
+      "group": "job-1-area-1",
+      "type": "product",
+      "description": "Juniper Pixel Studio · Junior web developer\nJan 2010 – Dec 2011\n\nConfigured content types, page templates, and editor guidance. Enabled clients to maintain their own site content.\n\nFictional responsibility fulfilled within this engagement.",
+      "elevation": 0
+    },
+    {
+      "id": "job-1-area-2-function-1",
+      "name": "Browser and accessibility checks",
+      "group": "job-1-area-2",
+      "type": "workflow",
+      "description": "Juniper Pixel Studio · Junior web developer\nJan 2010 – Dec 2011\n\nChecked keyboard navigation, form labels, layouts, and supported browsers. Fixed issues before client acceptance.\n\nFictional responsibility fulfilled within this engagement.",
+      "elevation": 0
+    },
+    {
+      "id": "job-1-area-2-function-2",
+      "name": "Client support and handover",
+      "group": "job-1-area-2",
+      "type": "message",
+      "description": "Juniper Pixel Studio · Junior web developer\nJan 2010 – Dec 2011\n\nTriaged support requests, explained fixes, and wrote concise handover notes for content editors.\n\nFictional responsibility fulfilled within this engagement.",
+      "elevation": 0
+    },
+    {
+      "id": "job-2-role",
+      "name": "Software developer",
+      "group": "job-2-area-1",
+      "type": "career-role",
+      "description": "Alex Rowan · fictional CV\nHarborline Systems\nJan 2012 – Dec 2014 · 3 years\nDeveloped internal operations software with a cross-functional team. Delivered API integrations and dependable release routines for service staff.\n\nPlane height = 5 × (start year − 2010). Height encodes chronology, not seniority, importance, or duration. All grouped functions belong to this engagement.",
+      "elevation": 0
+    },
+    {
+      "id": "job-2-area-1-function-1",
+      "name": "API and business logic",
+      "group": "job-2-area-1",
+      "type": "api-call",
+      "description": "Harborline Systems · Software developer\nJan 2012 – Dec 2014\n\nImplemented application endpoints, validation rules, and automated tests for an internal service-management product.\n\nFictional responsibility fulfilled within this engagement.",
+      "elevation": 0
+    },
+    {
+      "id": "job-2-area-1-function-2",
+      "name": "Relational data modeling",
+      "group": "job-2-area-1",
+      "type": "database",
+      "description": "Harborline Systems · Software developer\nJan 2012 – Dec 2014\n\nDesigned relational tables, queries, and versioned migrations. Supported reporting and reproducible environment setup.\n\nFictional responsibility fulfilled within this engagement.",
+      "elevation": 0
+    },
+    {
+      "id": "job-2-area-2-function-1",
+      "name": "Build and release automation",
+      "group": "job-2-area-2",
+      "type": "workflow",
+      "description": "Harborline Systems · Software developer\nJan 2012 – Dec 2014\n\nMaintained CI jobs, repeatable deployments, and release notes so the team could ship reviewed changes consistently.\n\nFictional responsibility fulfilled within this engagement.",
+      "elevation": 0
+    },
+    {
+      "id": "job-2-area-2-function-2",
+      "name": "Requirements workshops",
+      "group": "job-2-area-2",
+      "type": "usergroup",
+      "description": "Harborline Systems · Software developer\nJan 2012 – Dec 2014\n\nWorked with service staff to turn operational problems into acceptance criteria and small deliverable increments.\n\nFictional responsibility fulfilled within this engagement.",
+      "elevation": 0
+    },
+    {
+      "id": "job-3-role",
+      "name": "Full-stack engineer",
+      "group": "job-3-area-1",
+      "type": "career-role",
+      "description": "Alex Rowan · fictional CV\nMeadowCart\nJan 2015 – Dec 2017 · 3 years\nOwned customer-facing commerce journeys and their supporting services. Delivered an updated checkout and connected inventory workflows.\n\nPlane height = 5 × (start year − 2010). Height encodes chronology, not seniority, importance, or duration. All grouped functions belong to this engagement.",
+      "elevation": 0
+    },
+    {
+      "id": "job-3-area-1-function-1",
+      "name": "Checkout experience",
+      "group": "job-3-area-1",
+      "type": "product",
+      "description": "MeadowCart · Full-stack engineer\nJan 2015 – Dec 2017\n\nImplemented basket, checkout, and order-status interfaces. Worked with design and support to make errors and recovery understandable.\n\nFictional responsibility fulfilled within this engagement.",
+      "elevation": 0
+    },
+    {
+      "id": "job-3-area-1-function-2",
+      "name": "Payment and inventory integration",
+      "group": "job-3-area-1",
+      "type": "api-call",
+      "description": "MeadowCart · Full-stack engineer\nJan 2015 – Dec 2017\n\nIntegrated payment notifications and inventory updates with explicit failure handling and reconciliation steps.\n\nFictional responsibility fulfilled within this engagement.",
+      "elevation": 0
+    },
+    {
+      "id": "job-3-area-2-function-1",
+      "name": "Performance and monitoring",
+      "group": "job-3-area-2",
+      "type": "processing",
+      "description": "MeadowCart · Full-stack engineer\nJan 2015 – Dec 2017\n\nInvestigated slow requests, improved frequently used queries, and added dashboards for production behavior.\n\nFictional responsibility fulfilled within this engagement.",
+      "elevation": 0
+    },
+    {
+      "id": "job-3-area-2-function-2",
+      "name": "Product event analysis",
+      "group": "job-3-area-2",
+      "type": "dataflow",
+      "description": "MeadowCart · Full-stack engineer\nJan 2015 – Dec 2017\n\nDefined meaningful product events and reviewed funnel data with the product team to prioritize improvements.\n\nFictional responsibility fulfilled within this engagement.",
+      "elevation": 0
+    },
+    {
+      "id": "job-4-role",
+      "name": "Senior consultant · fixed-term contract",
+      "group": "job-4-area-1",
+      "type": "career-role",
+      "description": "Alex Rowan · fictional CV\nCobalt Forge Labs\nJan 2018 – Dec 2020 · 3 years\nCompleted a three-year client delivery contract covering discovery, modernization, and handover. Delivered a staged replacement for a legacy case-management application.\n\nPlane height = 5 × (start year − 2010). Height encodes chronology, not seniority, importance, or duration. All grouped functions belong to this engagement.",
+      "elevation": 0
+    },
+    {
+      "id": "job-4-area-1-function-1",
+      "name": "Discovery and solution design",
+      "group": "job-4-area-1",
+      "type": "workflow",
+      "description": "Cobalt Forge Labs · Senior consultant · fixed-term contract\nJan 2018 – Dec 2020\n\nMapped existing workflows, constraints, and integration boundaries. Recorded architectural options and agreed a staged migration plan.\n\nFictional responsibility fulfilled within this engagement.",
+      "elevation": 0
+    },
+    {
+      "id": "job-4-area-1-function-2",
+      "name": "Migration and integration delivery",
+      "group": "job-4-area-1",
+      "type": "dataflow",
+      "description": "Cobalt Forge Labs · Senior consultant · fixed-term contract\nJan 2018 – Dec 2020\n\nBuilt adapters and migration routines, verified reconciled records, and coordinated cutover rehearsals with client teams.\n\nFictional responsibility fulfilled within this engagement.",
+      "elevation": 0
+    },
+    {
+      "id": "job-4-area-2-function-1",
+      "name": "Stakeholder demonstrations",
+      "group": "job-4-area-2",
+      "type": "message",
+      "description": "Cobalt Forge Labs · Senior consultant · fixed-term contract\nJan 2018 – Dec 2020\n\nDemonstrated working increments, gathered feedback, and translated risks into clear choices for client stakeholders.\n\nFictional responsibility fulfilled within this engagement.",
+      "elevation": 0
+    },
+    {
+      "id": "job-4-area-2-function-2",
+      "name": "Mentoring and operational handover",
+      "group": "job-4-area-2",
+      "type": "usergroup",
+      "description": "Cobalt Forge Labs · Senior consultant · fixed-term contract\nJan 2018 – Dec 2020\n\nPaired with client developers, reviewed changes, and transferred runbooks and support ownership before the contract ended.\n\nFictional responsibility fulfilled within this engagement.",
+      "elevation": 0
+    },
+    {
+      "id": "job-5-role",
+      "name": "Platform engineering lead",
+      "group": "job-5-area-1",
+      "type": "career-role",
+      "description": "Alex Rowan · fictional CV\nLanternCloud\nJan 2021 – Dec 2023 · 3 years\nLed a small platform team supporting several product teams. Delivered reusable deployment paths and clearer service ownership.\n\nPlane height = 5 × (start year − 2010). Height encodes chronology, not seniority, importance, or duration. All grouped functions belong to this engagement.",
+      "elevation": 0
+    },
+    {
+      "id": "job-5-area-1-function-1",
+      "name": "Self-service delivery templates",
+      "group": "job-5-area-1",
+      "type": "product",
+      "description": "LanternCloud · Platform engineering lead\nJan 2021 – Dec 2023\n\nBuilt versioned service templates, CI/CD conventions, and onboarding examples that product teams could adapt.\n\nFictional responsibility fulfilled within this engagement.",
+      "elevation": 0
+    },
+    {
+      "id": "job-5-area-1-function-2",
+      "name": "Observability and incident readiness",
+      "group": "job-5-area-1",
+      "type": "processing",
+      "description": "LanternCloud · Platform engineering lead\nJan 2021 – Dec 2023\n\nEstablished service dashboards, alert ownership, and incident exercises with the teams operating the services.\n\nFictional responsibility fulfilled within this engagement.",
+      "elevation": 0
+    },
+    {
+      "id": "job-5-area-2-function-1",
+      "name": "Team coaching and planning",
+      "group": "job-5-area-2",
+      "type": "usergroup",
+      "description": "LanternCloud · Platform engineering lead\nJan 2021 – Dec 2023\n\nCoached engineers, coordinated capacity, and balanced planned platform improvements with operational requests.\n\nFictional responsibility fulfilled within this engagement.",
+      "elevation": 0
+    },
+    {
+      "id": "job-5-area-2-function-2",
+      "name": "Architecture and cost reviews",
+      "group": "job-5-area-2",
+      "type": "workflow",
+      "description": "LanternCloud · Platform engineering lead\nJan 2021 – Dec 2023\n\nFacilitated design reviews and reviewed hosting usage with service owners. Recorded tradeoffs and follow-up actions.\n\nFictional responsibility fulfilled within this engagement.",
+      "elevation": 0
+    },
+    {
+      "id": "job-6-role",
+      "name": "Principal product engineer",
+      "group": "job-6-area-1",
+      "type": "career-role",
+      "description": "Alex Rowan · fictional CV\nOpenTrail Products\nJan 2024 – Dec 2025 · 2 years\nWorked across product, design, and engineering to connect strategy with delivery. Completed a product-platform simplification program and established shared technical decision records.\n\nPlane height = 5 × (start year − 2010). Height encodes chronology, not seniority, importance, or duration. All grouped functions belong to this engagement.",
+      "elevation": 0
+    },
+    {
+      "id": "job-6-area-1-function-1",
+      "name": "Technical product strategy",
+      "group": "job-6-area-1",
+      "type": "product",
+      "description": "OpenTrail Products · Principal product engineer\nJan 2024 – Dec 2025\n\nConnected customer needs, platform constraints, and product priorities. Tested assumptions through small prototypes before larger commitments.\n\nFictional responsibility fulfilled within this engagement.",
+      "elevation": 0
+    },
+    {
+      "id": "job-6-area-1-function-2",
+      "name": "Cross-team architecture",
+      "group": "job-6-area-1",
+      "type": "workflow",
+      "description": "OpenTrail Products · Principal product engineer\nJan 2024 – Dec 2025\n\nAligned boundaries and integration contracts across product teams. Documented decisions with their consequences and review dates.\n\nFictional responsibility fulfilled within this engagement.",
+      "elevation": 0
+    },
+    {
+      "id": "job-6-area-2-function-1",
+      "name": "Program sequencing and risk",
+      "group": "job-6-area-2",
+      "type": "processing",
+      "description": "OpenTrail Products · Principal product engineer\nJan 2024 – Dec 2025\n\nBroke a multi-team program into reversible releases, tracked dependencies, and made delivery risks visible early.\n\nFictional responsibility fulfilled within this engagement.",
+      "elevation": 0
+    },
+    {
+      "id": "job-6-area-2-function-2",
+      "name": "Engineering community and mentoring",
+      "group": "job-6-area-2",
+      "type": "usergroup",
+      "description": "OpenTrail Products · Principal product engineer\nJan 2024 – Dec 2025\n\nMentored senior engineers, hosted design discussions, and shared examples that helped teams make decisions independently.\n\nFictional responsibility fulfilled within this engagement.",
+      "elevation": 0
+    },
+    {
+      "id": "side-1-role",
+      "name": "Owner · private web studio",
+      "group": "side-1-area-1",
+      "type": "private-business",
+      "description": "Alex Rowan · fictional CV\nWeekend Webcraft\nJan 2013 – Dec 2016 · 4 years\nA private evening-and-weekend web studio alongside the 2012–2014 and 2015–2017 jobs. Separate clients and deliverables; closed in December 2016.\n\nPlane height = 5 × (start year − 2010). Height encodes chronology, not seniority, importance, or duration. All grouped functions belong to this engagement.",
+      "elevation": 0
+    },
+    {
+      "id": "side-1-area-1-function-1",
+      "name": "Discovery and fixed-scope proposals",
+      "group": "side-1-area-1",
+      "type": "message",
+      "description": "Weekend Webcraft · Owner · private web studio\nJan 2013 – Dec 2016\n\nMet local clients, clarified their needs, and agreed scope, pricing, and acceptance before starting work.\n\nFictional responsibility fulfilled within this engagement.",
+      "elevation": 0
+    },
+    {
+      "id": "side-1-area-1-function-2",
+      "name": "Website delivery and care",
+      "group": "side-1-area-1",
+      "type": "product",
+      "description": "Weekend Webcraft · Owner · private web studio\nJan 2013 – Dec 2016\n\nDesigned and delivered small websites, provided editor training, and handled maintenance requests.\n\nFictional responsibility fulfilled within this engagement.",
+      "elevation": 0
+    },
+    {
+      "id": "side-1-area-2-function-1",
+      "name": "Scheduling and customer support",
+      "group": "side-1-area-2",
+      "type": "workflow",
+      "description": "Weekend Webcraft · Owner · private web studio\nJan 2013 – Dec 2016\n\nPlanned a limited evening workload and set response expectations so private commitments remained manageable.\n\nFictional responsibility fulfilled within this engagement.",
+      "elevation": 0
+    },
+    {
+      "id": "side-1-area-2-function-2",
+      "name": "Quoting and bookkeeping",
+      "group": "side-1-area-2",
+      "type": "processing",
+      "description": "Weekend Webcraft · Owner · private web studio\nJan 2013 – Dec 2016\n\nPrepared quotes and invoices, recorded expenses, and kept project records separate from employment work.\n\nFictional responsibility fulfilled within this engagement.",
+      "elevation": 0
+    },
+    {
+      "id": "side-2-role",
+      "name": "Co-owner · private online shop",
+      "group": "side-2-area-1",
+      "type": "private-business",
+      "description": "Alex Rowan · fictional CV\nSmall Batch Goods\nJan 2018 – Dec 2021 · 4 years\nA privately owned small-batch homewares shop operated with a partner alongside consulting and the start of the platform-lead role. Closed in December 2021.\n\nPlane height = 5 × (start year − 2010). Height encodes chronology, not seniority, importance, or duration. All grouped functions belong to this engagement.",
+      "elevation": 0
+    },
+    {
+      "id": "side-2-area-1-function-1",
+      "name": "Product catalog and storefront",
+      "group": "side-2-area-1",
+      "type": "shop",
+      "description": "Small Batch Goods · Co-owner · private online shop\nJan 2018 – Dec 2021\n\nCreated product pages, photography briefs, and stock information for a small independent online catalog.\n\nFictional responsibility fulfilled within this engagement.",
+      "elevation": 0
+    },
+    {
+      "id": "side-2-area-1-function-2",
+      "name": "Packing and supplier coordination",
+      "group": "side-2-area-1",
+      "type": "warehouse",
+      "description": "Small Batch Goods · Co-owner · private online shop\nJan 2018 – Dec 2021\n\nCoordinated replenishment, packed orders, and kept customers informed about delivery and availability.\n\nFictional responsibility fulfilled within this engagement.",
+      "elevation": 0
+    },
+    {
+      "id": "side-2-area-2-function-1",
+      "name": "Customer care and returns",
+      "group": "side-2-area-2",
+      "type": "message",
+      "description": "Small Batch Goods · Co-owner · private online shop\nJan 2018 – Dec 2021\n\nAnswered product questions and handled return requests with clear status updates and recorded follow-up.\n\nFictional responsibility fulfilled within this engagement.",
+      "elevation": 0
+    },
+    {
+      "id": "side-2-area-2-function-2",
+      "name": "Pricing and inventory planning",
+      "group": "side-2-area-2",
+      "type": "processing",
+      "description": "Small Batch Goods · Co-owner · private online shop\nJan 2018 – Dec 2021\n\nReviewed material and delivery costs, maintained stock records, and planned small purchasing batches.\n\nFictional responsibility fulfilled within this engagement.",
+      "elevation": 0
+    },
+    {
+      "id": "side-3-role",
+      "name": "Founder · private training business",
+      "group": "side-3-area-1",
+      "type": "private-business",
+      "description": "Alex Rowan · fictional CV\nPractical Code Sessions\nJan 2022 – Dec 2025 · 4 years\nA private part-time workshop business alongside platform leadership and principal engineering. This CV snapshot records its activity through December 2025.\n\nPlane height = 5 × (start year − 2010). Height encodes chronology, not seniority, importance, or duration. All grouped functions belong to this engagement.",
+      "elevation": 0
+    },
+    {
+      "id": "side-3-area-1-function-1",
+      "name": "Workshop curriculum and exercises",
+      "group": "side-3-area-1",
+      "type": "product",
+      "description": "Practical Code Sessions · Founder · private training business\nJan 2022 – Dec 2025\n\nDesigned practical software workshops with reusable exercises, worked examples, and clear learning outcomes.\n\nFictional responsibility fulfilled within this engagement.",
+      "elevation": 0
+    },
+    {
+      "id": "side-3-area-1-function-2",
+      "name": "Teaching and individual feedback",
+      "group": "side-3-area-1",
+      "type": "usergroup",
+      "description": "Practical Code Sessions · Founder · private training business\nJan 2022 – Dec 2025\n\nFacilitated small-group sessions, adapted explanations, and gave actionable feedback on participants’ work.\n\nFictional responsibility fulfilled within this engagement.",
+      "elevation": 0
+    },
+    {
+      "id": "side-3-area-2-function-1",
+      "name": "Bookings and partner outreach",
+      "group": "side-3-area-2",
+      "type": "message",
+      "description": "Practical Code Sessions · Founder · private training business\nJan 2022 – Dec 2025\n\nArranged workshop dates, coordinated venues or online sessions, and explained course scope to prospective partners.\n\nFictional responsibility fulfilled within this engagement.",
+      "elevation": 0
+    },
+    {
+      "id": "side-3-area-2-function-2",
+      "name": "Feedback and course improvement",
+      "group": "side-3-area-2",
+      "type": "workflow",
+      "description": "Practical Code Sessions · Founder · private training business\nJan 2022 – Dec 2025\n\nReviewed participant feedback and completion difficulties, then revised examples and teaching materials.\n\nFictional responsibility fulfilled within this engagement.",
+      "elevation": 0
+    }
+  ],
+  "connections": [
+    {
+      "id": "cv-link-1",
+      "from": "job-1-role",
+      "to": "job-1-area-1-function-1",
+      "label": "Fulfilled responsibility · Website delivery",
+      "direction": "forward",
+      "style": "normal"
+    },
+    {
+      "id": "cv-link-2",
+      "from": "job-1-role",
+      "to": "job-1-area-1-function-2",
+      "label": "Fulfilled responsibility · Website delivery",
+      "direction": "forward",
+      "style": "normal"
+    },
+    {
+      "id": "cv-link-3",
+      "from": "job-1-role",
+      "to": "job-1-area-2-function-1",
+      "label": "Fulfilled responsibility · Quality and support",
+      "direction": "forward",
+      "style": "normal"
+    },
+    {
+      "id": "cv-link-4",
+      "from": "job-1-role",
+      "to": "job-1-area-2-function-2",
+      "label": "Fulfilled responsibility · Quality and support",
+      "direction": "forward",
+      "style": "normal"
+    },
+    {
+      "id": "cv-link-5",
+      "from": "job-2-role",
+      "to": "job-2-area-1-function-1",
+      "label": "Fulfilled responsibility · Application engineering",
+      "direction": "forward",
+      "style": "normal"
+    },
+    {
+      "id": "cv-link-6",
+      "from": "job-2-role",
+      "to": "job-2-area-1-function-2",
+      "label": "Fulfilled responsibility · Application engineering",
+      "direction": "forward",
+      "style": "normal"
+    },
+    {
+      "id": "cv-link-7",
+      "from": "job-2-role",
+      "to": "job-2-area-2-function-1",
+      "label": "Fulfilled responsibility · Delivery and discovery",
+      "direction": "forward",
+      "style": "normal"
+    },
+    {
+      "id": "cv-link-8",
+      "from": "job-2-role",
+      "to": "job-2-area-2-function-2",
+      "label": "Fulfilled responsibility · Delivery and discovery",
+      "direction": "forward",
+      "style": "normal"
+    },
+    {
+      "id": "cv-link-9",
+      "from": "job-3-role",
+      "to": "job-3-area-1-function-1",
+      "label": "Fulfilled responsibility · Commerce journeys",
+      "direction": "forward",
+      "style": "normal"
+    },
+    {
+      "id": "cv-link-10",
+      "from": "job-3-role",
+      "to": "job-3-area-1-function-2",
+      "label": "Fulfilled responsibility · Commerce journeys",
+      "direction": "forward",
+      "style": "normal"
+    },
+    {
+      "id": "cv-link-11",
+      "from": "job-3-role",
+      "to": "job-3-area-2-function-1",
+      "label": "Fulfilled responsibility · Reliability and insight",
+      "direction": "forward",
+      "style": "normal"
+    },
+    {
+      "id": "cv-link-12",
+      "from": "job-3-role",
+      "to": "job-3-area-2-function-2",
+      "label": "Fulfilled responsibility · Reliability and insight",
+      "direction": "forward",
+      "style": "normal"
+    },
+    {
+      "id": "cv-link-13",
+      "from": "job-4-role",
+      "to": "job-4-area-1-function-1",
+      "label": "Fulfilled responsibility · Architecture and modernization",
+      "direction": "forward",
+      "style": "normal"
+    },
+    {
+      "id": "cv-link-14",
+      "from": "job-4-role",
+      "to": "job-4-area-1-function-2",
+      "label": "Fulfilled responsibility · Architecture and modernization",
+      "direction": "forward",
+      "style": "normal"
+    },
+    {
+      "id": "cv-link-15",
+      "from": "job-4-role",
+      "to": "job-4-area-2-function-1",
+      "label": "Fulfilled responsibility · Client enablement",
+      "direction": "forward",
+      "style": "normal"
+    },
+    {
+      "id": "cv-link-16",
+      "from": "job-4-role",
+      "to": "job-4-area-2-function-2",
+      "label": "Fulfilled responsibility · Client enablement",
+      "direction": "forward",
+      "style": "normal"
+    },
+    {
+      "id": "cv-link-17",
+      "from": "job-5-role",
+      "to": "job-5-area-1-function-1",
+      "label": "Fulfilled responsibility · Developer platform",
+      "direction": "forward",
+      "style": "normal"
+    },
+    {
+      "id": "cv-link-18",
+      "from": "job-5-role",
+      "to": "job-5-area-1-function-2",
+      "label": "Fulfilled responsibility · Developer platform",
+      "direction": "forward",
+      "style": "normal"
+    },
+    {
+      "id": "cv-link-19",
+      "from": "job-5-role",
+      "to": "job-5-area-2-function-1",
+      "label": "Fulfilled responsibility · Technical leadership",
+      "direction": "forward",
+      "style": "normal"
+    },
+    {
+      "id": "cv-link-20",
+      "from": "job-5-role",
+      "to": "job-5-area-2-function-2",
+      "label": "Fulfilled responsibility · Technical leadership",
+      "direction": "forward",
+      "style": "normal"
+    },
+    {
+      "id": "cv-link-21",
+      "from": "job-6-role",
+      "to": "job-6-area-1-function-1",
+      "label": "Fulfilled responsibility · Product and architecture",
+      "direction": "forward",
+      "style": "normal"
+    },
+    {
+      "id": "cv-link-22",
+      "from": "job-6-role",
+      "to": "job-6-area-1-function-2",
+      "label": "Fulfilled responsibility · Product and architecture",
+      "direction": "forward",
+      "style": "normal"
+    },
+    {
+      "id": "cv-link-23",
+      "from": "job-6-role",
+      "to": "job-6-area-2-function-1",
+      "label": "Fulfilled responsibility · Delivery and people",
+      "direction": "forward",
+      "style": "normal"
+    },
+    {
+      "id": "cv-link-24",
+      "from": "job-6-role",
+      "to": "job-6-area-2-function-2",
+      "label": "Fulfilled responsibility · Delivery and people",
+      "direction": "forward",
+      "style": "normal"
+    },
+    {
+      "id": "cv-link-25",
+      "from": "side-1-role",
+      "to": "side-1-area-1-function-1",
+      "label": "Fulfilled responsibility · Client services",
+      "direction": "forward",
+      "style": "normal"
+    },
+    {
+      "id": "cv-link-26",
+      "from": "side-1-role",
+      "to": "side-1-area-1-function-2",
+      "label": "Fulfilled responsibility · Client services",
+      "direction": "forward",
+      "style": "normal"
+    },
+    {
+      "id": "cv-link-27",
+      "from": "side-1-role",
+      "to": "side-1-area-2-function-1",
+      "label": "Fulfilled responsibility · Business operations",
+      "direction": "forward",
+      "style": "normal"
+    },
+    {
+      "id": "cv-link-28",
+      "from": "side-1-role",
+      "to": "side-1-area-2-function-2",
+      "label": "Fulfilled responsibility · Business operations",
+      "direction": "forward",
+      "style": "normal"
+    },
+    {
+      "id": "cv-link-29",
+      "from": "side-2-role",
+      "to": "side-2-area-1-function-1",
+      "label": "Fulfilled responsibility · Store and fulfillment",
+      "direction": "forward",
+      "style": "normal"
+    },
+    {
+      "id": "cv-link-30",
+      "from": "side-2-role",
+      "to": "side-2-area-1-function-2",
+      "label": "Fulfilled responsibility · Store and fulfillment",
+      "direction": "forward",
+      "style": "normal"
+    },
+    {
+      "id": "cv-link-31",
+      "from": "side-2-role",
+      "to": "side-2-area-2-function-1",
+      "label": "Fulfilled responsibility · Customer and commercial work",
+      "direction": "forward",
+      "style": "normal"
+    },
+    {
+      "id": "cv-link-32",
+      "from": "side-2-role",
+      "to": "side-2-area-2-function-2",
+      "label": "Fulfilled responsibility · Customer and commercial work",
+      "direction": "forward",
+      "style": "normal"
+    },
+    {
+      "id": "cv-link-33",
+      "from": "side-3-role",
+      "to": "side-3-area-1-function-1",
+      "label": "Fulfilled responsibility · Learning products",
+      "direction": "forward",
+      "style": "normal"
+    },
+    {
+      "id": "cv-link-34",
+      "from": "side-3-role",
+      "to": "side-3-area-1-function-2",
+      "label": "Fulfilled responsibility · Learning products",
+      "direction": "forward",
+      "style": "normal"
+    },
+    {
+      "id": "cv-link-35",
+      "from": "side-3-role",
+      "to": "side-3-area-2-function-1",
+      "label": "Fulfilled responsibility · Business development",
+      "direction": "forward",
+      "style": "normal"
+    },
+    {
+      "id": "cv-link-36",
+      "from": "side-3-role",
+      "to": "side-3-area-2-function-2",
+      "label": "Fulfilled responsibility · Business development",
+      "direction": "forward",
+      "style": "normal"
+    },
+    {
+      "id": "cv-link-37",
+      "from": {
+        "kind": "plane",
+        "id": "job-1"
+      },
+      "to": {
+        "kind": "plane",
+        "id": "job-2"
+      },
+      "label": "Career progression · 2011 → 2012",
+      "direction": "forward",
+      "style": "normal"
+    },
+    {
+      "id": "cv-link-38",
+      "from": {
+        "kind": "plane",
+        "id": "job-2"
+      },
+      "to": {
+        "kind": "plane",
+        "id": "job-3"
+      },
+      "label": "Career progression · 2014 → 2015",
+      "direction": "forward",
+      "style": "normal"
+    },
+    {
+      "id": "cv-link-39",
+      "from": {
+        "kind": "plane",
+        "id": "job-3"
+      },
+      "to": {
+        "kind": "plane",
+        "id": "job-4"
+      },
+      "label": "Career progression · 2017 → 2018",
+      "direction": "forward",
+      "style": "normal"
+    },
+    {
+      "id": "cv-link-40",
+      "from": {
+        "kind": "plane",
+        "id": "job-4"
+      },
+      "to": {
+        "kind": "plane",
+        "id": "job-5"
+      },
+      "label": "Career progression · 2020 → 2021",
+      "direction": "forward",
+      "style": "normal"
+    },
+    {
+      "id": "cv-link-41",
+      "from": {
+        "kind": "plane",
+        "id": "job-5"
+      },
+      "to": {
+        "kind": "plane",
+        "id": "job-6"
+      },
+      "label": "Career progression · 2023 → 2024",
+      "direction": "forward",
+      "style": "normal"
+    },
+    {
+      "id": "cv-link-42",
+      "from": {
+        "kind": "plane",
+        "id": "job-2"
+      },
+      "to": {
+        "kind": "plane",
+        "id": "side-1"
+      },
+      "label": "Concurrent private work · 2013–2014 · independent of employer",
+      "direction": "forward",
+      "style": "wobbly"
+    },
+    {
+      "id": "cv-link-43",
+      "from": {
+        "kind": "plane",
+        "id": "job-3"
+      },
+      "to": {
+        "kind": "plane",
+        "id": "side-1"
+      },
+      "label": "Concurrent private work · 2015–2016 · independent of employer",
+      "direction": "forward",
+      "style": "wobbly"
+    },
+    {
+      "id": "cv-link-44",
+      "from": {
+        "kind": "plane",
+        "id": "job-4"
+      },
+      "to": {
+        "kind": "plane",
+        "id": "side-2"
+      },
+      "label": "Concurrent private work · 2018–2020 · independent of employer",
+      "direction": "forward",
+      "style": "wobbly"
+    },
+    {
+      "id": "cv-link-45",
+      "from": {
+        "kind": "plane",
+        "id": "job-5"
+      },
+      "to": {
+        "kind": "plane",
+        "id": "side-2"
+      },
+      "label": "Concurrent private work · 2021 · independent of employer",
+      "direction": "forward",
+      "style": "wobbly"
+    },
+    {
+      "id": "cv-link-46",
+      "from": {
+        "kind": "plane",
+        "id": "job-5"
+      },
+      "to": {
+        "kind": "plane",
+        "id": "side-3"
+      },
+      "label": "Concurrent private work · 2022–2023 · independent of employer",
+      "direction": "forward",
+      "style": "wobbly"
+    },
+    {
+      "id": "cv-link-47",
+      "from": {
+        "kind": "plane",
+        "id": "job-6"
+      },
+      "to": {
+        "kind": "plane",
+        "id": "side-3"
+      },
+      "label": "Concurrent private work · 2024–2025 · independent of employer",
+      "direction": "forward",
+      "style": "wobbly"
+    }
+  ]
+}
