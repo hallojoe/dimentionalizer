@@ -1,0 +1,610 @@
+{
+  "schemaVersion": 1,
+  "presentation": {
+    "title": "One request across service instances — Dimentionalizer",
+    "eyebrow": "INFRASTRUCTURE",
+    "headline": "One request across service instances.",
+    "description": "Trace a request across an edge, three alternative application instances, shared data, asynchronous workers, and exceptions. Branches are routing alternatives; not every instance executes every request."
+  },
+  "spaces": [
+    {
+      "id": "main",
+      "name": "One request across service instances",
+      "spacing": {
+        "mode": "margin",
+        "target": "children",
+        "value": 2
+      }
+    }
+  ],
+  "spaceView": {
+    "visible": [
+      "main"
+    ],
+    "active": "main"
+  },
+  "planes": [
+    {
+      "id": "edge",
+      "name": "Entry and response · +16",
+      "elevation": 16,
+      "space": "main",
+      "spacing": {
+        "mode": "padding",
+        "target": "children",
+        "value": 1
+      },
+      "decoration": {
+        "grid": true,
+        "color": "#61d8ee",
+        "opacity": 0.035
+      }
+    },
+    {
+      "id": "apps",
+      "name": "Application instances · +8",
+      "elevation": 8,
+      "space": "main",
+      "spacing": {
+        "mode": "padding",
+        "target": "children",
+        "value": 1
+      },
+      "decoration": {
+        "grid": true,
+        "color": "#b8ff6c",
+        "opacity": 0.035
+      }
+    },
+    {
+      "id": "data",
+      "name": "Shared data · −6",
+      "elevation": -6,
+      "space": "main",
+      "spacing": {
+        "mode": "padding",
+        "target": "children",
+        "value": 1
+      },
+      "decoration": {
+        "grid": true,
+        "color": "#b9a0ff",
+        "opacity": 0.035
+      }
+    },
+    {
+      "id": "jobs",
+      "name": "Asynchronous work · 0",
+      "elevation": 0,
+      "space": "main",
+      "spacing": {
+        "mode": "padding",
+        "target": "children",
+        "value": 1
+      },
+      "decoration": {
+        "grid": true,
+        "color": "#ffb16c",
+        "opacity": 0.035
+      }
+    },
+    {
+      "id": "failures",
+      "name": "Exceptions · −18",
+      "elevation": -18,
+      "space": "main",
+      "spacing": {
+        "mode": "padding",
+        "target": "children",
+        "value": 1
+      },
+      "decoration": {
+        "grid": true,
+        "color": "#f488b5",
+        "opacity": 0.035
+      }
+    }
+  ],
+  "groups": [
+    {
+      "id": "edge",
+      "name": "Ingress and caller",
+      "plane": "edge",
+      "elevation": 0,
+      "color": "#61d8ee",
+      "spacing": {
+        "mode": "margin",
+        "target": "children",
+        "value": 1.5
+      }
+    },
+    {
+      "id": "instances",
+      "name": "Application instance pool",
+      "plane": "apps",
+      "elevation": 0,
+      "color": "#b8ff6c",
+      "spacing": {
+        "mode": "padding",
+        "target": "self",
+        "value": 2
+      }
+    },
+    {
+      "id": "data",
+      "name": "Data dependencies",
+      "plane": "data",
+      "elevation": 0,
+      "color": "#b9a0ff",
+      "spacing": {
+        "mode": "padding",
+        "target": "self",
+        "value": 2
+      }
+    },
+    {
+      "id": "jobs",
+      "name": "Worker instances",
+      "plane": "jobs",
+      "elevation": 2,
+      "color": "#ffb16c",
+      "spacing": {
+        "mode": "margin",
+        "target": "children",
+        "value": 1.5
+      }
+    },
+    {
+      "id": "failures",
+      "name": "Retry and investigation",
+      "plane": "failures",
+      "elevation": 0,
+      "color": "#f488b5",
+      "spacing": {
+        "mode": "padding",
+        "target": "self",
+        "value": 2
+      }
+    }
+  ],
+  "objects": [
+    {
+      "id": "caller",
+      "name": "Caller",
+      "type": "user",
+      "group": "edge",
+      "elevation": 0.0,
+      "description": "The origin of a request in this static walkthrough.",
+      "spacing": {
+        "mode": "padding",
+        "target": "self",
+        "value": 0
+      }
+    },
+    {
+      "id": "request",
+      "name": "Request + correlation ID",
+      "type": "request",
+      "group": "edge",
+      "elevation": 0.0,
+      "description": "Carry enough context to trace the request.",
+      "checklist": [
+        {
+          "id": "step-1",
+          "text": "Identify the operation and expected result.",
+          "done": false
+        },
+        {
+          "id": "step-2",
+          "text": "Choose a correlation ID for the walkthrough.",
+          "done": false
+        }
+      ]
+    },
+    {
+      "id": "gateway",
+      "name": "Gateway and routing",
+      "type": "reverse-proxy",
+      "group": "edge",
+      "elevation": 2.0,
+      "description": "Select one healthy application instance for this attempt."
+    },
+    {
+      "id": "a",
+      "name": "Application instance A",
+      "type": "processing",
+      "group": "instances",
+      "elevation": 3.0,
+      "description": "One possible execution instance.",
+      "checklist": [
+        {
+          "id": "step-1",
+          "text": "Validate the request.",
+          "done": false
+        },
+        {
+          "id": "step-2",
+          "text": "Read or update the required state.",
+          "done": false
+        },
+        {
+          "id": "step-3",
+          "text": "Produce a result or explicit failure.",
+          "done": false
+        }
+      ]
+    },
+    {
+      "id": "b",
+      "name": "Application instance B",
+      "type": "processing",
+      "group": "instances",
+      "elevation": 0.0,
+      "description": "An alternative execution instance or target of a later retry."
+    },
+    {
+      "id": "c",
+      "name": "Application instance C",
+      "type": "processing",
+      "group": "instances",
+      "elevation": -3.0,
+      "description": "A third alternative execution instance."
+    },
+    {
+      "id": "cache",
+      "name": "Shared cache",
+      "type": "cache",
+      "group": "data",
+      "elevation": 3.0,
+      "description": "A fast lookup path; cache misses use the durable store."
+    },
+    {
+      "id": "db",
+      "name": "Durable store",
+      "type": "database",
+      "group": "data",
+      "elevation": 0.0,
+      "description": "The source of durable application data."
+    },
+    {
+      "id": "outbox",
+      "name": "Recorded follow-up work",
+      "type": "storage",
+      "group": "data",
+      "elevation": -2.0,
+      "description": "An illustrative durable record of work to publish after the operation."
+    },
+    {
+      "id": "response",
+      "name": "Response to caller",
+      "type": "response",
+      "group": "edge",
+      "elevation": -2.0,
+      "description": "The synchronous result; asynchronous work may remain."
+    },
+    {
+      "id": "queue",
+      "name": "Work queue",
+      "type": "queue",
+      "group": "jobs",
+      "elevation": 0.0,
+      "description": "Separate response time from downstream work."
+    },
+    {
+      "id": "worker-a",
+      "name": "Worker instance A",
+      "type": "processing",
+      "group": "jobs",
+      "elevation": 2.0,
+      "description": "One consumer of queued work."
+    },
+    {
+      "id": "worker-b",
+      "name": "Worker instance B",
+      "type": "processing",
+      "group": "jobs",
+      "elevation": -2.0,
+      "description": "An alternative consumer, not a second mandatory execution."
+    },
+    {
+      "id": "mail",
+      "name": "E-mail step",
+      "type": "email",
+      "group": "jobs",
+      "elevation": 1.0,
+      "description": "A downstream notification step; the explorer sends nothing."
+    },
+    {
+      "id": "callback",
+      "name": "Completion webhook",
+      "type": "webhook",
+      "group": "jobs",
+      "elevation": -1.0,
+      "description": "An illustrative downstream callback."
+    },
+    {
+      "id": "timeout",
+      "name": "Transient failure or timeout",
+      "type": "event",
+      "group": "failures",
+      "elevation": -2.0,
+      "description": "An exception path requiring an explicit retry decision."
+    },
+    {
+      "id": "retry",
+      "name": "Retry decision",
+      "type": "workflow",
+      "group": "failures",
+      "elevation": 0.0,
+      "description": "Decide whether another attempt is appropriate.",
+      "checklist": [
+        {
+          "id": "step-1",
+          "text": "Check whether the operation is safe to retry.",
+          "done": false
+        },
+        {
+          "id": "step-2",
+          "text": "Define an attempt limit and delay.",
+          "done": false
+        },
+        {
+          "id": "step-3",
+          "text": "Keep the same correlation context.",
+          "done": false
+        }
+      ]
+    },
+    {
+      "id": "dead-letter",
+      "name": "Exhausted work",
+      "type": "queue",
+      "group": "failures",
+      "elevation": -4.0,
+      "description": "Retain failed work for investigation after attempts are exhausted."
+    },
+    {
+      "id": "trace",
+      "name": "Trace and investigation",
+      "type": "storage",
+      "group": "failures",
+      "elevation": 2.0,
+      "description": "Evidence to explain the path across instances.",
+      "checklist": [
+        {
+          "id": "step-1",
+          "text": "Find request and attempt identifiers.",
+          "done": false
+        },
+        {
+          "id": "step-2",
+          "text": "Follow instance and dependency spans.",
+          "done": false
+        },
+        {
+          "id": "step-3",
+          "text": "Record a reproducible next action.",
+          "done": false
+        }
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "id": "link-1",
+      "from": "caller",
+      "to": "request",
+      "label": "Starts",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-2",
+      "from": "request",
+      "to": "gateway",
+      "label": "Submit",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-3",
+      "from": "gateway",
+      "to": "a",
+      "label": "If assigned to A",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-4",
+      "from": "gateway",
+      "to": "b",
+      "label": "If assigned to B",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-5",
+      "from": "gateway",
+      "to": "c",
+      "label": "If assigned to C",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-6",
+      "from": "a",
+      "to": "cache",
+      "label": "Lookup",
+      "style": "normal",
+      "direction": "bidirectional"
+    },
+    {
+      "id": "link-7",
+      "from": "b",
+      "to": "cache",
+      "label": "Lookup",
+      "style": "normal",
+      "direction": "bidirectional"
+    },
+    {
+      "id": "link-8",
+      "from": "c",
+      "to": "cache",
+      "label": "Lookup",
+      "style": "normal",
+      "direction": "bidirectional"
+    },
+    {
+      "id": "link-9",
+      "from": "cache",
+      "to": "db",
+      "label": "Cache miss",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-10",
+      "from": "a",
+      "to": "db",
+      "label": "Durable update",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-11",
+      "from": "db",
+      "to": "outbox",
+      "label": "Record follow-up",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-12",
+      "from": "a",
+      "to": "response",
+      "label": "Success from A",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-13",
+      "from": "b",
+      "to": "response",
+      "label": "Success from B",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-14",
+      "from": "c",
+      "to": "response",
+      "label": "Success from C",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-15",
+      "from": "response",
+      "to": "caller",
+      "label": "Return result",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-16",
+      "from": "outbox",
+      "to": "queue",
+      "label": "Publish recorded work",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-17",
+      "from": "queue",
+      "to": "worker-a",
+      "label": "If assigned to worker A",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-18",
+      "from": "queue",
+      "to": "worker-b",
+      "label": "If assigned to worker B",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-19",
+      "from": "worker-a",
+      "to": "mail",
+      "label": "Notification job",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-20",
+      "from": "worker-b",
+      "to": "callback",
+      "label": "Callback job",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-21",
+      "from": "a",
+      "to": "timeout",
+      "label": "Failure example",
+      "style": "lightning",
+      "direction": "forward"
+    },
+    {
+      "id": "link-22",
+      "from": "timeout",
+      "to": "retry",
+      "label": "Assess",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-23",
+      "from": "retry",
+      "to": "b",
+      "label": "Another attempt if permitted",
+      "style": "wobbly",
+      "direction": "forward"
+    },
+    {
+      "id": "link-24",
+      "from": "retry",
+      "to": "dead-letter",
+      "label": "Attempts exhausted",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-25",
+      "from": "dead-letter",
+      "to": "trace",
+      "label": "Investigate",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-26",
+      "from": "gateway",
+      "to": "trace",
+      "label": "Record request path",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-27",
+      "from": "worker-a",
+      "to": "trace",
+      "label": "Record worker attempt",
+      "style": "normal",
+      "direction": "forward"
+    }
+  ]
+}

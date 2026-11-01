@@ -1,0 +1,541 @@
+{
+  "schemaVersion": 1,
+  "presentation": {
+    "title": "Plan a household week — Dimentionalizer",
+    "eyebrow": "PLANNING & LEARNING",
+    "headline": "Plan a household week.",
+    "description": "Shared commitments, meals, errands, home and work tasks, exceptions, and reflection. Editable checklists help turn the model into a planning conversation rather than a prescribed routine."
+  },
+  "spaces": [
+    {
+      "id": "main",
+      "name": "Plan a household week",
+      "spacing": {
+        "mode": "margin",
+        "target": "children",
+        "value": 2
+      }
+    }
+  ],
+  "spaceView": {
+    "visible": [
+      "main"
+    ],
+    "active": "main"
+  },
+  "planes": [
+    {
+      "id": "planning",
+      "name": "Shared planning · +14",
+      "elevation": 14,
+      "space": "main",
+      "spacing": {
+        "mode": "padding",
+        "target": "children",
+        "value": 1
+      },
+      "decoration": {
+        "grid": true,
+        "color": "#61d8ee",
+        "opacity": 0.035
+      }
+    },
+    {
+      "id": "doing",
+      "name": "Everyday actions · 0",
+      "elevation": 0,
+      "space": "main",
+      "spacing": {
+        "mode": "padding",
+        "target": "children",
+        "value": 1
+      },
+      "decoration": {
+        "grid": true,
+        "color": "#b8ff6c",
+        "opacity": 0.035
+      }
+    },
+    {
+      "id": "changes",
+      "name": "Changes and constraints · −10",
+      "elevation": -10,
+      "space": "main",
+      "spacing": {
+        "mode": "padding",
+        "target": "children",
+        "value": 1
+      },
+      "decoration": {
+        "grid": true,
+        "color": "#b9a0ff",
+        "opacity": 0.035
+      }
+    },
+    {
+      "id": "review",
+      "name": "Reflection · +6",
+      "elevation": 6,
+      "space": "main",
+      "spacing": {
+        "mode": "padding",
+        "target": "children",
+        "value": 1
+      },
+      "decoration": {
+        "grid": true,
+        "color": "#ffb16c",
+        "opacity": 0.035
+      }
+    }
+  ],
+  "groups": [
+    {
+      "id": "plan",
+      "name": "Agree on the week",
+      "plane": "planning",
+      "elevation": 0,
+      "color": "#61d8ee",
+      "spacing": {
+        "mode": "margin",
+        "target": "children",
+        "value": 1.5
+      }
+    },
+    {
+      "id": "meals",
+      "name": "Meals and shopping",
+      "plane": "doing",
+      "elevation": 0,
+      "color": "#b8ff6c",
+      "spacing": {
+        "mode": "padding",
+        "target": "self",
+        "value": 2
+      }
+    },
+    {
+      "id": "tasks",
+      "name": "Home and work coordination",
+      "plane": "doing",
+      "elevation": 3,
+      "color": "#b9a0ff",
+      "spacing": {
+        "mode": "padding",
+        "target": "self",
+        "value": 2
+      }
+    },
+    {
+      "id": "change",
+      "name": "Handle changes",
+      "plane": "changes",
+      "elevation": 0,
+      "color": "#ffb16c",
+      "spacing": {
+        "mode": "margin",
+        "target": "children",
+        "value": 1.5
+      }
+    },
+    {
+      "id": "reflect",
+      "name": "Review and adjust",
+      "plane": "review",
+      "elevation": 0,
+      "color": "#f488b5",
+      "spacing": {
+        "mode": "padding",
+        "target": "self",
+        "value": 2
+      }
+    }
+  ],
+  "objects": [
+    {
+      "id": "family",
+      "name": "Household members",
+      "type": "family",
+      "group": "plan",
+      "elevation": 0.0,
+      "description": "The people sharing responsibilities.",
+      "spacing": {
+        "mode": "padding",
+        "target": "self",
+        "value": 0
+      }
+    },
+    {
+      "id": "calendar",
+      "name": "Fixed commitments",
+      "type": "event",
+      "group": "plan",
+      "elevation": 2.0,
+      "description": "Collect appointments, work commitments, and travel before optional tasks.",
+      "checklist": [
+        {
+          "id": "step-1",
+          "text": "Add fixed commitments for each person.",
+          "done": false
+        },
+        {
+          "id": "step-2",
+          "text": "Check travel and handoff time.",
+          "done": false
+        }
+      ]
+    },
+    {
+      "id": "capacity",
+      "name": "Available time and energy",
+      "type": "processing",
+      "group": "plan",
+      "elevation": -2.0,
+      "description": "Make a realistic plan with room for change.",
+      "checklist": [
+        {
+          "id": "step-1",
+          "text": "Identify crowded days.",
+          "done": false
+        },
+        {
+          "id": "step-2",
+          "text": "Leave room for rest and unexpected work.",
+          "done": false
+        }
+      ]
+    },
+    {
+      "id": "owners",
+      "name": "Agree on owners",
+      "type": "usergroup",
+      "group": "plan",
+      "elevation": 0.0,
+      "description": "Every shared task has an owner and a clear handoff.",
+      "checklist": [
+        {
+          "id": "step-1",
+          "text": "Name an owner for each shared task.",
+          "done": false
+        },
+        {
+          "id": "step-2",
+          "text": "Check that the plan feels workable to everyone.",
+          "done": false
+        }
+      ]
+    },
+    {
+      "id": "meals",
+      "name": "Choose a few meals",
+      "type": "food",
+      "group": "meals",
+      "elevation": 0.0,
+      "description": "A flexible meal plan based on the week’s commitments.",
+      "checklist": [
+        {
+          "id": "step-1",
+          "text": "Check what is already available.",
+          "done": false
+        },
+        {
+          "id": "step-2",
+          "text": "Choose meals that suit busy days.",
+          "done": false
+        }
+      ]
+    },
+    {
+      "id": "list",
+      "name": "Shopping list",
+      "type": "storage",
+      "group": "meals",
+      "elevation": -1.0,
+      "description": "A shared list derived from meals and household needs."
+    },
+    {
+      "id": "shop",
+      "name": "Grocery trip",
+      "type": "shop",
+      "group": "meals",
+      "elevation": 0.0,
+      "description": "Combine shopping with a practical route or handoff."
+    },
+    {
+      "id": "prepare",
+      "name": "Prepare ahead where useful",
+      "type": "processing",
+      "group": "meals",
+      "elevation": 2.0,
+      "description": "A small amount of preparation can reduce work on busy days."
+    },
+    {
+      "id": "home-tasks",
+      "name": "Household tasks",
+      "type": "workflow",
+      "group": "tasks",
+      "elevation": 0.0,
+      "description": "A bounded list of maintenance and tidying tasks.",
+      "checklist": [
+        {
+          "id": "step-1",
+          "text": "Choose the tasks that matter this week.",
+          "done": false
+        },
+        {
+          "id": "step-2",
+          "text": "Break large tasks into a first action.",
+          "done": false
+        }
+      ]
+    },
+    {
+      "id": "work-plan",
+      "name": "Coordinate work commitments",
+      "type": "office",
+      "group": "tasks",
+      "elevation": 2.0,
+      "description": "Account for work responsibilities in the shared plan."
+    },
+    {
+      "id": "study",
+      "name": "Study or practice",
+      "type": "desk",
+      "group": "tasks",
+      "elevation": 4.0,
+      "description": "A learning block with a specific outcome.",
+      "checklist": [
+        {
+          "id": "step-1",
+          "text": "Choose one learning goal.",
+          "done": false
+        },
+        {
+          "id": "step-2",
+          "text": "Schedule a small practice block.",
+          "done": false
+        },
+        {
+          "id": "step-3",
+          "text": "Keep a note of what to try next.",
+          "done": false
+        }
+      ]
+    },
+    {
+      "id": "rest",
+      "name": "Protected downtime",
+      "type": "sofa",
+      "group": "tasks",
+      "elevation": -3.0,
+      "description": "An intentional part of the plan rather than leftover time."
+    },
+    {
+      "id": "change",
+      "name": "An unexpected change",
+      "type": "request",
+      "group": "change",
+      "elevation": -2.0,
+      "description": "A changed appointment, delayed trip, or new responsibility."
+    },
+    {
+      "id": "replan",
+      "name": "Reassign, defer, or simplify",
+      "type": "processing",
+      "group": "change",
+      "elevation": 0.0,
+      "description": "Adjust explicitly when assumptions change.",
+      "checklist": [
+        {
+          "id": "step-1",
+          "text": "Identify what is affected.",
+          "done": false
+        },
+        {
+          "id": "step-2",
+          "text": "Tell people who depend on the original plan.",
+          "done": false
+        },
+        {
+          "id": "step-3",
+          "text": "Choose what to simplify or defer.",
+          "done": false
+        }
+      ]
+    },
+    {
+      "id": "review",
+      "name": "End-of-week review",
+      "type": "event",
+      "group": "reflect",
+      "elevation": 0.0,
+      "description": "Learn from the week rather than counting only completed tasks.",
+      "checklist": [
+        {
+          "id": "step-1",
+          "text": "Name what worked well.",
+          "done": false
+        },
+        {
+          "id": "step-2",
+          "text": "Choose one thing to make easier next week.",
+          "done": false
+        }
+      ]
+    },
+    {
+      "id": "next",
+      "name": "Next week’s starting point",
+      "type": "workflow",
+      "group": "reflect",
+      "elevation": 2.0,
+      "description": "Carry forward useful information without copying every unfinished task."
+    }
+  ],
+  "connections": [
+    {
+      "id": "link-1",
+      "from": "family",
+      "to": "calendar",
+      "label": "Share commitments",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-2",
+      "from": "calendar",
+      "to": "capacity",
+      "label": "Check feasibility",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-3",
+      "from": "capacity",
+      "to": "owners",
+      "label": "Agree on responsibilities",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-4",
+      "from": "owners",
+      "to": "meals",
+      "label": "Plan meals",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-5",
+      "from": "owners",
+      "to": "home-tasks",
+      "label": "Plan home work",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-6",
+      "from": "owners",
+      "to": "work-plan",
+      "label": "Coordinate commitments",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-7",
+      "from": "owners",
+      "to": "study",
+      "label": "Protect learning time",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-8",
+      "from": "owners",
+      "to": "rest",
+      "label": "Protect downtime",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-9",
+      "from": "meals",
+      "to": "list",
+      "label": "Needed supplies",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-10",
+      "from": "list",
+      "to": "shop",
+      "label": "Buy what is needed",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-11",
+      "from": "shop",
+      "to": "prepare",
+      "label": "Prepare where useful",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-12",
+      "from": "change",
+      "to": "replan",
+      "label": "Plan no longer fits",
+      "style": "lightning",
+      "direction": "forward"
+    },
+    {
+      "id": "link-13",
+      "from": "replan",
+      "to": "owners",
+      "label": "Update ownership",
+      "style": "wobbly",
+      "direction": "forward"
+    },
+    {
+      "id": "link-14",
+      "from": "home-tasks",
+      "to": "review",
+      "label": "Reflect on the week",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-15",
+      "from": "study",
+      "to": "review",
+      "label": "Capture learning",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-16",
+      "from": "rest",
+      "to": "review",
+      "label": "Check sustainability",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-17",
+      "from": "review",
+      "to": "next",
+      "label": "Choose improvements",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-18",
+      "from": "next",
+      "to": "calendar",
+      "label": "Begin next planning cycle",
+      "style": "normal",
+      "direction": "forward"
+    }
+  ]
+}

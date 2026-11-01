@@ -1,9 +1,10 @@
 import type { ArchitectureConfig, SpaceView } from '../config/types';
 import { addBlankSpace, appendSpaces, duplicateSpace, toggleSpace } from '../config/spaces';
 import { loadPreset, presetCatalog } from '../presets/catalog';
+import { spacingControls } from './spacing';
 import { element, get } from './dom';
 
-export function mountSpaces(getConfig: () => ArchitectureConfig, apply: (config: ArchitectureConfig) => void, setView: (view: SpaceView) => void): () => void {
+export function mountSpaces(getConfig: () => ArchitectureConfig, apply: (config: ArchitectureConfig) => void, setView: (view: SpaceView) => void, onSpacingChange: () => void): () => void {
   const dialog = get<HTMLDialogElement>('spaces-dialog'), error = get('spaces-error');
   const mode = get<HTMLSelectElement>('space-create-mode'), source = get<HTMLSelectElement>('space-create-source');
   let request: AbortController | undefined;
@@ -32,7 +33,11 @@ export function mountSpaces(getConfig: () => ArchitectureConfig, apply: (config:
       };
       label.prepend(checkbox);
       const only = element('button', '', 'View alone'); only.onclick = () => { setView({ visible: [space.id], active: space.id }); render(); };
-      row.append(label, only); list.append(row);
+      row.append(label, only);
+      const details = element('details', 'space-spacing'); details.append(element('summary', '', `Spacing · ${space.name}`));
+      const controls = element('div');
+      const update = () => { controls.replaceChildren(spacingControls(space, undefined, true, () => { onSpacingChange(); update(); })); };
+      update(); details.append(controls); list.append(row, details);
     });
     sources();
   }

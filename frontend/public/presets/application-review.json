@@ -1,0 +1,600 @@
+{
+  "schemaVersion": 1,
+  "presentation": {
+    "title": "An application through many reviewers — Dimentionalizer",
+    "eyebrow": "PLANNING & LEARNING",
+    "headline": "An application through many reviewers.",
+    "description": "A learning-budget application moves through intake, completeness, manager review, budget review, coordination, decision, and fulfillment. Rework and decline paths are explicit. This is an illustrative process, not an organization policy."
+  },
+  "spaces": [
+    {
+      "id": "main",
+      "name": "An application through many reviewers",
+      "spacing": {
+        "mode": "margin",
+        "target": "children",
+        "value": 2
+      }
+    }
+  ],
+  "spaceView": {
+    "visible": [
+      "main"
+    ],
+    "active": "main"
+  },
+  "planes": [
+    {
+      "id": "entry",
+      "name": "Intake · 0",
+      "elevation": 0,
+      "space": "main",
+      "spacing": {
+        "mode": "padding",
+        "target": "children",
+        "value": 1
+      },
+      "decoration": {
+        "grid": true,
+        "color": "#61d8ee",
+        "opacity": 0.035
+      }
+    },
+    {
+      "id": "review",
+      "name": "Review instances · +12",
+      "elevation": 12,
+      "space": "main",
+      "spacing": {
+        "mode": "padding",
+        "target": "children",
+        "value": 1
+      },
+      "decoration": {
+        "grid": true,
+        "color": "#b8ff6c",
+        "opacity": 0.035
+      }
+    },
+    {
+      "id": "decision",
+      "name": "Decision · +24",
+      "elevation": 24,
+      "space": "main",
+      "spacing": {
+        "mode": "padding",
+        "target": "children",
+        "value": 1
+      },
+      "decoration": {
+        "grid": true,
+        "color": "#b9a0ff",
+        "opacity": 0.035
+      }
+    },
+    {
+      "id": "exceptions",
+      "name": "Rework · −10",
+      "elevation": -10,
+      "space": "main",
+      "spacing": {
+        "mode": "padding",
+        "target": "children",
+        "value": 1
+      },
+      "decoration": {
+        "grid": true,
+        "color": "#ffb16c",
+        "opacity": 0.035
+      }
+    },
+    {
+      "id": "followup",
+      "name": "Fulfillment · +4",
+      "elevation": 4,
+      "space": "main",
+      "spacing": {
+        "mode": "padding",
+        "target": "children",
+        "value": 1
+      },
+      "decoration": {
+        "grid": true,
+        "color": "#f488b5",
+        "opacity": 0.035
+      }
+    }
+  ],
+  "groups": [
+    {
+      "id": "applicant",
+      "name": "Applicant and intake",
+      "plane": "entry",
+      "elevation": 0,
+      "color": "#61d8ee",
+      "spacing": {
+        "mode": "margin",
+        "target": "children",
+        "value": 1.5
+      }
+    },
+    {
+      "id": "reviewers",
+      "name": "Independent review instances",
+      "plane": "review",
+      "elevation": 2,
+      "color": "#b8ff6c",
+      "spacing": {
+        "mode": "padding",
+        "target": "self",
+        "value": 2
+      }
+    },
+    {
+      "id": "decision",
+      "name": "Decision and communication",
+      "plane": "decision",
+      "elevation": 0,
+      "color": "#b9a0ff",
+      "spacing": {
+        "mode": "padding",
+        "target": "self",
+        "value": 2
+      }
+    },
+    {
+      "id": "rework",
+      "name": "Return for revision",
+      "plane": "exceptions",
+      "elevation": -2,
+      "color": "#ffb16c",
+      "spacing": {
+        "mode": "margin",
+        "target": "children",
+        "value": 1.5
+      }
+    },
+    {
+      "id": "delivery",
+      "name": "Fulfillment and follow-up",
+      "plane": "followup",
+      "elevation": 0,
+      "color": "#f488b5",
+      "spacing": {
+        "mode": "padding",
+        "target": "self",
+        "value": 2
+      }
+    }
+  ],
+  "objects": [
+    {
+      "id": "person",
+      "name": "Applicant",
+      "type": "user",
+      "group": "applicant",
+      "elevation": 0.0,
+      "description": "The person requesting a learning opportunity.",
+      "spacing": {
+        "mode": "padding",
+        "target": "self",
+        "value": 0
+      }
+    },
+    {
+      "id": "request",
+      "name": "Submit application",
+      "type": "request",
+      "group": "applicant",
+      "elevation": 0.0,
+      "description": "Describe the purpose, expected outcome, estimate, and timing.",
+      "checklist": [
+        {
+          "id": "step-1",
+          "text": "State the learning outcome.",
+          "done": false
+        },
+        {
+          "id": "step-2",
+          "text": "Attach a cost estimate and timing.",
+          "done": false
+        },
+        {
+          "id": "step-3",
+          "text": "Name a contact for questions.",
+          "done": false
+        }
+      ]
+    },
+    {
+      "id": "documents",
+      "name": "Supporting information",
+      "type": "storage",
+      "group": "applicant",
+      "elevation": -1.0,
+      "description": "Documents and links that let reviewers understand the request."
+    },
+    {
+      "id": "intake",
+      "name": "Instance 1 · Intake",
+      "type": "processing",
+      "group": "applicant",
+      "elevation": 2.0,
+      "description": "Register receipt and assign an owner.",
+      "checklist": [
+        {
+          "id": "step-1",
+          "text": "Record receipt and a reference.",
+          "done": false
+        },
+        {
+          "id": "step-2",
+          "text": "Confirm where status updates will appear.",
+          "done": false
+        }
+      ]
+    },
+    {
+      "id": "complete",
+      "name": "Instance 2 · Completeness",
+      "type": "processing",
+      "group": "reviewers",
+      "elevation": -2.0,
+      "description": "Check information before substantive review.",
+      "checklist": [
+        {
+          "id": "step-1",
+          "text": "Check purpose, estimate, and dates.",
+          "done": false
+        },
+        {
+          "id": "step-2",
+          "text": "Return one clear list of missing information if needed.",
+          "done": false
+        }
+      ]
+    },
+    {
+      "id": "manager",
+      "name": "Instance 3 · Manager review",
+      "type": "processing",
+      "group": "reviewers",
+      "elevation": 0.0,
+      "description": "Review relevance, workload, and expected benefit.",
+      "checklist": [
+        {
+          "id": "step-1",
+          "text": "Discuss the intended outcome.",
+          "done": false
+        },
+        {
+          "id": "step-2",
+          "text": "Check scheduling and handover needs.",
+          "done": false
+        }
+      ]
+    },
+    {
+      "id": "budget",
+      "name": "Instance 4 · Budget review",
+      "type": "processing",
+      "group": "reviewers",
+      "elevation": 2.0,
+      "description": "Review the illustrative funding route.",
+      "checklist": [
+        {
+          "id": "step-1",
+          "text": "Confirm the estimate is understood.",
+          "done": false
+        },
+        {
+          "id": "step-2",
+          "text": "Record the funding decision or questions.",
+          "done": false
+        }
+      ]
+    },
+    {
+      "id": "coordinator",
+      "name": "Instance 5 · Coordinator",
+      "type": "processing",
+      "group": "reviewers",
+      "elevation": 4.0,
+      "description": "Bring reviews together and resolve conflicting feedback."
+    },
+    {
+      "id": "decision",
+      "name": "Instance 6 · Final decision",
+      "type": "event",
+      "group": "decision",
+      "elevation": 0.0,
+      "description": "Record approval, conditions, or decline with a clear next step.",
+      "checklist": [
+        {
+          "id": "step-1",
+          "text": "Record the decision and rationale.",
+          "done": false
+        },
+        {
+          "id": "step-2",
+          "text": "Name the owner of the next step.",
+          "done": false
+        }
+      ]
+    },
+    {
+      "id": "approved",
+      "name": "Approved with next steps",
+      "type": "response",
+      "group": "decision",
+      "elevation": 2.0,
+      "description": "Communicate the agreed outcome and conditions."
+    },
+    {
+      "id": "declined",
+      "name": "Declined or deferred",
+      "type": "response",
+      "group": "rework",
+      "elevation": -3.0,
+      "description": "A non-success path with an explanation and possible future options."
+    },
+    {
+      "id": "missing",
+      "name": "Request clarification",
+      "type": "request",
+      "group": "rework",
+      "elevation": 0.0,
+      "description": "Ask a specific question about the same application."
+    },
+    {
+      "id": "revise",
+      "name": "Applicant revises",
+      "type": "processing",
+      "group": "rework",
+      "elevation": 2.0,
+      "description": "Return clarified information without losing the application context.",
+      "checklist": [
+        {
+          "id": "step-1",
+          "text": "Answer each review question.",
+          "done": false
+        },
+        {
+          "id": "step-2",
+          "text": "Highlight what changed.",
+          "done": false
+        }
+      ]
+    },
+    {
+      "id": "schedule",
+      "name": "Arrange participation",
+      "type": "workflow",
+      "group": "delivery",
+      "elevation": 0.0,
+      "description": "Turn approval into a practical plan.",
+      "checklist": [
+        {
+          "id": "step-1",
+          "text": "Confirm dates and availability.",
+          "done": false
+        },
+        {
+          "id": "step-2",
+          "text": "Agree on coverage for ongoing work.",
+          "done": false
+        }
+      ]
+    },
+    {
+      "id": "learn",
+      "name": "Participate and take notes",
+      "type": "processing",
+      "group": "delivery",
+      "elevation": 3.0,
+      "description": "Complete the learning activity and capture useful ideas."
+    },
+    {
+      "id": "share",
+      "name": "Share the learning",
+      "type": "message",
+      "group": "delivery",
+      "elevation": 1.0,
+      "description": "Make useful learning available to colleagues.",
+      "checklist": [
+        {
+          "id": "step-1",
+          "text": "Summarize the most useful takeaways.",
+          "done": false
+        },
+        {
+          "id": "step-2",
+          "text": "Share one reusable example.",
+          "done": false
+        }
+      ]
+    },
+    {
+      "id": "reflect",
+      "name": "Reflect on the outcome",
+      "type": "event",
+      "group": "delivery",
+      "elevation": -2.0,
+      "description": "Compare the result with the purpose in the application.",
+      "checklist": [
+        {
+          "id": "step-1",
+          "text": "Record what changed in practice.",
+          "done": false
+        },
+        {
+          "id": "step-2",
+          "text": "Identify a useful next step.",
+          "done": false
+        }
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "id": "link-1",
+      "from": "person",
+      "to": "request",
+      "label": "Prepares",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-2",
+      "from": "documents",
+      "to": "request",
+      "label": "Supports",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-3",
+      "from": "request",
+      "to": "intake",
+      "label": "Received",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-4",
+      "from": "intake",
+      "to": "complete",
+      "label": "Assigned",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-5",
+      "from": "complete",
+      "to": "manager",
+      "label": "Complete",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-6",
+      "from": "complete",
+      "to": "missing",
+      "label": "Information missing",
+      "style": "wobbly",
+      "direction": "forward"
+    },
+    {
+      "id": "link-7",
+      "from": "missing",
+      "to": "revise",
+      "label": "Clarify",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-8",
+      "from": "revise",
+      "to": "complete",
+      "label": "Resubmit same application",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-9",
+      "from": "manager",
+      "to": "budget",
+      "label": "Relevant and feasible",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-10",
+      "from": "manager",
+      "to": "missing",
+      "label": "Needs clarification",
+      "style": "wobbly",
+      "direction": "forward"
+    },
+    {
+      "id": "link-11",
+      "from": "budget",
+      "to": "coordinator",
+      "label": "Review recorded",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-12",
+      "from": "coordinator",
+      "to": "decision",
+      "label": "Reviews aligned",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-13",
+      "from": "decision",
+      "to": "approved",
+      "label": "Approved",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-14",
+      "from": "decision",
+      "to": "declined",
+      "label": "Declined or deferred",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-15",
+      "from": "approved",
+      "to": "schedule",
+      "label": "Proceed",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-16",
+      "from": "schedule",
+      "to": "learn",
+      "label": "Participate",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-17",
+      "from": "learn",
+      "to": "share",
+      "label": "Apply and share",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-18",
+      "from": "share",
+      "to": "reflect",
+      "label": "Review benefit",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-19",
+      "from": "declined",
+      "to": "person",
+      "label": "Explain outcome",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-20",
+      "from": "reflect",
+      "to": "person",
+      "label": "Close the loop",
+      "style": "normal",
+      "direction": "forward"
+    }
+  ]
+}

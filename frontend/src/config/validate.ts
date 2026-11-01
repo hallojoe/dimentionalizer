@@ -3,6 +3,7 @@ import { palette, presentationDefaults, viewDefaults } from './defaults';
 import type { ArchitectureConfig, ConnectionEndpoint, CustomObjectType, ValidationResult } from './types';
 import { validateElevation } from './elevation';
 import { endpointKey } from './connections';
+import { validateSpacing } from './spacing';
 import { validateModelUrl } from './model-url';
 import type { ObjectType } from '../catalog/catalog';
 
@@ -81,7 +82,7 @@ export function validateConfig(input: unknown): ValidationResult {
   }
   const spaces = array(value.spaces === undefined ? [{ id: 'main', name: 'Main space' }] : value.spaces, 'spaces', 50).map((entry, i) => {
     const space = record(entry, `spaces[${i}]`);
-    return { id: string(space.id, `spaces[${i}].id`), name: string(space.name, `spaces[${i}].name`), description: optionalText(space.description, `spaces[${i}].description`) };
+    return { ...validateSpacing(space.spacing, `spaces[${i}].spacing`), id: string(space.id, `spaces[${i}].id`), name: string(space.name, `spaces[${i}].name`), description: optionalText(space.description, `spaces[${i}].description`) };
   });
   if (!spaces.length) throw Error('At least one space is required.');
   unique(spaces.map(space => space.id), 'spaces');
@@ -121,7 +122,7 @@ export function validateConfig(input: unknown): ValidationResult {
     const sizing = plane.sizing === undefined ? 'auto' : plane.sizing;
     if (sizing !== 'auto' && sizing !== 'locked') throw Error(`planes[${i}].sizing must be auto or locked.`);
     return {
-      space, id: string(plane.id, `planes[${i}].id`), name: string(plane.name, `planes[${i}].name`),
+      ...validateSpacing(plane.spacing, `planes[${i}].spacing`), space, id: string(plane.id, `planes[${i}].id`), name: string(plane.name, `planes[${i}].name`),
       width: number(plane.width, `planes[${i}].width`, 20, 1, 10000),
       height: number(plane.height, `planes[${i}].height`, 20, 1, 10000),
       elevation: validateElevation(plane.elevation, `planes[${i}].elevation`),
@@ -141,7 +142,7 @@ export function validateConfig(input: unknown): ValidationResult {
     const g = record(entry, `groups[${i}]`);
     const plane = string(g.plane, `groups[${i}].plane`, planes[0]?.id);
     if (!planeIds.has(plane)) throw Error(`groups[${i}].plane references unknown plane "${plane}".`);
-    return { id: string(g.id, `groups[${i}].id`), name: string(g.name, `groups[${i}].name`), color: color(g.color, `groups[${i}].color`, palette[i % palette.length]), elevation: validateElevation(g.elevation, `groups[${i}].elevation`), plane };
+    return { ...validateSpacing(g.spacing, `groups[${i}].spacing`), id: string(g.id, `groups[${i}].id`), name: string(g.name, `groups[${i}].name`), color: color(g.color, `groups[${i}].color`, palette[i % palette.length]), elevation: validateElevation(g.elevation, `groups[${i}].elevation`), plane };
   });
   unique(groups.map(g => g.id), 'groups');
   const groupIds = new Set(groups.map(g => g.id));
@@ -155,7 +156,12 @@ export function validateConfig(input: unknown): ValidationResult {
     if (linkedSpace === ownSpace) throw Error(`objects[${i}].linkedSpace must reference a different space.`);
     const type = string(o.type, `objects[${i}].type`, 'container');
     if (!isKnownType(type, objectTypes)) warnings.push(`Object "${String(o.name)}": unknown type "${type}"; displayed as Container.`);
-    return { ...(linkedSpace ? { linkedSpace } : {}), id: string(o.id, `objects[${i}].id`), name: string(o.name, `objects[${i}].name`), group, type, description: optionalText(o.description, `objects[${i}].description`), elevation: validateElevation(o.elevation, `objects[${i}].elevation`) };
+    const checklist = o.checklist === undefined ? undefined : array(o.checklist, `objects[${i}].checklist`, 20).map((entry, j) => {
+      const item = record(entry, `objects[${i}].checklist[${j}]`);
+      return { id: string(item.id, `objects[${i}].checklist[${j}].id`), text: string(item.text, `objects[${i}].checklist[${j}].text`), done: boolean(item.done, `objects[${i}].checklist[${j}].done`, false) };
+    });
+    if (checklist) unique(checklist.map(item => item.id), `objects[${i}].checklist`);
+    return { ...validateSpacing(o.spacing, `objects[${i}].spacing`, false), ...(checklist ? { checklist } : {}), ...(linkedSpace ? { linkedSpace } : {}), id: string(o.id, `objects[${i}].id`), name: string(o.name, `objects[${i}].name`), group, type, description: optionalText(o.description, `objects[${i}].description`), elevation: validateElevation(o.elevation, `objects[${i}].elevation`) };
   });
   unique(objects.map(o => o.id), 'objects');
   const objectIds = new Set(objects.map(o => o.id));

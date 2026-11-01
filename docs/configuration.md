@@ -40,6 +40,7 @@ Start with `frontend/public/examples/minimal.json`. `architecture.schema.json` c
 | `presentation.accent`, `background` | Six-digit hex colors; group colors are independent |
 | `view` | Optional boolean settings; reduced-motion preference suppresses automatic motion |
 | `view.showGrid` | Show/hide the world ground grid; defaults to `true`; does not hide group platforms |
+| Entity `spacing` | Optional on spaces, planes, groups, and objects; see [spacing and overrides](spacing.md) |
 | `spaces` | Optional array of 1–50 spaces; omitted creates Main space; each needs unique `id` and `name` |
 | `spaceView` | Optional `{ visible: [space IDs], active: space ID or null }`; defaults to all spaces in combined view |
 | `objectTypes` | Optional array of up to 50 custom type definitions; see [object types and models](object-types.md) |
@@ -52,6 +53,7 @@ Start with `frontend/public/examples/minimal.json`. `architecture.schema.json` c
 | Group `elevation` | Signed height relative to its parent plane; defaults to `0` |
 | `objects` | Required array, up to 500 entries; an empty architecture is allowed |
 | Object `id`, `name`, `group` | Required; `group` must match a group ID; object IDs must be unique |
+| Object `checklist` | Optional array of up to 20 `{ id, text, done? }` items; IDs unique per object; `done` defaults to false |
 | Object `linkedSpace` | Optional portal target; must be another existing space; clicking pans there and keeps the inspector |
 | Object `type` | Optional; defaults to `container`; built-in or custom type ID; unknown types are retained and displayed as Container |
 | Object `description` | Optional plain text, supports line breaks |

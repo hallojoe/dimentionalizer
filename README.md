@@ -30,7 +30,7 @@ npm run preview   # Serve the production build locally
 | --- | --- |
 | `frontend/public/architecture.json` | Default architecture and presentation settings; edit this to customize a deployment |
 | `frontend/public/examples/` | Small importable starting documents |
-| `frontend/public/presets/` | Sixteen categorized structure presets and their metadata index |
+| `frontend/public/presets/` | Twenty categorized structure presets and their metadata index |
 | `frontend/public/architecture.schema.json` | JSON Schema for editor assistance |
 | `frontend/src/config/` | Document types, defaults, runtime validation, migration, and browser persistence |
 | `frontend/src/catalog/` | Built-in and custom type resolution, geometry builders, and glTF/GLB loading |
@@ -55,14 +55,18 @@ The frontend uses **TypeScript, Vite, and Three.js**, with native DOM components
 - Grouped 3D platforms, orbit/pan/zoom, group and object focus, labels, automatic orbit, and animated directional connection packets.
 - Multiple spaces: create blank, start from a preset template, or duplicate an existing space; show one, several, or all together. Object portals pan into a linked space, dim the surrounding context, and retain the inspector. Back restores the previous view.
 - Connector styles **Normal, Lightning, Wobbly**, with optional independent in/out capacities expressed as lane thickness.
+- Spacing on spaces, planes, groups, and objects: margin or padding, applied to self or direct children with explicit child overrides.
+- Saved object checklists for planning and learning, displayed in the existing inspector.
 - Configurable planes with auto-fit or locked dimensions, color, opacity, border, grid, and labels. Groups reference their parent plane; existing documents receive a default auto-fit plane.
 - Signed plane, group, and item elevation controls (`0` baseline, positive above, negative below), plus independently toggleable ground-grid visibility. Settings persist and export with the configuration.
 - Search and type filtering; keyboard-accessible directory and inspector. Left/right arrows browse objects while inspecting; Escape closes the inspector.
 - Connections between planes, groups, and items, with one-way or bidirectional animated dots and inspector controls. Explicit labels and incoming/outgoing inspection. Only configured connections are displayed; no dependencies are inferred from proximity.
 - JSON editing, import, validated export, default restoration, and browser-local persistence.
-- Preset picker with seven common system setups, a source-grounded Umbraco Cluster snapshot, three business/workflow examples, and five human-situation examples; open any preset as an editable draft before applying it.
+- Preset picker with seven common system setups, a source-grounded Umbraco Cluster snapshot, three business/workflow examples, five human-situation examples, and four detailed planning/workflow walkthroughs; open any preset as an editable draft before applying it.
 - Migration of the original `{ name, group, text }[]` format into a version 1 document.
 - Responsive layout, reduced-motion support, and a usable WebGL fallback.
+
+Try **Presets → Planning & learning → A whole day, outside and inside** for an elevated workflow with a workday portal and saved checklists.
 
 Try **Presets → Home & family → Home and neighborhood**. Click the Home object to move from outside to inside, then use **Back to outer view**. **Spaces** manages creation and visible spaces; the directory’s **Space** selector changes focus.
 
@@ -76,6 +80,7 @@ Changes are stored locally under `dimentionalizer.config.v1` for the browser's o
 
 ## Customize and extend
 
+- [Spacing, overrides, and planning checklists](docs/spacing.md)
 - [Spaces, portals, and connector capacity](docs/spaces.md)
 - [Configuration reference](docs/configuration.md)
 - [Presets and source mapping](docs/presets.md)

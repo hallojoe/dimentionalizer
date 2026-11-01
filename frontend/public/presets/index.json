@@ -1,5 +1,32 @@
 [
   {
+    "id": "whole-day",
+    "name": "A whole day, outside and inside",
+    "summary": "An editable day with a workday portal, parallel responsibilities, interruptions, recovery, and tomorrow’s preparation. Elevation distinguishes focus, coordination, and recovery; times are examples.",
+    "category": "Planning & learning",
+    "groups": 6,
+    "objects": 23,
+    "connections": 24
+  },
+  {
+    "id": "application-review",
+    "name": "An application through many reviewers",
+    "summary": "A learning-budget application moves through intake, completeness, manager review, budget review, coordination, decision, and fulfillment. Rework and decline paths are explicit. This is an illustrative process, not an organization policy.",
+    "category": "Planning & learning",
+    "groups": 5,
+    "objects": 17,
+    "connections": 20
+  },
+  {
+    "id": "household-week",
+    "name": "Plan a household week",
+    "summary": "Shared commitments, meals, errands, home and work tasks, exceptions, and reflection. Editable checklists help turn the model into a planning conversation rather than a prescribed routine.",
+    "category": "Planning & learning",
+    "groups": 5,
+    "objects": 16,
+    "connections": 18
+  },
+  {
     "id": "home-neighborhood",
     "name": "Home and neighborhood",
     "category": "Home & family",
@@ -133,6 +160,15 @@
     "groups": 4,
     "objects": 14,
     "connections": 14
+  },
+  {
+    "id": "request-instances",
+    "name": "One request across service instances",
+    "summary": "Trace a request across an edge, three alternative application instances, shared data, asynchronous workers, and exceptions. Branches are routing alternatives; not every instance executes every request.",
+    "category": "Infrastructure",
+    "groups": 5,
+    "objects": 19,
+    "connections": 27
   },
   {
     "id": "umbraco-topology",

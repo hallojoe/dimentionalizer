@@ -22,10 +22,13 @@ export interface ArchitectureConfig {
   connections: ArchitectureConnection[];
 }
 
-export interface ArchitectureSpace { id: string; name: string; description: string }
+export interface Spacing { mode: 'margin' | 'padding'; target: 'self' | 'children'; value: number }
+export interface SpacedEntity { spacing?: Spacing }
+
+export interface ArchitectureSpace extends SpacedEntity { id: string; name: string; description: string }
 export interface SpaceView { visible: string[]; active: string | null }
 
-export interface ArchitecturePlane {
+export interface ArchitecturePlane extends SpacedEntity {
   space: string;
   id: string;
   name: string;
@@ -37,13 +40,14 @@ export interface ArchitecturePlane {
   decoration: { color: string; opacity: number; border: boolean; grid: boolean; label: boolean };
 }
 
-export interface ArchitectureGroup {
+export interface ArchitectureGroup extends SpacedEntity {
   id: string; name: string; color: string;
   plane: string;
   /** Signed height relative to its parent plane. Defaults to 0. */
   elevation?: number;
 }
-export interface ArchitectureObject {
+export interface ArchitectureObject extends SpacedEntity {
+  checklist?: { id: string; text: string; done: boolean }[];
   /** Clicking the object enters this space, without changing its parent group. */
   linkedSpace?: string;
   id: string;

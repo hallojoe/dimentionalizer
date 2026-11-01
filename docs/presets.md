@@ -4,12 +4,16 @@ Choose **Presets** in the header, filter by category, then **Open editable prese
 
 Presets use the existing version 1 document format. All normal controls work after applying one: group focus, object inspection, connection navigation, search, type filtering, view options, JSON import/export, and browser-local saving. No separate preset renderer or backend is involved. Preset loading also works in the WebGL fallback directory.
 
-The 16 presets are grouped into **Home & family**, **Work & study**, **Travel & mobility**, **Business & workflows**, **Infrastructure**, and **Repository snapshots**. To add a preset without replacing the current document, use **Spaces → Add a space → A preset template**.
+The 20 presets are grouped into **Planning & learning**, **Home & family**, **Work & study**, **Travel & mobility**, **Business & workflows**, **Infrastructure**, and **Repository snapshots**. To add a preset without replacing the current document, use **Spaces → Add a space → A preset template**.
 
 ## Included setups
 
 | Preset | What it illustrates |
 | --- | --- |
+| A whole day, outside and inside | A morning-to-night overview, detailed workday portal, interruption branches, elevations, and saved checklists |
+| An application through many reviewers | Six review instances, clarification/rework, approval or decline, participation, and reflection |
+| One request across service instances | Alternative application instances, workers, shared data, retry and investigation at different elevations |
+| Plan a household week | Commitments, ownership, meals, work, home tasks, downtime, replanning, and reflection |
 | Home and neighborhood | A family, shop, bus, and Home portal leading to living, sleeping, and bathroom spaces |
 | Family morning | Waking, washing, breakfast, study, and departure with everyday people and furniture |
 | Outside and inside the office | Campus and Office portal, workstations, partitions, lounge, and shared facilities |
@@ -27,7 +31,7 @@ The 16 presets are grouped into **Home & family**, **Work & study**, **Travel & 
 | Event launch | Organizers, attendees, event, ticket shop, registration, e-mail, and Slack-style notifications |
 | Order approval workflow | Request, validation, custom Approval type, human review, API call, webhook, response, event, and dataflow |
 
-The seven Infrastructure presets are illustrative reference architectures, not claims about a particular deployment or production-readiness guarantees. Components can be consolidated, renamed, or replaced to match your real system. Their descriptions call out logical components and relevant assumptions. For example, a replayable event stream is represented as a generic Container rather than pretending it is a work queue.
+The Infrastructure presets are illustrative reference architectures, not claims about a particular deployment or production-readiness guarantees. Components can be consolidated, renamed, or replaced to match your real system. Their descriptions call out logical components and relevant assumptions. For example, a replayable event stream is represented as a generic Container rather than pretending it is a work queue.
 
 The business/workflow and human-situation examples are illustrative models. Transport capacities are examples, not measured schedules or service capacities. Portal examples keep the outside space visible and dimmed while the interior comes into focus. Email, Slack, webhooks, and API calls are visual nodes; no integrations execute. Retail operations loads its original model from `models/parcel-locker.gltf`; the others need no model assets. Existing infrastructure presets retain their original types and relationships.
 
@@ -67,3 +71,5 @@ This is a static visualization. Dimentionalizer does not start the Umbraco stack
 4. Run `npm test` and `npm run build` in `frontend/`. Update the catalog-count test when intentionally expanding the collection. Tests enforce matching files, counts, valid references, known types, and round-trip export.
 
 Preset URLs honor Vite's configured base path. Failed loads and invalid documents leave the active architecture untouched; closing the picker cancels a pending request.
+
+The four detailed workflow walkthroughs use spacing inheritance and positive/negative elevations. Key objects have editable checklist prompts in the inspector. See [spacing and planning](spacing.md) for how to adapt them.

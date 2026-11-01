@@ -51,3 +51,9 @@ Spaces sit above planes in the document. Their IDs, plane memberships, object po
 The viewer retains all space geometry, separates space footprints horizontally, and applies visibility and opacity independently of object filtering. Entering a portal updates the visible-space set and active focus, flies the camera to the destination, and leaves the selected object's inspector intact. Back restores a prior view state. This is linked-space navigation, not recursive geometry embedded inside an object's mesh.
 
 Connector styles produce shared curves for both tube geometry and moving dots. Capacity widths use a bounded square-root scale normalized against other capacities with the same unit; two-way capacity decoration creates separate outbound and inbound lanes. A zero-capacity lane remains visible with no animated dot.
+
+## Spacing and checklist state
+
+`config/spacing.ts` validates optional spacing and resolves direct-child defaults. Omission is preserved, so explicit zero can override inheritance. Layout keeps surface dimensions separate from occupied dimensions: margins affect packing, while padding affects the target's interior footprint. Objects use variable-width columns and variable-depth rows; this reserves different leaf allocations without resizing their visual models. Locked surfaces retain their dimensions and report additional spacing overflow.
+
+Object checklists are ordinary document data. The inspector persists checkbox changes without rebuilding the scene. Normalization and space duplication produce independent checklist values; geometry, routing, and workflow execution do not depend on completion state.

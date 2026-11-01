@@ -1,0 +1,731 @@
+{
+  "schemaVersion": 1,
+  "presentation": {
+    "title": "A whole day, outside and inside — Dimentionalizer",
+    "eyebrow": "PLANNING & LEARNING",
+    "headline": "A whole day, outside and inside.",
+    "description": "An editable day with a workday portal, parallel responsibilities, interruptions, recovery, and tomorrow’s preparation. Elevation distinguishes focus, coordination, and recovery; times are examples."
+  },
+  "spaces": [
+    {
+      "id": "day",
+      "name": "The whole day",
+      "spacing": {
+        "mode": "margin",
+        "target": "children",
+        "value": 2
+      }
+    },
+    {
+      "id": "work",
+      "name": "Inside the workday",
+      "spacing": {
+        "mode": "margin",
+        "target": "children",
+        "value": 2
+      }
+    }
+  ],
+  "spaceView": {
+    "visible": [
+      "day",
+      "work"
+    ],
+    "active": "day"
+  },
+  "planes": [
+    {
+      "id": "morning",
+      "name": "Morning · 0",
+      "elevation": 0,
+      "space": "day",
+      "spacing": {
+        "mode": "padding",
+        "target": "children",
+        "value": 1
+      },
+      "decoration": {
+        "grid": true,
+        "color": "#61d8ee",
+        "opacity": 0.035
+      }
+    },
+    {
+      "id": "transitions",
+      "name": "Transitions · +8",
+      "elevation": 8,
+      "space": "day",
+      "spacing": {
+        "mode": "padding",
+        "target": "children",
+        "value": 1
+      },
+      "decoration": {
+        "grid": true,
+        "color": "#b8ff6c",
+        "opacity": 0.035
+      }
+    },
+    {
+      "id": "recovery",
+      "name": "Recovery · −8",
+      "elevation": -8,
+      "space": "day",
+      "spacing": {
+        "mode": "padding",
+        "target": "children",
+        "value": 1
+      },
+      "decoration": {
+        "grid": true,
+        "color": "#b9a0ff",
+        "opacity": 0.035
+      }
+    },
+    {
+      "id": "focus",
+      "name": "Focused work · +18",
+      "elevation": 18,
+      "space": "work",
+      "spacing": {
+        "mode": "padding",
+        "target": "children",
+        "value": 1
+      },
+      "decoration": {
+        "grid": true,
+        "color": "#ffb16c",
+        "opacity": 0.035
+      }
+    },
+    {
+      "id": "people",
+      "name": "Coordination · +5",
+      "elevation": 5,
+      "space": "work",
+      "spacing": {
+        "mode": "padding",
+        "target": "children",
+        "value": 1
+      },
+      "decoration": {
+        "grid": true,
+        "color": "#f488b5",
+        "opacity": 0.035
+      }
+    },
+    {
+      "id": "exceptions",
+      "name": "Interruptions · −8",
+      "elevation": -8,
+      "space": "work",
+      "spacing": {
+        "mode": "padding",
+        "target": "children",
+        "value": 1
+      },
+      "decoration": {
+        "grid": true,
+        "color": "#61d8ee",
+        "opacity": 0.035
+      }
+    }
+  ],
+  "groups": [
+    {
+      "id": "start",
+      "name": "06:30–08:00 · Morning",
+      "plane": "morning",
+      "elevation": 0,
+      "color": "#61d8ee",
+      "spacing": {
+        "mode": "margin",
+        "target": "children",
+        "value": 1.5
+      }
+    },
+    {
+      "id": "travel",
+      "name": "08:00–17:30 · Between roles",
+      "plane": "transitions",
+      "elevation": 0,
+      "color": "#b8ff6c",
+      "spacing": {
+        "mode": "padding",
+        "target": "self",
+        "value": 2
+      }
+    },
+    {
+      "id": "home",
+      "name": "18:00–22:30 · Home and recovery",
+      "plane": "recovery",
+      "elevation": 2,
+      "color": "#b9a0ff",
+      "spacing": {
+        "mode": "padding",
+        "target": "self",
+        "value": 2
+      }
+    },
+    {
+      "id": "deep",
+      "name": "09:00–12:00 · Focus",
+      "plane": "focus",
+      "elevation": 2,
+      "color": "#ffb16c",
+      "spacing": {
+        "mode": "margin",
+        "target": "children",
+        "value": 1.5
+      }
+    },
+    {
+      "id": "team",
+      "name": "12:00–16:30 · Coordination",
+      "plane": "people",
+      "elevation": 0,
+      "color": "#f488b5",
+      "spacing": {
+        "mode": "padding",
+        "target": "self",
+        "value": 2
+      }
+    },
+    {
+      "id": "interrupt",
+      "name": "Exception path",
+      "plane": "exceptions",
+      "elevation": -3,
+      "color": "#61d8ee",
+      "spacing": {
+        "mode": "padding",
+        "target": "self",
+        "value": 2
+      }
+    }
+  ],
+  "objects": [
+    {
+      "id": "wake",
+      "name": "06:30 · Wake and orient",
+      "type": "human",
+      "group": "start",
+      "elevation": 0.0,
+      "description": "Begin with a realistic picture of the day.",
+      "checklist": [
+        {
+          "id": "step-1",
+          "text": "Check fixed appointments and travel times.",
+          "done": false
+        },
+        {
+          "id": "step-2",
+          "text": "Choose one personal priority.",
+          "done": false
+        }
+      ],
+      "spacing": {
+        "mode": "padding",
+        "target": "self",
+        "value": 0
+      }
+    },
+    {
+      "id": "wash",
+      "name": "06:40 · Get ready",
+      "type": "shower",
+      "group": "start",
+      "elevation": 0.0,
+      "description": "Complete the morning routine before shared activities."
+    },
+    {
+      "id": "breakfast",
+      "name": "07:00 · Breakfast",
+      "type": "food",
+      "group": "start",
+      "elevation": 0.0,
+      "description": "A meal and a chance to coordinate the household."
+    },
+    {
+      "id": "handoff",
+      "name": "07:30 · Household handoff",
+      "type": "family",
+      "group": "start",
+      "elevation": 1.0,
+      "description": "Confirm who handles transport, pickup, meals, and changes.",
+      "checklist": [
+        {
+          "id": "step-1",
+          "text": "Agree on pickup and evening responsibilities.",
+          "done": false
+        },
+        {
+          "id": "step-2",
+          "text": "Pack essentials and check departure time.",
+          "done": false
+        }
+      ]
+    },
+    {
+      "id": "commute",
+      "name": "08:00 · Commute",
+      "type": "bus",
+      "group": "travel",
+      "elevation": 0.0,
+      "description": "Transition from household to work responsibilities."
+    },
+    {
+      "id": "workday",
+      "name": "09:00 · Enter the workday",
+      "type": "office",
+      "group": "travel",
+      "elevation": 2.0,
+      "description": "Click to enter the detailed workday while the outside day stays visible.",
+      "linkedSpace": "work"
+    },
+    {
+      "id": "errands",
+      "name": "17:30 · Essential errands",
+      "type": "shop",
+      "group": "travel",
+      "elevation": -2.0,
+      "description": "Keep errands bounded to what is useful today.",
+      "checklist": [
+        {
+          "id": "step-1",
+          "text": "Review the short shopping list.",
+          "done": false
+        },
+        {
+          "id": "step-2",
+          "text": "Defer nonessential errands if time is tight.",
+          "done": false
+        }
+      ]
+    },
+    {
+      "id": "dinner",
+      "name": "18:30 · Dinner",
+      "type": "food",
+      "group": "home",
+      "elevation": 0.0,
+      "description": "A shared meal after the workday."
+    },
+    {
+      "id": "reset",
+      "name": "19:15 · Household reset",
+      "type": "processing",
+      "group": "home",
+      "elevation": 2.0,
+      "description": "A short reset prepares useful basics for tomorrow.",
+      "checklist": [
+        {
+          "id": "step-1",
+          "text": "Put essentials back in place.",
+          "done": false
+        },
+        {
+          "id": "step-2",
+          "text": "Prepare anything needed for tomorrow.",
+          "done": false
+        }
+      ]
+    },
+    {
+      "id": "rest",
+      "name": "20:00 · Rest or shared time",
+      "type": "sofa",
+      "group": "home",
+      "elevation": -2.0,
+      "description": "Intentional free time, below the work-focus plane."
+    },
+    {
+      "id": "tomorrow",
+      "name": "21:00 · Plan tomorrow",
+      "type": "workflow",
+      "group": "home",
+      "elevation": 1.0,
+      "description": "Close open loops and choose a realistic starting point.",
+      "checklist": [
+        {
+          "id": "step-1",
+          "text": "Capture unfinished work.",
+          "done": false
+        },
+        {
+          "id": "step-2",
+          "text": "Choose tomorrow’s first useful action.",
+          "done": false
+        },
+        {
+          "id": "step-3",
+          "text": "Check the calendar and prepare essentials.",
+          "done": false
+        }
+      ]
+    },
+    {
+      "id": "sleep",
+      "name": "22:30 · End the day",
+      "type": "bed",
+      "group": "home",
+      "elevation": -3.0,
+      "description": "An illustrative endpoint; adapt the timing to your routine."
+    },
+    {
+      "id": "priorities",
+      "name": "09:00 · Choose work priorities",
+      "type": "workflow",
+      "group": "deep",
+      "elevation": 0.0,
+      "description": "Select outcomes for the focus block.",
+      "checklist": [
+        {
+          "id": "step-1",
+          "text": "Name the most important outcome.",
+          "done": false
+        },
+        {
+          "id": "step-2",
+          "text": "Identify the next concrete action.",
+          "done": false
+        }
+      ]
+    },
+    {
+      "id": "focus-one",
+      "name": "09:15 · Focus block A",
+      "type": "processing",
+      "group": "deep",
+      "elevation": 3.0,
+      "description": "A protected block for the important task.",
+      "checklist": [
+        {
+          "id": "step-1",
+          "text": "Make the task small enough to start.",
+          "done": false
+        },
+        {
+          "id": "step-2",
+          "text": "Capture interruptions without switching immediately.",
+          "done": false
+        }
+      ]
+    },
+    {
+      "id": "draft",
+      "name": "11:30 · Reviewable result",
+      "type": "product",
+      "group": "deep",
+      "elevation": 1.0,
+      "description": "A draft, prototype, or analysis that others can review."
+    },
+    {
+      "id": "lunch",
+      "name": "12:00 · Lunch and pause",
+      "type": "food",
+      "group": "team",
+      "elevation": 0.0,
+      "description": "A transition out of focused work."
+    },
+    {
+      "id": "review",
+      "name": "13:00 · Peer review",
+      "type": "usergroup",
+      "group": "team",
+      "elevation": 2.0,
+      "description": "Collect feedback on the concrete result.",
+      "checklist": [
+        {
+          "id": "step-1",
+          "text": "Ask a focused review question.",
+          "done": false
+        },
+        {
+          "id": "step-2",
+          "text": "Record changes and open questions.",
+          "done": false
+        }
+      ]
+    },
+    {
+      "id": "revise",
+      "name": "14:00 · Incorporate feedback",
+      "type": "processing",
+      "group": "deep",
+      "elevation": -1.0,
+      "description": "Return to focused work for the changes that matter."
+    },
+    {
+      "id": "coordinate",
+      "name": "15:30 · Team handoff",
+      "type": "message",
+      "group": "team",
+      "elevation": 1.0,
+      "description": "Make progress and next steps visible.",
+      "checklist": [
+        {
+          "id": "step-1",
+          "text": "Share the result and its location.",
+          "done": false
+        },
+        {
+          "id": "step-2",
+          "text": "Name the next owner and any blockers.",
+          "done": false
+        }
+      ]
+    },
+    {
+      "id": "close",
+      "name": "16:30 · Close the workday",
+      "type": "event",
+      "group": "team",
+      "elevation": -1.0,
+      "description": "Capture progress and transition back outside.",
+      "checklist": [
+        {
+          "id": "step-1",
+          "text": "Record the next action.",
+          "done": false
+        },
+        {
+          "id": "step-2",
+          "text": "Make deadlines and dependencies explicit.",
+          "done": false
+        }
+      ]
+    },
+    {
+      "id": "incoming",
+      "name": "Unexpected request",
+      "type": "request",
+      "group": "interrupt",
+      "elevation": -2.0,
+      "description": "An interruption that may not need immediate attention."
+    },
+    {
+      "id": "triage",
+      "name": "Now, later, or delegate?",
+      "type": "processing",
+      "group": "interrupt",
+      "elevation": 0.0,
+      "description": "Choose a deliberate response to the interruption.",
+      "checklist": [
+        {
+          "id": "step-1",
+          "text": "Clarify what is needed and by when.",
+          "done": false
+        },
+        {
+          "id": "step-2",
+          "text": "Choose an owner and response time.",
+          "done": false
+        }
+      ]
+    },
+    {
+      "id": "later",
+      "name": "Deferred work",
+      "type": "queue",
+      "group": "interrupt",
+      "elevation": -1.0,
+      "description": "A holding place for future work, not an automatic executor."
+    }
+  ],
+  "connections": [
+    {
+      "id": "link-1",
+      "from": "wake",
+      "to": "wash",
+      "label": "Begin routine",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-2",
+      "from": "wash",
+      "to": "breakfast",
+      "label": "Ready for breakfast",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-3",
+      "from": "breakfast",
+      "to": "handoff",
+      "label": "Coordinate",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-4",
+      "from": "handoff",
+      "to": "commute",
+      "label": "Leave",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-5",
+      "from": "commute",
+      "to": "workday",
+      "label": "Arrive",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-6",
+      "from": "workday",
+      "to": "priorities",
+      "label": "Enter detailed work",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-7",
+      "from": "priorities",
+      "to": "focus-one",
+      "label": "Choose focus",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-8",
+      "from": "focus-one",
+      "to": "draft",
+      "label": "Produce output",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-9",
+      "from": "draft",
+      "to": "lunch",
+      "label": "Pause",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-10",
+      "from": "lunch",
+      "to": "review",
+      "label": "Request feedback",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-11",
+      "from": "review",
+      "to": "revise",
+      "label": "Changes needed",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-12",
+      "from": "revise",
+      "to": "coordinate",
+      "label": "Ready to share",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-13",
+      "from": "coordinate",
+      "to": "close",
+      "label": "Handoff complete",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-14",
+      "from": "close",
+      "to": "errands",
+      "label": "Return to outside day",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-15",
+      "from": "errands",
+      "to": "dinner",
+      "label": "Home",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-16",
+      "from": "dinner",
+      "to": "reset",
+      "label": "Reset",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-17",
+      "from": "reset",
+      "to": "rest",
+      "label": "Recover",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-18",
+      "from": "rest",
+      "to": "tomorrow",
+      "label": "Prepare",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-19",
+      "from": "tomorrow",
+      "to": "sleep",
+      "label": "Finish",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-20",
+      "from": "focus-one",
+      "to": "incoming",
+      "label": "Possible interruption",
+      "style": "wobbly",
+      "direction": "forward"
+    },
+    {
+      "id": "link-21",
+      "from": "incoming",
+      "to": "triage",
+      "label": "Assess interruption",
+      "style": "lightning",
+      "direction": "forward"
+    },
+    {
+      "id": "link-22",
+      "from": "triage",
+      "to": "later",
+      "label": "Can wait",
+      "style": "normal",
+      "direction": "forward"
+    },
+    {
+      "id": "link-23",
+      "from": "later",
+      "to": "priorities",
+      "label": "Plan next block",
+      "style": "wobbly",
+      "direction": "forward"
+    },
+    {
+      "id": "link-24",
+      "from": "triage",
+      "to": "coordinate",
+      "label": "Needs another owner",
+      "style": "normal",
+      "direction": "forward"
+    }
+  ]
+}

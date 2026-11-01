@@ -9,9 +9,9 @@ const directory = new URL('../public/presets/', import.meta.url);
 const read = (id: string) => readFileSync(new URL(`${id}.json`, directory), 'utf8');
 
 test('infrastructure, Umbraco, business, and workflow presets are discoverable', () => {
-  assert.equal(presetCatalog.length, 16);
-  assert.equal(presetCatalog.filter(preset => !preset.source).length, 15);
-  assert.equal(new Set(presetCatalog.map(preset => preset.id)).size, 16);
+  assert.equal(presetCatalog.length, 20);
+  assert.equal(presetCatalog.filter(preset => !preset.source).length, 19);
+  assert.equal(new Set(presetCatalog.map(preset => preset.id)).size, 20);
   assert.deepEqual(readdirSync(directory).filter(name => name !== 'index.json').sort(), presetCatalog.map(p => `${p.id}.json`).sort());
   for (const preset of presetCatalog) assert.match(preset.id, /^[a-z0-9]+(?:-[a-z0-9]+)*$/);
 });

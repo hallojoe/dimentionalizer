@@ -111,6 +111,9 @@
             "minLength": 1,
             "maxLength": 10000,
             "description": "Parent plane ID; omitted uses the first plane."
+          },
+          "spacing": {
+            "$ref": "#/$defs/spacing"
           }
         },
         "additionalProperties": false
@@ -165,6 +168,48 @@
             "minLength": 1,
             "maxLength": 10000,
             "description": "Click the object to enter this other space."
+          },
+          "spacing": {
+            "allOf": [
+              {
+                "$ref": "#/$defs/spacing"
+              },
+              {
+                "properties": {
+                  "target": {
+                    "const": "self"
+                  }
+                }
+              }
+            ]
+          },
+          "checklist": {
+            "type": "array",
+            "maxItems": 20,
+            "items": {
+              "type": "object",
+              "required": [
+                "id",
+                "text"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 10000
+                },
+                "text": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 10000
+                },
+                "done": {
+                  "type": "boolean",
+                  "default": false
+                }
+              }
+            }
           }
         },
         "additionalProperties": false
@@ -386,6 +431,9 @@
             "minLength": 1,
             "maxLength": 10000,
             "description": "Parent space ID; omitted uses the first space."
+          },
+          "spacing": {
+            "$ref": "#/$defs/spacing"
           }
         }
       }
@@ -524,6 +572,9 @@
           "description": {
             "type": "string",
             "maxLength": 10000
+          },
+          "spacing": {
+            "$ref": "#/$defs/spacing"
           }
         }
       }
@@ -552,5 +603,36 @@
       }
     }
   },
-  "additionalProperties": false
+  "additionalProperties": false,
+  "$defs": {
+    "spacing": {
+      "type": "object",
+      "required": [
+        "value"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "mode": {
+          "enum": [
+            "margin",
+            "padding"
+          ],
+          "default": "margin"
+        },
+        "target": {
+          "enum": [
+            "self",
+            "children"
+          ],
+          "default": "self"
+        },
+        "value": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1000,
+          "description": "Extra horizontal scene units per side, beyond the baseline layout."
+        }
+      }
+    }
+  }
 }

@@ -13,6 +13,8 @@ import { elevationControl } from './elevation';
 import { mountSpaces } from './spaces';
 import { enterSpace } from '../config/spaces';
 import { connectorControls } from './connectors';
+import { spacingControls } from './spacing';
+import { checklistControls } from './checklist';
 import { planeControls } from './planes';
 
 export async function startApp(): Promise<() => void> {
@@ -198,7 +200,7 @@ export async function startApp(): Promise<() => void> {
     panel.append(icon, element('div', 'eyebrow', type.name.toUpperCase()), element('h2', '', object.name), element('span', 'tag', group.name), element('p', 'object-description', object.description || 'No description provided.'));
     const metadata = element('dl', 'metadata');
     for (const [label, value] of [['Object ID', object.id], ['Type', object.type ?? 'container']]) metadata.append(element('dt', '', label), element('dd', '', value));
-    panel.append(metadata);
+    panel.append(metadata, checklistControls(object, persist));
     const typeLabel = element('label', 'property-field', 'Object type');
     const typeSelect = element('select'); typeSelect.setAttribute('aria-label', 'Object type');
     const availableTypes = getObjectCatalog(config.objectTypes);
@@ -231,6 +233,7 @@ export async function startApp(): Promise<() => void> {
     parent.onclick = () => inspectScope({ kind: 'plane', id: plane.id });
     elevations.prepend(parent);
     panel.append(elevations);
+    panel.append(spacingControls(object, group, false, refreshConfiguration));
     renderConnections(panel, id);
     get('object-position').textContent = `${config.objects.indexOf(object) + 1} / ${config.objects.length}`;
     openInspector();
@@ -296,13 +299,14 @@ export async function startApp(): Promise<() => void> {
       const plane = config.planes.find(p => p.id === ref.id)!;
       const placed = layoutGroups(config).planes.find(p => p.id === ref.id)!;
       panel.append(element('p', 'muted', `Rendered footprint: ${placed.width} × ${placed.height} · ${placed.groups.length} groups`));
-      if (placed.overflow) panel.append(element('p', 'error', 'Contents exceed this locked footprint. Increase the dimensions or choose auto-fit.'));
-      panel.append(planeControls(plane, refreshConfiguration));
+      if (placed.overflow) panel.append(element('p', 'error', 'Contents or spacing exceed this locked footprint. Increase dimensions, reduce spacing, or choose auto-fit.'));
+      panel.append(planeControls(plane, refreshConfiguration), spacingControls(plane, config.spaces.find(space => space.id === plane.space), true, refreshConfiguration));
     } else {
       const group = config.groups.find(g => g.id === ref.id)!;
       const plane = config.planes.find(p => p.id === group.plane)!;
       panel.append(groupPlaneControl(group), elevationControl('inspect-group-elevation', 'Group elevation', group.elevation ?? 0, 'Relative to its parent plane.', value => { group.elevation = value; refreshConfiguration(); }), element('p', 'muted', `World elevation: ${plane.elevation + (group.elevation ?? 0)} (${plane.elevation} plane + ${group.elevation ?? 0} group)`));
     }
+    if (ref.kind === 'group') { const group = config.groups.find(g => g.id === ref.id)!; panel.append(spacingControls(group, config.planes.find(p => p.id === group.plane), true, refreshConfiguration)); }
     renderConnections(panel, ref);
     openInspector(); renderDirectory();
     if (ref.kind === 'plane') viewer?.focusPlane(ref.id); else viewer?.focusGroup(ref.id);
@@ -365,7 +369,7 @@ export async function startApp(): Promise<() => void> {
     filter.value = typeFilter;
   }
   renderCatalog();
-  const disposeSpaces = mountSpaces(() => config, apply, changeSpaceView);
+  const disposeSpaces = mountSpaces(() => config, apply, changeSpaceView, refreshConfiguration);
   get<HTMLSelectElement>('space-focus').onchange = event => { const id = (event.target as HTMLSelectElement).value; changeSpaceView(id ? enterSpace(config.spaceView, id) : { ...config.spaceView, active: null }); };
   get('space-back').onclick = () => { const previous = spaceHistory.pop(); if (previous) changeSpaceView(previous, false); };
   get<HTMLInputElement>('search').oninput = event => {

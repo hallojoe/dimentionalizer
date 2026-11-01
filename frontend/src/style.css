@@ -211,3 +211,11 @@ button.platform-label { pointer-events: auto; padding: 2px 4px; border: none; ba
 .preset-category-heading { grid-column: 1 / -1; color: var(--accent); font-size: 14px; margin: 20px 0 0; }
 .connector-controls { border-left: 1px solid var(--line); padding-left: 12px; margin-bottom: 24px; }
 .space-label { text-transform: uppercase; letter-spacing: 2px; color: var(--accent); font-weight: 600; }
+
+.spacing-controls { border-top: 1px solid var(--line); margin: 24px 0; padding-top: 18px; }
+.space-spacing { padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 12px; }
+.space-spacing summary { cursor: pointer; color: var(--muted); }
+.object-checklist { margin: 24px 0; }
+.checklist-item { display: flex; align-items: flex-start; gap: 10px; font-size: 12px; line-height: 1.7; padding: 9px 0; overflow-wrap: anywhere; }
+.checklist-item input { flex-shrink: 0; margin-top: 5px; accent-color: var(--accent); }
+.checklist-item.completed span { color: var(--muted); text-decoration: line-through; }
