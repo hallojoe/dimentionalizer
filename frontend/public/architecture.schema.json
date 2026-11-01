@@ -147,7 +147,7 @@
             "minLength": 1,
             "maxLength": 10000,
             "default": "container",
-            "description": "Predefined: container, database, email, cache, reverse-proxy, queue, storage, cdn. Unknown IDs fall back to container."
+            "description": "Built-in or custom objectTypes ID. Omitted defaults to container; unknown IDs retain identity and fall back to container."
           },
           "description": {
             "type": "string",
@@ -329,6 +329,97 @@
               "label": {
                 "type": "boolean",
                 "default": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "objectTypes": {
+      "type": "array",
+      "maxItems": 50,
+      "description": "Custom semantic types; omit for built-ins only. Built-in IDs cannot be overridden.",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "name"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 10000
+          },
+          "symbol": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 8,
+            "default": "◇"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 10000
+          },
+          "shape": {
+            "enum": [
+              "container",
+              "database",
+              "email",
+              "cache",
+              "reverse-proxy",
+              "queue",
+              "storage",
+              "cdn",
+              "user",
+              "usergroup",
+              "event",
+              "product",
+              "shop",
+              "warehouse",
+              "workflow",
+              "request",
+              "response",
+              "processing",
+              "webhook",
+              "api-call",
+              "dataflow",
+              "message"
+            ],
+            "default": "container"
+          },
+          "model": {
+            "type": "object",
+            "required": [
+              "url"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "url": {
+                "type": "string",
+                "maxLength": 2000,
+                "description": "Relative asset path or HTTPS URL ending in .glb/.gltf; self-contained glTF 2.0 static mesh."
+              },
+              "rotation": {
+                "type": "array",
+                "minItems": 3,
+                "maxItems": 3,
+                "items": {
+                  "type": "number",
+                  "minimum": -360,
+                  "maximum": 360
+                },
+                "default": [
+                  0,
+                  0,
+                  0
+                ],
+                "description": "X/Y/Z angles in degrees, applied before auto-fit."
               }
             }
           }

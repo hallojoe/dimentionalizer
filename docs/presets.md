@@ -1,4 +1,4 @@
-# Architecture presets
+# Structure presets
 
 Choose **Presets** in the header, then **Open editable preset**. The document opens in Configure as a draft. Review or change it, then choose **Apply configuration** to replace the active architecture. Closing the editor keeps the active configuration unchanged. Export the current configuration first if you want to retain a separate copy before applying another one.
 
@@ -16,8 +16,13 @@ Presets use the existing version 1 document format. All normal controls work aft
 | Real-time collaboration | Web/mobile clients, WebSocket ingress, two servers, presence, durable messages, per-instance fan-out |
 | Analytics data pipeline | Operational events and extracts, raw storage, transformation, quarantine, warehouse and dashboards |
 | Umbraco local Cluster | Source-grounded snapshot of the linked repository's checked-in demo |
+| Retail operations | Customers, loyalty members, products, shop, warehouse, fulfillment, and a custom glTF parcel locker across three planes |
+| Event launch | Organizers, attendees, event, ticket shop, registration, e-mail, and Slack-style notifications |
+| Order approval workflow | Request, validation, custom Approval type, human review, API call, webhook, response, event, and dataflow |
 
 The first seven are illustrative reference architectures, not claims about a particular deployment or production-readiness guarantees. Components can be consolidated, renamed, or replaced to match your real system. Their descriptions call out logical components and relevant assumptions. For example, a replayable event stream is represented as a generic Container rather than pretending it is a work queue.
+
+The three business/workflow examples are illustrative models. Email, Slack, webhooks, and API calls are visual nodes; no integrations execute. Retail operations loads its original model from `models/parcel-locker.gltf`; the others need no model assets. Existing infrastructure presets retain their original types and relationships.
 
 ## Umbraco source and scope
 

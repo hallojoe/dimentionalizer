@@ -1,4 +1,4 @@
-import { objectCatalog, resolveType } from '../catalog/catalog';
+import { getObjectCatalog, resolveType } from '../catalog/catalog';
 import { parseConfig } from '../config/validate';
 import { loadSaved, saveConfig } from '../config/storage';
 import type { ArchitectureConfig, ArchitectureGroup, ArchitectureObject, ConnectionEndpoint, EntityRef } from '../config/types';
@@ -25,6 +25,11 @@ export async function startApp(): Promise<() => void> {
   let selectedScope: EntityRef | null = null;
   let query = '', typeFilter = 'all';
   let viewer: SceneViewer | undefined;
+  const modelErrors = new Map<string, string>();
+  function clearModelErrors(): void { modelErrors.clear(); get('model-notice').hidden = true; }
+  function reportModelError(type: string, message: string): void {
+    modelErrors.set(type, message); get('model-notice').textContent = [...modelErrors.values()].join(' '); get('model-notice').hidden = false;
+  }
   let noticeTimer: ReturnType<typeof setTimeout> | undefined;
   const editor = get<HTMLTextAreaElement>('json-editor');
   const configDialog = get<HTMLDialogElement>('configuration');
@@ -39,6 +44,7 @@ export async function startApp(): Promise<() => void> {
     if (!saveConfig(config)) notify('Changes are active, but browser storage is unavailable. Export your configuration to keep them.');
   }
   function refreshConfiguration(): void {
+    clearModelErrors();
     viewer?.setConfig(config, true);
     renderDirectory();
     if (selected) inspect(selected, false);
@@ -49,10 +55,11 @@ export async function startApp(): Promise<() => void> {
     persist();
   }
   function matches(object: ArchitectureObject): boolean {
+    const type = resolveType(object.type, config.objectTypes);
     return (!activeGroup || object.group === activeGroup)
       && (!activePlane || config.groups.find(group => group.id === object.group)?.plane === activePlane)
-      && (typeFilter === 'all' || resolveType(object.type).id === typeFilter)
-      && `${object.name} ${object.description ?? ''} ${object.type ?? 'container'}`.toLowerCase().includes(query);
+      && (typeFilter === 'all' || type.id === typeFilter)
+      && `${object.name} ${object.description ?? ''} ${object.type ?? 'container'} ${type.name}`.toLowerCase().includes(query);
   }
   function renderDirectory(): void {
     const planes = get<HTMLSelectElement>('plane-filter');
@@ -95,7 +102,7 @@ export async function startApp(): Promise<() => void> {
     const list = get('object-list');
     list.replaceChildren();
     objects.forEach(object => {
-      const type = resolveType(object.type);
+      const type = resolveType(object.type, config.objectTypes);
       const button = element('button', `object-row${object.id === selected ? ' selected' : ''}`);
       button.setAttribute('aria-label', `Inspect ${object.name}, ${type.name}`);
       button.setAttribute('aria-pressed', String(object.id === selected));
@@ -123,7 +130,7 @@ export async function startApp(): Promise<() => void> {
       section.style.setProperty('--group-color', group.color);
       section.append(element('h3', '', group.name));
       entries.forEach(object => {
-        const button = element('button', '', `${resolveType(object.type).symbol}  ${object.name}`);
+        const button = element('button', '', `${resolveType(object.type, config.objectTypes).symbol}  ${object.name}`);
         button.onclick = () => inspect(object.id);
         section.append(button);
       });
@@ -151,7 +158,7 @@ export async function startApp(): Promise<() => void> {
     get('inspector-nav').hidden = false;
     const group = config.groups.find(g => g.id === object.group)!;
     const plane = config.planes.find(p => p.id === group.plane)!;
-    const type = resolveType(object.type);
+    const type = resolveType(object.type, config.objectTypes);
     const panel = get('inspector-content');
     panel.replaceChildren();
     const icon = element('div', 'inspector-icon', type.symbol); icon.style.color = group.color;
@@ -159,6 +166,17 @@ export async function startApp(): Promise<() => void> {
     const metadata = element('dl', 'metadata');
     for (const [label, value] of [['Object ID', object.id], ['Type', object.type ?? 'container']]) metadata.append(element('dt', '', label), element('dd', '', value));
     panel.append(metadata);
+    const typeLabel = element('label', 'property-field', 'Object type');
+    const typeSelect = element('select'); typeSelect.setAttribute('aria-label', 'Object type');
+    const availableTypes = getObjectCatalog(config.objectTypes);
+    if (!availableTypes.some(entry => entry.id === object.type)) {
+      const unknown = element('option', '', `${object.type} (Container fallback)`); unknown.value = object.type ?? 'container'; typeSelect.append(unknown);
+    }
+    for (const entry of availableTypes) { const option = element('option', '', `${entry.name}${entry.custom ? ' · custom' : ''}`); option.value = entry.id; typeSelect.append(option); }
+    typeSelect.value = object.type ?? 'container';
+    typeSelect.onchange = () => { object.type = typeSelect.value; refreshConfiguration(); };
+    typeLabel.append(typeSelect); panel.append(typeLabel);
+    if (type.custom) panel.append(element('p', 'muted', type.model ? `Custom model: ${type.model.url}` : `Custom type using the ${type.shape} shape.`));
     const elevations = element('section', 'inspector-elevations');
     elevations.append(
       elevationControl('inspect-group-elevation', 'Group elevation', group.elevation ?? 0, 'Moves this group and its objects relative to the parent plane.', value => {
@@ -270,12 +288,13 @@ export async function startApp(): Promise<() => void> {
     get<HTMLInputElement>('search').value = '';
     get<HTMLSelectElement>('type-filter').value = 'all';
     closeInspector();
+    clearModelErrors(); renderCatalog();
     viewer?.setConfig(config);
     renderPresentation(); renderDirectory();
     persist();
   }
 
-  try { viewer = createViewer(get('scene-host'), inspect, inspectScope); }
+  try { viewer = createViewer(get('scene-host'), inspect, inspectScope, reportModelError); }
   catch {
     get('scene-host').replaceChildren();
     get('fallback').hidden = false;
@@ -285,13 +304,20 @@ export async function startApp(): Promise<() => void> {
     for (const id of ['names', 'orbit', 'effects', 'reset-view']) get<HTMLButtonElement>(id).disabled = true;
   }
   viewer?.setConfig(config);
-  objectCatalog.forEach(type => {
-    const option = element('option', '', type.name); option.value = type.id;
-    get('type-filter').append(option);
-    const card = element('article', 'catalog-card');
-    card.append(element('div', 'catalog-symbol', type.symbol), element('h3', '', type.name), element('code', '', type.id), element('p', '', type.description));
-    get('catalog-grid').append(card);
-  });
+  function renderCatalog(): void {
+    const filter = get<HTMLSelectElement>('type-filter'); filter.replaceChildren();
+    const all = element('option', '', 'All types'); all.value = 'all'; filter.append(all);
+    const grid = get('catalog-grid'); grid.replaceChildren();
+    for (const type of getObjectCatalog(config.objectTypes)) {
+      const option = element('option', '', type.name); option.value = type.id; filter.append(option);
+      const card = element('article', 'catalog-card');
+      card.append(element('div', 'catalog-symbol', type.symbol), element('h3', '', type.name), element('code', '', type.id), element('p', '', type.description));
+      if (type.custom) card.append(element('small', 'muted', type.model ? `CUSTOM MODEL · ${type.model.url}` : `CUSTOM TYPE · ${type.shape}`));
+      grid.append(card);
+    }
+    filter.value = typeFilter;
+  }
+  renderCatalog();
   get<HTMLInputElement>('search').oninput = event => {
     query = (event.target as HTMLInputElement).value.trim().toLowerCase(); closeInspector(); renderDirectory();
   };

@@ -1,6 +1,9 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { createObjectVisual } from '../catalog/geometry';
+import { resolveType } from '../catalog/catalog';
+import { ModelLibrary } from '../catalog/models';
+import { disposeResources } from './resources';
 import type { ObjectVisual } from '../catalog/geometry';
 import type { ArchitectureConfig, ArchitectureConnection, ConnectionEndpoint, EntityRef } from '../config/types';
 import { endpointKey } from '../config/connections';
@@ -21,7 +24,7 @@ export interface SceneViewer {
 }
 
 /** Owns GPU resources and camera only. No document persistence or inspector markup. */
-export function createViewer(host: HTMLElement, onSelect: (id: string) => void, onScopeSelect?: (ref: EntityRef) => void): SceneViewer {
+export function createViewer(host: HTMLElement, onSelect: (id: string) => void, onScopeSelect?: (ref: EntityRef) => void, onModelError?: (type: string, message: string) => void): SceneViewer {
   const renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
   renderer.domElement.setAttribute('aria-label', 'Interactive 3D architecture. Use the object directory for keyboard navigation.');
@@ -56,15 +59,8 @@ export function createViewer(host: HTMLElement, onSelect: (id: string) => void, 
   const homeTarget = new THREE.Vector3();
   let flight: { start: number; from: THREE.Vector3; to: THREE.Vector3; targetFrom: THREE.Vector3; targetTo: THREE.Vector3 } | null = null;
 
-  function disposeRoot(object: THREE.Object3D): void {
-    object.traverse(child => {
-      if (child instanceof THREE.Mesh || child instanceof THREE.Line || child instanceof THREE.Points) {
-        child.geometry.dispose();
-        const materials = Array.isArray(child.material) ? child.material : [child.material];
-        materials.forEach(material => material.dispose());
-      }
-    });
-  }
+  let modelLibrary: ModelLibrary | undefined;
+  let generation = 0;
   function fly(to: THREE.Vector3, targetTo: THREE.Vector3): void {
     flight = { start: performance.now(), from: camera.position.clone(), to, targetFrom: controls.target.clone(), targetTo };
   }
@@ -72,7 +68,11 @@ export function createViewer(host: HTMLElement, onSelect: (id: string) => void, 
   controls.addEventListener('start', cancelFlight);
 
   function setConfig(config: ArchitectureConfig, preserveCamera = false): void {
-    disposeRoot(root);
+    const currentGeneration = ++generation;
+    modelLibrary?.dispose();
+    modelLibrary = new ModelLibrary(new URL(import.meta.env.BASE_URL, location.href).href);
+    const modelErrors = new Set<string>();
+    disposeResources(root);
     root.clear();
     labelLayer.replaceChildren();
     objects = []; packets = []; links = []; groupLabels = [];
@@ -127,7 +127,22 @@ export function createViewer(host: HTMLElement, onSelect: (id: string) => void, 
       labelLayer.append(heading);
       groupLabels.push({ element: heading, position: new THREE.Vector3(group.x - group.width / 2, group.y + 0.1, group.z + group.depth / 2 + 1.2) });
       for (const entry of group.objects) {
-        const visual = createObjectVisual(entry.object.type, group.color);
+        const visual = createObjectVisual(entry.object.type, group.color, config.objectTypes);
+        const type = resolveType(entry.object.type, config.objectTypes);
+        if (type.model) {
+          void modelLibrary.create(type.model, group.color).then(model => {
+            if (generation !== currentGeneration) { disposeResources(model); return; }
+            // Keep the stable hit target, position, labels, and selection callbacks.
+            const fallback = new THREE.Group();
+            for (const child of [...visual.root.children]) if (child !== visual.hit) fallback.add(child);
+            disposeResources(fallback);
+            visual.root.add(model);
+          }).catch(error => {
+            if (generation !== currentGeneration || modelErrors.has(type.id)) return;
+            modelErrors.add(type.id);
+            onModelError?.(type.id, `${type.name}: ${(error as Error).message} Showing the ${type.shape} fallback.`);
+          });
+        }
         visual.root.position.set(entry.x, entry.y + 0.35, entry.z);
         visual.hit.userData.id = entry.object.id;
         root.add(visual.root);
@@ -271,10 +286,11 @@ export function createViewer(host: HTMLElement, onSelect: (id: string) => void, 
   return {
     setConfig, focusGroup, focusObject, focusPlane, setVisible, setOptions,
     dispose() {
+      generation++; modelLibrary?.dispose();
       cancelAnimationFrame(frame);
       observer.disconnect();
       controls.dispose();
-      disposeRoot(root); disposeRoot(grid);
+      disposeResources(root); disposeResources(grid);
       renderer.dispose();
       renderer.domElement.remove(); labelLayer.remove();
     },

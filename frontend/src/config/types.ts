@@ -1,3 +1,5 @@
+import type { ObjectType } from '../catalog/catalog';
+
 /** Portable document model. IDs, not display names, define relationships. */
 export interface ArchitectureConfig {
   schemaVersion: 1;
@@ -11,6 +13,7 @@ export interface ArchitectureConfig {
     background: string;
   };
   view: { showNames: boolean; effects: boolean; autoOrbit: boolean; showGrid: boolean };
+  objectTypes: CustomObjectType[];
   planes: ArchitecturePlane[];
   groups: ArchitectureGroup[];
   objects: ArchitectureObject[];
@@ -55,3 +58,14 @@ export interface EntityRef { kind: 'plane' | 'group' | 'object'; id: string }
 /** Strings retain the version 1 shorthand for object endpoints. */
 export type ConnectionEndpoint = string | EntityRef;
 export interface ValidationResult { config: ArchitectureConfig; warnings: string[] }
+
+/** Portable, declarative type definitions. No executable renderer code in documents. */
+export interface CustomObjectType {
+  id: string;
+  name: string;
+  symbol: string;
+  description: string;
+  /** Built-in appearance, also used while a model loads or if it fails. */
+  shape: ObjectType;
+  model?: { url: string; rotation: [number, number, number] };
+}

@@ -1,9 +1,9 @@
 import type { ArchitectureConfig } from './types';
 
 export const presentationDefaults: ArchitectureConfig['presentation'] = {
-  title: 'Dimentionalizer — Architecture explorer',
+  title: 'Dimentionalizer — Structure explorer',
   brand: 'Dimentionalizer',
-  eyebrow: 'SYSTEM ARCHITECTURE',
+  eyebrow: 'CONNECTED STRUCTURES',
   headline: 'Give your systems\na new dimension.',
   description: 'Explore the building blocks. Follow the connections. See how it all fits together.',
   accent: '#b8ff6c',

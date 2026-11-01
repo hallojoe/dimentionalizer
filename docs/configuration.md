@@ -40,6 +40,7 @@ Start with `frontend/public/examples/minimal.json`. `architecture.schema.json` c
 | `presentation.accent`, `background` | Six-digit hex colors; group colors are independent |
 | `view` | Optional boolean settings; reduced-motion preference suppresses automatic motion |
 | `view.showGrid` | Show/hide the world ground grid; defaults to `true`; does not hide group platforms |
+| `objectTypes` | Optional array of up to 50 custom type definitions; see [object types and models](object-types.md) |
 | `planes` | Optional array, up to 50 entries; omitted creates one default auto-fit plane at world zero |
 | Plane fields | See **Planes** below |
 | `groups` | Required array, up to 50 entries; empty groups are allowed |
@@ -49,7 +50,7 @@ Start with `frontend/public/examples/minimal.json`. `architecture.schema.json` c
 | Group `elevation` | Signed height relative to its parent plane; defaults to `0` |
 | `objects` | Required array, up to 500 entries; an empty architecture is allowed |
 | Object `id`, `name`, `group` | Required; `group` must match a group ID; object IDs must be unique |
-| Object `type` | Optional; defaults to `container`; unknown types are retained and displayed as Container |
+| Object `type` | Optional; defaults to `container`; built-in or custom type ID; unknown types are retained and displayed as Container |
 | Object `description` | Optional plain text, supports line breaks |
 | Object `elevation` | Signed offset relative to its group; defaults to `0` |
 | `connections` | Optional array, up to 2,000 edges |
@@ -59,13 +60,13 @@ Start with `frontend/public/examples/minimal.json`. `architecture.schema.json` c
 
 Text values are limited to 10,000 characters and imported documents to 2 MB. A large valid architecture can still need a capable device; rendering limits are ceilings, not performance guarantees.
 
-Types use these exact IDs: `container`, `database`, `email`, `cache`, `reverse-proxy`, `queue`, `storage`, `cdn`. Names do not determine type. A component named "Database" with no `type` is still a generic container.
+Built-in types cover infrastructure, people, business entities, and workflow steps. See the complete [type catalog and custom model contract](object-types.md). Add `objectTypes` to define a custom meaning that reuses a shape or loads a self-contained glTF/GLB asset. Names do not determine type: a component named "Database" with no `type` is still a generic container.
 
 Duplicate display names are allowed. Stable IDs keep relationships unambiguous. Connections default to one-way from `from` to `to`. Set `direction: "bidirectional"` to animate two particles traveling in opposite directions. Every entity inspector lists its connections and lets you change their direction. These particles illustrate the configuration and do not represent traffic measurements.
 
 ## Planes
 
-Planes are an additional level above groups. Each group belongs to exactly one plane through `group.plane`; objects still belong to groups. Existing documents and all eight presets work without modification: omitting `planes` creates a default auto-fit plane at elevation `0`. With explicit planes, groups without a `plane` use the first entry. Plane IDs must be unique within the plane catalog; group and object IDs have their own namespaces.
+Planes are an additional level above groups. Each group belongs to exactly one plane through `group.plane`; objects still belong to groups. Existing documents and the original eight presets work without modification: omitting `planes` creates a default auto-fit plane at elevation `0`. With explicit planes, groups without a `plane` use the first entry. Plane IDs must be unique within the plane catalog; group and object IDs have their own namespaces.
 
 | Plane field | Meaning and default |
 | --- | --- |
@@ -146,4 +147,4 @@ An imported array of `{ "name": "API", "group": "Services", "text": "Description
 
 ## Security and privacy
 
-The viewer does not execute HTML or scripts from configuration: display text is inserted with DOM `textContent`. No analytics or server persistence are included. The example contains fictional, generic architecture. Use appropriate access controls on your hosting if your configuration describes a private system.
+The viewer does not execute HTML or scripts from configuration: display text is inserted with DOM `textContent`. No analytics or server persistence are included. Examples contain fictional structures. Custom model URLs trigger browser asset requests; JSON exports reference these files without embedding them. Use appropriate access controls on your hosting if your configuration describes a private system.

@@ -1,8 +1,10 @@
 import { isKnownType } from '../catalog/catalog';
 import { palette, presentationDefaults, viewDefaults } from './defaults';
-import type { ArchitectureConfig, ConnectionEndpoint, ValidationResult } from './types';
+import type { ArchitectureConfig, ConnectionEndpoint, CustomObjectType, ValidationResult } from './types';
 import { validateElevation } from './elevation';
 import { endpointKey } from './connections';
+import { validateModelUrl } from './model-url';
+import type { ObjectType } from '../catalog/catalog';
 
 type RecordValue = Record<string, unknown>;
 function record(value: unknown, path: string): RecordValue {
@@ -77,6 +79,26 @@ export function validateConfig(input: unknown): ValidationResult {
     if (v[key] !== undefined && typeof v[key] !== 'boolean') throw Error(`view.${key} must be true or false.`);
     view[key] = (v[key] as boolean | undefined) ?? viewDefaults[key];
   }
+  const objectTypes: CustomObjectType[] = array(value.objectTypes === undefined ? [] : value.objectTypes, 'objectTypes', 50).map((entry, i) => {
+    const path = `objectTypes[${i}]`;
+    const type = record(entry, path);
+    const id = string(type.id, `${path}.id`);
+    if (!/^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/.test(id)) throw Error(`${path}.id must be a lowercase slug.`);
+    if (isKnownType(id)) throw Error(`${path}.id cannot replace a built-in type.`);
+    const shape = string(type.shape, `${path}.shape`, 'container');
+    if (!isKnownType(shape)) throw Error(`${path}.shape must name a built-in shape.`);
+    const symbol = string(type.symbol, `${path}.symbol`, '◇');
+    if ([...symbol].length > 8) throw Error(`${path}.symbol must be at most 8 characters.`);
+    const result: CustomObjectType = { id, name: string(type.name, `${path}.name`), symbol, description: optionalText(type.description, `${path}.description`), shape: shape as ObjectType };
+    if (type.model !== undefined) {
+      const model = record(type.model, `${path}.model`);
+      const rotation = model.rotation === undefined ? [0, 0, 0] : array(model.rotation, `${path}.model.rotation`, 3);
+      if (rotation.length !== 3) throw Error(`${path}.model.rotation must contain three angles in degrees.`);
+      result.model = { url: validateModelUrl(model.url, `${path}.model.url`), rotation: rotation.map((angle, j) => number(angle, `${path}.model.rotation[${j}]`, 0, -360, 360)) as [number, number, number] };
+    }
+    return result;
+  });
+  unique(objectTypes.map(type => type.id), 'objectTypes');
   const planes = array(value.planes === undefined ? [{ id: 'default', name: 'Default plane' }] : value.planes, 'planes', 50).map((entry, i) => {
     const plane = record(entry, `planes[${i}]`);
     const decoration = record(plane.decoration === undefined ? {} : plane.decoration, `planes[${i}].decoration`);
@@ -112,7 +134,7 @@ export function validateConfig(input: unknown): ValidationResult {
     const group = string(o.group, `objects[${i}].group`);
     if (!groupIds.has(group)) throw Error(`objects[${i}].group references unknown group "${group}".`);
     const type = string(o.type, `objects[${i}].type`, 'container');
-    if (!isKnownType(type)) warnings.push(`Object "${String(o.name)}": unknown type "${type}"; displayed as Container.`);
+    if (!isKnownType(type, objectTypes)) warnings.push(`Object "${String(o.name)}": unknown type "${type}"; displayed as Container.`);
     return { id: string(o.id, `objects[${i}].id`), name: string(o.name, `objects[${i}].name`), group, type, description: optionalText(o.description, `objects[${i}].description`), elevation: validateElevation(o.elevation, `objects[${i}].elevation`) };
   });
   unique(objects.map(o => o.id), 'objects');
@@ -139,7 +161,7 @@ export function validateConfig(input: unknown): ValidationResult {
     return { id: string(c.id, `connections[${i}].id`), from, to, label: optionalText(c.label, `connections[${i}].label`), direction: direction as 'forward' | 'bidirectional' };
   });
   unique(connections.map(c => c.id), 'connections');
-  const config: ArchitectureConfig = { schemaVersion: 1, presentation, view, planes, groups, objects, connections };
+  const config: ArchitectureConfig = { schemaVersion: 1, presentation, view, objectTypes, planes, groups, objects, connections };
   return { config, warnings };
 }
 

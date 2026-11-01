@@ -6,12 +6,13 @@ export const shell = `
     <div class="header-actions"><button id="presets-button">Presets <span>▦</span></button><button id="catalog-button">Object catalog <span>↗</span></button><button id="config-button" class="primary">Configure <span>⌘</span></button></div>
   </header>
   <main class="workspace">
-    <aside class="sidebar" aria-label="Architecture directory">
+    <aside class="sidebar" aria-label="Structure directory">
       <section class="intro"><div id="eyebrow" class="eyebrow"></div><h1 id="headline"></h1><p id="description"></p></section>
       <div class="stats"><div><strong id="group-count">0</strong><span>GROUPS</span></div><div><strong id="object-count">0</strong><span>OBJECTS</span></div><div><strong id="connection-count">0</strong><span>LINKS</span></div></div>
       <div class="section-heading">NETWORK DIRECTORY <span id="visible-count"></span></div>
       <label class="type-filter">Plane<select id="plane-filter" aria-label="Plane filter"></select></label>
       <button id="inspect-plane" class="scope-button" disabled>Inspect plane & connections ↗</button>
+      <p id="model-notice" class="layout-notice" role="status" hidden></p>
       <p id="layout-notice" class="layout-notice" role="status" hidden></p>
       <label class="search"><span aria-hidden="true">⌕</span><input id="search" type="search" aria-label="Search objects" placeholder="Find an object…" /></label>
       <label class="type-filter">Object type<select id="type-filter"><option value="all">All types</option></select></label>
@@ -19,12 +20,12 @@ export const shell = `
       <div id="group-elevation-controls" hidden></div>
       <div class="section-heading object-heading">OBJECTS <span>SELECT TO INSPECT</span></div>
       <div id="object-list" class="object-list"></div>
-      <p class="sidebar-foot">A map of your architecture.<br>Not live telemetry.</p>
+      <p class="sidebar-foot">A map of your structure.<br>Not live telemetry.</p>
     </aside>
-    <section class="stage" aria-label="Architecture visualization">
+    <section class="stage" aria-label="Structure visualization">
       <div class="stage-heading"><span><i class="status-dot"></i> <span id="scene-status">SPATIAL VIEW</span></span><span id="scene-context">ENTIRE NETWORK</span></div>
       <div id="scene-host"></div>
-      <div id="fallback" class="fallback" hidden><span class="fallback-symbol">◇</span><h2>Your architecture, connected.</h2><p>3D is unavailable in this browser. Explore every object and its connections in the directory.</p><p class="muted">Enable WebGL / hardware acceleration to use the spatial view.</p><div id="fallback-summary"></div></div>
+      <div id="fallback" class="fallback" hidden><span class="fallback-symbol">◇</span><h2>Your world, connected.</h2><p>3D is unavailable in this browser. Explore every object and its connections in the directory.</p><p class="muted">Enable WebGL / hardware acceleration to use the spatial view.</p><div id="fallback-summary"></div></div>
       <div id="empty-state" class="empty-state" hidden><h2>A new space to build.</h2><p>Open Configure to add groups and objects.</p></div>
       <div class="viewbar" aria-label="View controls"><button id="names" aria-pressed="true">◉ <span>Names</span></button><button id="orbit" aria-pressed="false">◌ <span>Auto orbit</span></button><button id="effects" aria-pressed="true">✧ <span>Effects</span></button><button id="grid" aria-pressed="true" aria-label="World grid visibility">▦ <span>Grid</span></button><span class="control-divider"></span><button id="reset-view">⌖ <span>Reset view</span></button></div>
       <div class="stage-footer"><span>DRAG TO ORBIT <b>·</b> SCROLL TO ZOOM <b>·</b> CLICK TO INSPECT</span><span>DIMENSION / 01</span></div>
@@ -37,7 +38,7 @@ export const shell = `
   </main>
   <div id="notice" class="notice" role="status" hidden></div>
   <dialog id="configuration" aria-labelledby="config-title">
-    <div class="dialog-heading"><span class="eyebrow">ARCHITECTURE DOCUMENT</span><button data-close="configuration" aria-label="Close configuration">×</button></div>
+    <div class="dialog-heading"><span class="eyebrow">STRUCTURE DOCUMENT</span><button data-close="configuration" aria-label="Close configuration">×</button></div>
     <h2 id="config-title">Your structure. Your story.</h2><p>Edit your title, appearance, planes, groups, objects, and connections. Changes stay in this browser; export JSON to share or save them in your repository.</p>
     <p id="draft-notice" class="draft-notice" role="status" hidden></p>
     <div class="editor-toolbar"><label for="json-editor">CONFIGURATION.JSON</label><div><button id="import-button">Import JSON</button><button id="export-button">Export draft</button><button id="restore-button">Load default</button></div></div>
@@ -48,13 +49,13 @@ export const shell = `
   </dialog>
   <dialog id="catalog" aria-labelledby="catalog-title">
     <div class="dialog-heading"><span class="eyebrow">THE BUILDING BLOCKS</span><button data-close="catalog" aria-label="Close catalog">×</button></div>
-    <h2 id="catalog-title">One foundation. Eight forms.</h2><p>Every object starts as a container. Choose a specialized type when its shape helps tell the story. Technology decorators can be added in a future version.</p><div id="catalog-grid" class="catalog-grid"></div>
+    <h2 id="catalog-title">Objects for any world.</h2><p>People, products, places, systems, and processes. Choose a built-in type or define your own in Configure with a reusable shape or glTF/GLB model.</p><div id="catalog-grid" class="catalog-grid"></div>
     <div class="dialog-bottom"><span>Omit <code>type</code> to use a container.</span><button data-close="catalog" class="primary">Back to explorer</button></div>
   </dialog>
   <dialog id="presets" aria-labelledby="presets-title">
     <div class="dialog-heading"><span class="eyebrow">A PLACE TO START</span><button data-close="presets" aria-label="Close presets">×</button></div>
     <h2 id="presets-title">Real patterns. Your perspective.</h2>
-    <p>Seven common system patterns and an Umbraco repository snapshot. Open a preset, make it yours, then apply it. Your current architecture stays active until you apply the draft.</p>
+    <p>Infrastructure patterns, an Umbraco repository snapshot, and business and workflow examples. Open a preset, make it yours, then apply it. Your current architecture stays active until you apply the draft.</p>
     <div id="preset-error" class="error" role="alert"></div>
     <div id="preset-grid" class="preset-grid"></div>
     <div class="dialog-bottom"><span>All presets use the same editable version 1 format.</span><button data-close="presets">Back to explorer</button></div>

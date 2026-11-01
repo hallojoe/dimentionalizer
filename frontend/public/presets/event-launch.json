@@ -1,0 +1,272 @@
+{
+  "schemaVersion": 1,
+  "presentation": {
+    "title": "Event launch — Dimentionalizer",
+    "eyebrow": "PEOPLE & EVENTS",
+    "headline": "Event launch.",
+    "description": "Map an event from its people and ticket offering to registration, confirmation, and channel notifications. A business and communication model."
+  },
+  "objectTypes": [],
+  "planes": [
+    {
+      "id": "community",
+      "name": "Community",
+      "elevation": 10,
+      "decoration": {
+        "color": "#61d8ee",
+        "grid": true,
+        "opacity": 0.035
+      }
+    },
+    {
+      "id": "experience",
+      "name": "Event experience",
+      "elevation": 0,
+      "decoration": {
+        "color": "#b9a0ff",
+        "grid": true,
+        "opacity": 0.035
+      }
+    },
+    {
+      "id": "communications",
+      "name": "Communications",
+      "elevation": -8,
+      "decoration": {
+        "color": "#ffb16c",
+        "grid": true,
+        "opacity": 0.035
+      }
+    }
+  ],
+  "groups": [
+    {
+      "id": "people",
+      "name": "People",
+      "plane": "community",
+      "color": "#61d8ee",
+      "elevation": 0
+    },
+    {
+      "id": "offering",
+      "name": "Offering",
+      "plane": "experience",
+      "color": "#b9a0ff",
+      "elevation": 0
+    },
+    {
+      "id": "registration",
+      "name": "Registration",
+      "plane": "experience",
+      "color": "#b8ff6c",
+      "elevation": 3
+    },
+    {
+      "id": "notifications",
+      "name": "Notifications",
+      "plane": "communications",
+      "color": "#ffb16c",
+      "elevation": 0
+    }
+  ],
+  "objects": [
+    {
+      "id": "organizers",
+      "name": "Organizers",
+      "type": "usergroup",
+      "group": "people",
+      "description": "The team coordinating the launch."
+    },
+    {
+      "id": "speaker",
+      "name": "Guest speaker",
+      "type": "user",
+      "group": "people",
+      "description": "A person participating in the event."
+    },
+    {
+      "id": "attendees",
+      "name": "Attendees",
+      "type": "usergroup",
+      "group": "people",
+      "description": "The audience registering for the event."
+    },
+    {
+      "id": "event",
+      "name": "Community summit",
+      "type": "event",
+      "group": "offering",
+      "description": "The scheduled occasion being organized."
+    },
+    {
+      "id": "ticket",
+      "name": "Admission ticket",
+      "type": "product",
+      "group": "offering",
+      "description": "A digital product granting attendance."
+    },
+    {
+      "id": "box-office",
+      "name": "Ticket shop",
+      "type": "shop",
+      "group": "offering",
+      "description": "The sales point for admission."
+    },
+    {
+      "id": "signup",
+      "name": "Register",
+      "type": "request",
+      "group": "registration",
+      "description": "A request to reserve a place."
+    },
+    {
+      "id": "check",
+      "name": "Check availability",
+      "type": "processing",
+      "group": "registration",
+      "description": "A modeled capacity check."
+    },
+    {
+      "id": "confirmed",
+      "name": "Registration confirmed",
+      "type": "response",
+      "group": "registration",
+      "description": "The successful response to a registration request."
+    },
+    {
+      "id": "callback",
+      "name": "Payment callback",
+      "type": "webhook",
+      "group": "notifications",
+      "description": "An illustrative callback from the ticket payment system."
+    },
+    {
+      "id": "invite",
+      "name": "Send invitation",
+      "type": "email",
+      "group": "notifications",
+      "description": "A modeled invitation e-mail step."
+    },
+    {
+      "id": "slack",
+      "name": "Notify Slack channel",
+      "type": "message",
+      "group": "notifications",
+      "description": "A modeled channel message; no Slack integration is executed."
+    },
+    {
+      "id": "roster",
+      "name": "Attendee data",
+      "type": "dataflow",
+      "group": "notifications",
+      "description": "Registration data supplied to the event roster."
+    }
+  ],
+  "connections": [
+    {
+      "id": "link-1",
+      "from": "organizers",
+      "to": "event",
+      "label": "Organizes",
+      "direction": "forward"
+    },
+    {
+      "id": "link-2",
+      "from": "speaker",
+      "to": "event",
+      "label": "Speaks at",
+      "direction": "forward"
+    },
+    {
+      "id": "link-3",
+      "from": "event",
+      "to": "ticket",
+      "label": "Offers admission",
+      "direction": "forward"
+    },
+    {
+      "id": "link-4",
+      "from": "box-office",
+      "to": "ticket",
+      "label": "Sells",
+      "direction": "forward"
+    },
+    {
+      "id": "link-5",
+      "from": "attendees",
+      "to": "signup",
+      "label": "Registers",
+      "direction": "forward"
+    },
+    {
+      "id": "link-6",
+      "from": "signup",
+      "to": "check",
+      "label": "Check capacity",
+      "direction": "forward"
+    },
+    {
+      "id": "link-7",
+      "from": "check",
+      "to": "confirmed",
+      "label": "Place available",
+      "direction": "forward"
+    },
+    {
+      "id": "link-8",
+      "from": "confirmed",
+      "to": "attendees",
+      "label": "Acknowledgement",
+      "direction": "forward"
+    },
+    {
+      "id": "link-9",
+      "from": "callback",
+      "to": "confirmed",
+      "label": "Payment received",
+      "direction": "forward"
+    },
+    {
+      "id": "link-10",
+      "from": "confirmed",
+      "to": "invite",
+      "label": "Prepare invitation",
+      "direction": "forward"
+    },
+    {
+      "id": "link-11",
+      "from": "invite",
+      "to": "attendees",
+      "label": "Invitation",
+      "direction": "forward"
+    },
+    {
+      "id": "link-12",
+      "from": "callback",
+      "to": "slack",
+      "label": "Notify organizers",
+      "direction": "forward"
+    },
+    {
+      "id": "link-13",
+      "from": "slack",
+      "to": "organizers",
+      "label": "Channel update",
+      "direction": "forward"
+    },
+    {
+      "id": "link-14",
+      "from": "confirmed",
+      "to": "roster",
+      "label": "Update roster",
+      "direction": "forward"
+    },
+    {
+      "id": "link-15",
+      "from": "roster",
+      "to": "event",
+      "label": "Attendance list",
+      "direction": "forward"
+    }
+  ]
+}

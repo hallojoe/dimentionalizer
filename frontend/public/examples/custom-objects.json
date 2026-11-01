@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "presentation": {
+    "headline": "Your objects.\nYour vocabulary."
+  },
+  "objectTypes": [
+    {
+      "id": "parcel-locker",
+      "name": "Parcel locker",
+      "symbol": "▥",
+      "description": "A custom pickup location rendered from the bundled self-contained glTF model.",
+      "shape": "warehouse",
+      "model": {
+        "url": "models/parcel-locker.gltf",
+        "rotation": [
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "id": "customer",
+      "name": "Customer",
+      "symbol": "♙",
+      "description": "A person in our business vocabulary.",
+      "shape": "user"
+    }
+  ],
+  "groups": [
+    {
+      "id": "pickup",
+      "name": "Pickup experience"
+    }
+  ],
+  "objects": [
+    {
+      "id": "customer-1",
+      "name": "Customer",
+      "type": "customer",
+      "group": "pickup"
+    },
+    {
+      "id": "locker-1",
+      "name": "Pickup locker",
+      "type": "parcel-locker",
+      "group": "pickup"
+    }
+  ],
+  "connections": [
+    {
+      "id": "pickup",
+      "from": "customer-1",
+      "to": "locker-1",
+      "label": "Collect order",
+      "direction": "bidirectional"
+    }
+  ]
+}

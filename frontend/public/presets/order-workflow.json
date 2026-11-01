@@ -1,0 +1,287 @@
+{
+  "schemaVersion": 1,
+  "presentation": {
+    "title": "Order approval workflow — Dimentionalizer",
+    "eyebrow": "WORKFLOWS & DATAFLOWS",
+    "headline": "Order approval workflow.",
+    "description": "Follow a request through validation, human approval, an API call, an event, and notifications. Includes a custom Approval type that reuses a built-in shape."
+  },
+  "objectTypes": [
+    {
+      "id": "approval",
+      "name": "Approval",
+      "symbol": "✓",
+      "description": "A human review or decision step, independently named from its reusable Processing shape.",
+      "shape": "processing"
+    }
+  ],
+  "planes": [
+    {
+      "id": "entry",
+      "name": "Request & response",
+      "elevation": 8,
+      "decoration": {
+        "color": "#61d8ee",
+        "grid": true,
+        "opacity": 0.035
+      }
+    },
+    {
+      "id": "work",
+      "name": "Processing & decisions",
+      "elevation": 0,
+      "decoration": {
+        "color": "#b8ff6c",
+        "grid": true,
+        "opacity": 0.035
+      }
+    },
+    {
+      "id": "output",
+      "name": "Events & communication",
+      "elevation": -10,
+      "decoration": {
+        "color": "#b9a0ff",
+        "grid": true,
+        "opacity": 0.035
+      }
+    }
+  ],
+  "groups": [
+    {
+      "id": "interaction",
+      "name": "Interaction",
+      "plane": "entry",
+      "color": "#61d8ee",
+      "elevation": 0
+    },
+    {
+      "id": "steps",
+      "name": "Workflow steps",
+      "plane": "work",
+      "color": "#b8ff6c",
+      "elevation": 0
+    },
+    {
+      "id": "integration",
+      "name": "Integration",
+      "plane": "work",
+      "color": "#ffb16c",
+      "elevation": 4
+    },
+    {
+      "id": "outputs",
+      "name": "Outputs",
+      "plane": "output",
+      "color": "#b9a0ff",
+      "elevation": 0
+    }
+  ],
+  "objects": [
+    {
+      "id": "requester",
+      "name": "Requester",
+      "type": "user",
+      "group": "interaction",
+      "description": "The person initiating the request."
+    },
+    {
+      "id": "request",
+      "name": "Submit order",
+      "type": "request",
+      "group": "interaction",
+      "description": "The incoming order command."
+    },
+    {
+      "id": "response",
+      "name": "Order accepted",
+      "type": "response",
+      "group": "interaction",
+      "description": "The successful response returned to the requester."
+    },
+    {
+      "id": "rejected",
+      "name": "Order rejected",
+      "type": "response",
+      "group": "interaction",
+      "description": "An alternative response when approval is denied."
+    },
+    {
+      "id": "workflow",
+      "name": "Approval workflow",
+      "type": "workflow",
+      "group": "steps",
+      "description": "The logical coordination of the modeled steps."
+    },
+    {
+      "id": "validate",
+      "name": "Validate order",
+      "type": "processing",
+      "group": "steps",
+      "description": "Checks the request before it is sent for review."
+    },
+    {
+      "id": "approval",
+      "name": "Approve purchase",
+      "type": "approval",
+      "group": "steps",
+      "description": "A custom semantic type using Processing as its appearance."
+    },
+    {
+      "id": "reviewers",
+      "name": "Approvers",
+      "type": "usergroup",
+      "group": "steps",
+      "description": "The people responsible for the approval decision."
+    },
+    {
+      "id": "api",
+      "name": "Create supplier order",
+      "type": "api-call",
+      "group": "integration",
+      "description": "An API interaction after approval."
+    },
+    {
+      "id": "webhook",
+      "name": "Supplier callback",
+      "type": "webhook",
+      "group": "integration",
+      "description": "An asynchronous completion callback."
+    },
+    {
+      "id": "event",
+      "name": "Order created",
+      "type": "event",
+      "group": "outputs",
+      "description": "An event announcing successful creation."
+    },
+    {
+      "id": "email",
+      "name": "Send confirmation",
+      "type": "email",
+      "group": "outputs",
+      "description": "A modeled e-mail notification."
+    },
+    {
+      "id": "message",
+      "name": "Send Slack update",
+      "type": "message",
+      "group": "outputs",
+      "description": "A modeled chat notification."
+    },
+    {
+      "id": "dataflow",
+      "name": "Order analytics",
+      "type": "dataflow",
+      "group": "outputs",
+      "description": "The order data supplied to reporting."
+    }
+  ],
+  "connections": [
+    {
+      "id": "link-1",
+      "from": "requester",
+      "to": "request",
+      "label": "Submits",
+      "direction": "forward"
+    },
+    {
+      "id": "link-2",
+      "from": "request",
+      "to": "workflow",
+      "label": "Starts",
+      "direction": "forward"
+    },
+    {
+      "id": "link-3",
+      "from": "workflow",
+      "to": "validate",
+      "label": "First step",
+      "direction": "forward"
+    },
+    {
+      "id": "link-4",
+      "from": "validate",
+      "to": "approval",
+      "label": "Valid request",
+      "direction": "forward"
+    },
+    {
+      "id": "link-5",
+      "from": "approval",
+      "to": "reviewers",
+      "label": "Review exchange",
+      "direction": "bidirectional"
+    },
+    {
+      "id": "link-6",
+      "from": "approval",
+      "to": "api",
+      "label": "Approved",
+      "direction": "forward"
+    },
+    {
+      "id": "link-7",
+      "from": "approval",
+      "to": "rejected",
+      "label": "Rejected",
+      "direction": "forward"
+    },
+    {
+      "id": "link-8",
+      "from": "rejected",
+      "to": "requester",
+      "label": "Decision returned",
+      "direction": "forward"
+    },
+    {
+      "id": "link-9",
+      "from": "api",
+      "to": "webhook",
+      "label": "Asynchronous completion",
+      "direction": "forward"
+    },
+    {
+      "id": "link-10",
+      "from": "webhook",
+      "to": "event",
+      "label": "Order created",
+      "direction": "forward"
+    },
+    {
+      "id": "link-11",
+      "from": "event",
+      "to": "response",
+      "label": "Success",
+      "direction": "forward"
+    },
+    {
+      "id": "link-12",
+      "from": "response",
+      "to": "requester",
+      "label": "Result",
+      "direction": "forward"
+    },
+    {
+      "id": "link-13",
+      "from": "event",
+      "to": "email",
+      "label": "Notify customer",
+      "direction": "forward"
+    },
+    {
+      "id": "link-14",
+      "from": "event",
+      "to": "message",
+      "label": "Notify team",
+      "direction": "forward"
+    },
+    {
+      "id": "link-15",
+      "from": "event",
+      "to": "dataflow",
+      "label": "Publish order data",
+      "direction": "forward"
+    }
+  ]
+}

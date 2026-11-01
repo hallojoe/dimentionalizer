@@ -1,6 +1,6 @@
 # Dimentionalizer
 
-A configurable 3D architecture explorer. Describe a system in JSON, then explore its planes, groups, objects, and connections. Every object is a container by default; choose a specialized type when its shape communicates more.
+A configurable 3D structure explorer for systems, people, products, places, and workflows. Describe your model in JSON, then explore its planes, groups, objects, and connections. Every object is a container by default; choose a specialized type when its shape communicates more.
 
 Version 1 builds on the original container explorer's grouped platforms, luminous wire geometry, orbit navigation, and object inspection. It is product-neutral: branding, page title, headline, description, colors, and architecture all come from configuration.
 
@@ -30,10 +30,11 @@ npm run preview   # Serve the production build locally
 | --- | --- |
 | `frontend/public/architecture.json` | Default architecture and presentation settings; edit this to customize a deployment |
 | `frontend/public/examples/` | Small importable starting documents |
-| `frontend/public/presets/` | Eight selectable architecture presets and their metadata index |
+| `frontend/public/presets/` | Eleven selectable structure presets and their metadata index |
 | `frontend/public/architecture.schema.json` | JSON Schema for editor assistance |
 | `frontend/src/config/` | Document types, defaults, runtime validation, migration, and browser persistence |
-| `frontend/src/catalog/` | Predefined object metadata and independent 3D geometry builders |
+| `frontend/src/catalog/` | Built-in and custom type resolution, geometry builders, and glTF/GLB loading |
+| `frontend/public/models/` | Self-contained model assets, including an original custom example |
 | `frontend/src/presets/` | Preset catalog contract and validated, cancellable document loading |
 | `frontend/src/scene/` | Deterministic plane/group layout, camera, selection, connections, and GPU lifecycle |
 | `frontend/src/ui/` | Directory, inspector, configuration editor, and app coordination |
@@ -45,7 +46,9 @@ The frontend uses **TypeScript, Vite, and Three.js**, with native DOM components
 
 ## Version 1
 
-- Eight predefined shapes: **Container, Database, E-mail, Cache, Reverse proxy, Queue, Storage, CDN**.
+- **22 built-in types** covering infrastructure, people, business entities, and workflows. New business shapes: **User, User group, Event, Product, Shop, Warehouse**.
+- Workflow, Request, Response, Processing, Webhook, API call, Dataflow, and Message types; use E-mail for send-mail steps and Message for Slack notifications. These describe a process; they do not execute it.
+- Custom `objectTypes` with names, symbols, and reusable built-in shapes or self-contained **glTF 2.0 / GLB** models. Imported geometry fits the existing wire style and layout; loading failures retain a fallback shape.
 - Omitted types default to Container; unknown types retain their identifier but render as Container with a warning.
 - Configurable brand text, browser title, eyebrow, headline, description, accent, background, group names and colors.
 - Grouped 3D platforms, orbit/pan/zoom, group and object focus, labels, automatic orbit, and animated directional connection packets.
@@ -54,7 +57,7 @@ The frontend uses **TypeScript, Vite, and Three.js**, with native DOM components
 - Search and type filtering; keyboard-accessible directory and inspector. Left/right arrows browse objects while inspecting; Escape closes the inspector.
 - Connections between planes, groups, and items, with one-way or bidirectional animated dots and inspector controls. Explicit labels and incoming/outgoing inspection. Only configured connections are displayed; no dependencies are inferred from proximity.
 - JSON editing, import, validated export, default restoration, and browser-local persistence.
-- Preset picker with seven common system setups plus a source-grounded Umbraco Cluster snapshot; open any preset as an editable draft before applying it.
+- Preset picker with seven common system setups, a source-grounded Umbraco Cluster snapshot, and three business/workflow examples; open any preset as an editable draft before applying it.
 - Migration of the original `{ name, group, text }[]` format into a version 1 document.
 - Responsive layout, reduced-motion support, and a usable WebGL fallback.
 
@@ -62,7 +65,7 @@ Elevation composes as **world → plane → group → item**: plane `10` + group
 
 Open **Configure** to edit the active document. Imported files and **Load default** update the editor draft; only **Apply configuration** changes the explorer. **Export draft** validates and downloads the document currently in the editor.
 
-Open **Presets** to choose a three-tier web application, multi-tenant SaaS, e-commerce platform, background job system, headless publishing platform, real-time collaboration system, analytics pipeline, or the linked Umbraco local Cluster. The current architecture remains active until you apply the selected draft. See [preset details and Umbraco source mapping](docs/presets.md).
+Open **Presets** to choose a three-tier web application, multi-tenant SaaS, e-commerce platform, background job system, headless publishing platform, real-time collaboration system, analytics pipeline, the linked Umbraco local Cluster, **Retail operations**, **Event launch**, or **Order approval workflow**. The current architecture remains active until you apply the selected draft. See [preset details and Umbraco source mapping](docs/presets.md).
 
 Changes are stored locally under `dimentionalizer.config.v1` for the browser's origin. They are **not** committed to GitHub or saved on a server. To share a configuration, export it and replace `frontend/public/architecture.json` in your checkout. If an old local override hides changes to that file, choose **Configure → Load default → Apply configuration**.
 
@@ -70,7 +73,7 @@ Changes are stored locally under `dimentionalizer.config.v1` for the browser's o
 
 - [Configuration reference](docs/configuration.md)
 - [Presets and source mapping](docs/presets.md)
-- [Adding an object type](docs/object-types.md)
+- [Built-in types, custom vocabulary, and glTF/GLB models](docs/object-types.md)
 - [Design and scope](docs/architecture.md)
 
 Decorators (such as `sqlite` or `file-system`) are intentionally deferred. They are future attributes of an object, not new base object types. Version 1 does not implement decorator storage or rendering.
@@ -81,7 +84,7 @@ Decorators (such as `sqlite` or `file-system`) are intentionally deferred. They 
 
 ## Verification limits
 
-The initial release was typechecked, production-built, and tested for configuration validation/migration, catalog coverage, geometry construction, and group layout. Interactive browser and visual QA could not be completed in the creation environment because its managed preview service was unavailable. The GPU rendering path still needs a smoke test in a WebGL-capable browser.
+Automated checks cover configuration validation/migration, presets, catalog geometry, plane layout, glTF/GLB parsing, model fit, loading failures, cancellation, disposal, and JSON/browser-storage round trips. The production build includes TypeScript validation. Interactive browser and visual QA could not be completed in the creation environment because its managed preview service was unavailable. The GPU rendering path still needs a smoke test in a WebGL-capable browser.
 
 ## Third-party software
 

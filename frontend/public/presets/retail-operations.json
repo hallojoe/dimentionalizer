@@ -1,0 +1,287 @@
+{
+  "schemaVersion": 1,
+  "presentation": {
+    "title": "Retail operations — Dimentionalizer",
+    "eyebrow": "BUSINESS STRUCTURES",
+    "headline": "Retail operations.",
+    "description": "Follow customers, products, shops, and fulfillment across three planes. Includes a custom parcel-locker model alongside the built-in business objects."
+  },
+  "objectTypes": [
+    {
+      "id": "parcel-locker",
+      "name": "Parcel locker",
+      "symbol": "▥",
+      "description": "A custom pickup location rendered from the bundled self-contained glTF model.",
+      "shape": "warehouse",
+      "model": {
+        "url": "models/parcel-locker.gltf",
+        "rotation": [
+          0,
+          0,
+          0
+        ]
+      }
+    }
+  ],
+  "planes": [
+    {
+      "id": "people",
+      "name": "People & demand",
+      "elevation": 12,
+      "decoration": {
+        "color": "#61d8ee",
+        "grid": true,
+        "opacity": 0.035
+      }
+    },
+    {
+      "id": "commerce",
+      "name": "Commerce",
+      "elevation": 0,
+      "decoration": {
+        "color": "#b8ff6c",
+        "grid": true,
+        "opacity": 0.035
+      }
+    },
+    {
+      "id": "operations",
+      "name": "Fulfillment",
+      "elevation": -10,
+      "decoration": {
+        "color": "#ffb16c",
+        "grid": true,
+        "opacity": 0.035
+      }
+    }
+  ],
+  "groups": [
+    {
+      "id": "audience",
+      "name": "People",
+      "plane": "people",
+      "color": "#61d8ee",
+      "elevation": 0
+    },
+    {
+      "id": "storefront",
+      "name": "Storefront",
+      "plane": "commerce",
+      "color": "#b8ff6c",
+      "elevation": 0
+    },
+    {
+      "id": "inventory",
+      "name": "Inventory & pickup",
+      "plane": "operations",
+      "color": "#ffb16c",
+      "elevation": 0
+    },
+    {
+      "id": "fulfillment",
+      "name": "Order handling",
+      "plane": "operations",
+      "color": "#b9a0ff",
+      "elevation": 4
+    }
+  ],
+  "objects": [
+    {
+      "id": "customer",
+      "name": "Customer",
+      "type": "user",
+      "group": "audience",
+      "description": "A person browsing and buying products."
+    },
+    {
+      "id": "members",
+      "name": "Loyalty members",
+      "type": "usergroup",
+      "group": "audience",
+      "description": "An audience of customers with a shared membership."
+    },
+    {
+      "id": "shop",
+      "name": "Flagship shop",
+      "type": "shop",
+      "group": "storefront",
+      "description": "The sales location, represented as a business entity."
+    },
+    {
+      "id": "product",
+      "name": "Everyday backpack",
+      "type": "product",
+      "group": "storefront",
+      "description": "A product offered through the shop."
+    },
+    {
+      "id": "purchase",
+      "name": "Order placed",
+      "type": "event",
+      "group": "storefront",
+      "description": "A domain event marking a completed purchase."
+    },
+    {
+      "id": "warehouse",
+      "name": "Regional warehouse",
+      "type": "warehouse",
+      "group": "inventory",
+      "description": "Physical storage and dispatch location."
+    },
+    {
+      "id": "stock",
+      "name": "Reserved stock",
+      "type": "product",
+      "group": "inventory",
+      "description": "The allocated physical product for this order."
+    },
+    {
+      "id": "locker",
+      "name": "Neighborhood pickup",
+      "type": "parcel-locker",
+      "group": "inventory",
+      "description": "Customer pickup location using a user-defined glTF object type."
+    },
+    {
+      "id": "fulfill",
+      "name": "Fulfill order",
+      "type": "workflow",
+      "group": "fulfillment",
+      "description": "Coordinates picking, packing, and customer handoff."
+    },
+    {
+      "id": "pack",
+      "name": "Pick & pack",
+      "type": "processing",
+      "group": "fulfillment",
+      "description": "A work step carried out by the fulfillment team."
+    },
+    {
+      "id": "carrier",
+      "name": "Book delivery",
+      "type": "api-call",
+      "group": "fulfillment",
+      "description": "Illustrates a call to a carrier booking API."
+    },
+    {
+      "id": "receipt",
+      "name": "Send receipt",
+      "type": "email",
+      "group": "fulfillment",
+      "description": "Represents an e-mail step; no e-mail is sent by the explorer."
+    }
+  ],
+  "connections": [
+    {
+      "id": "link-1",
+      "from": "customer",
+      "to": "members",
+      "label": "Belongs to",
+      "direction": "forward"
+    },
+    {
+      "id": "link-2",
+      "from": "customer",
+      "to": "shop",
+      "label": "Visits",
+      "direction": "forward"
+    },
+    {
+      "id": "link-3",
+      "from": "shop",
+      "to": "product",
+      "label": "Offers",
+      "direction": "forward"
+    },
+    {
+      "id": "link-4",
+      "from": "customer",
+      "to": "product",
+      "label": "Chooses",
+      "direction": "forward"
+    },
+    {
+      "id": "link-5",
+      "from": "product",
+      "to": "purchase",
+      "label": "Purchased as",
+      "direction": "forward"
+    },
+    {
+      "id": "link-6",
+      "from": "purchase",
+      "to": "fulfill",
+      "label": "Starts",
+      "direction": "forward"
+    },
+    {
+      "id": "link-7",
+      "from": "warehouse",
+      "to": "stock",
+      "label": "Holds",
+      "direction": "forward"
+    },
+    {
+      "id": "link-8",
+      "from": "fulfill",
+      "to": "pack",
+      "label": "Coordinates",
+      "direction": "forward"
+    },
+    {
+      "id": "link-9",
+      "from": "pack",
+      "to": "stock",
+      "label": "Reserves",
+      "direction": "forward"
+    },
+    {
+      "id": "link-10",
+      "from": "pack",
+      "to": "carrier",
+      "label": "Ready for dispatch",
+      "direction": "forward"
+    },
+    {
+      "id": "link-11",
+      "from": "carrier",
+      "to": "locker",
+      "label": "Deliver to",
+      "direction": "forward"
+    },
+    {
+      "id": "link-12",
+      "from": "locker",
+      "to": "customer",
+      "label": "Pickup handoff",
+      "direction": "forward"
+    },
+    {
+      "id": "link-13",
+      "from": "purchase",
+      "to": "receipt",
+      "label": "Receipt requested",
+      "direction": "forward"
+    },
+    {
+      "id": "link-14",
+      "from": "receipt",
+      "to": "customer",
+      "label": "Receipt delivered",
+      "direction": "forward"
+    },
+    {
+      "id": "link-15",
+      "from": {
+        "kind": "plane",
+        "id": "commerce"
+      },
+      "to": {
+        "kind": "plane",
+        "id": "operations"
+      },
+      "label": "Commerce / operations",
+      "direction": "bidirectional"
+    }
+  ]
+}

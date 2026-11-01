@@ -75,5 +75,32 @@
       "url": "https://github.com/hallojoe/umbraco-topology/tree/3ce66024ac9e5dc603d42185001656c092a5b425/demo/Example.UmbracoSite",
       "revision": "3ce66024ac9e5dc603d42185001656c092a5b425"
     }
+  },
+  {
+    "id": "retail-operations",
+    "name": "Retail operations",
+    "summary": "Follow customers, products, shops, and fulfillment across three planes. Includes a custom parcel-locker model alongside the built-in business objects.",
+    "category": "Business structures",
+    "groups": 4,
+    "objects": 12,
+    "connections": 15
+  },
+  {
+    "id": "event-launch",
+    "name": "Event launch",
+    "summary": "Map an event from its people and ticket offering to registration, confirmation, and channel notifications. A business and communication model.",
+    "category": "People & events",
+    "groups": 4,
+    "objects": 13,
+    "connections": 15
+  },
+  {
+    "id": "order-workflow",
+    "name": "Order approval workflow",
+    "summary": "Follow a request through validation, human approval, an API call, an event, and notifications. Includes a custom Approval type that reuses a built-in shape.",
+    "category": "Workflows & dataflows",
+    "groups": 4,
+    "objects": 14,
+    "connections": 15
   }
 ]

@@ -1,23 +1,92 @@
-# Adding an object type
+# Objects and custom types
 
-Object types describe recognizable base shapes. Technology-specific decorators are deliberately separate future work.
+An object can represent a person, place, product, event, action, data stream, service, or anything else. Its `type` describes its meaning; the catalog supplies its name, symbol, and appearance. Layout groups and planes organize objects independently of their type. A User group object represents a team or audience; it does not create a layout group.
 
-1. Add an entry to `frontend/src/catalog/catalog.ts` with a stable lowercase `id`, display `name`, directory `symbol`, and short `description`.
-2. Add a geometry builder in `frontend/src/catalog/geometry.ts`. It receives the group color and returns a new `THREE.Group`.
-3. Register that builder in the `builders` map. Its `Record<ObjectType, Builder>` type makes missing entries a compile error.
-4. Add an example object using the new type, and run `npm test` and `npm run build` from `frontend/`.
+## Built-in catalog
 
-The UI catalog, type filter, inspector, and validator consume the registry; they do not need switch statements for every type. Unknown types always resolve through `resolveType()` to Container while retaining the original identifier in the document.
+| Category | Type IDs |
+| --- | --- |
+| General | `container` |
+| Infrastructure | `database`, `email`, `cache`, `reverse-proxy`, `queue`, `storage`, `cdn` |
+| People and business | `user`, `usergroup`, `event`, `product`, `shop`, `warehouse` |
+| Workflows and communication | `workflow`, `request`, `response`, `processing`, `webhook`, `api-call`, `dataflow`, `message` |
 
-## Geometry contract
+Use `email` for a Send e-mail step and `message` for a Slack or chat notification. `warehouse` depicts a physical location; an analytical data warehouse can use `database`. Labels and descriptions provide the context. These are visual model elements: they do not execute workflows, make API calls, send e-mails, or post Slack messages. Animated connection dots illustrate direction rather than live execution or measured traffic.
 
-- Center the object around X/Z = 0, with its base at Y = 0.
-- Keep it within approximately 4.7 × 2.5 × 2.5 world units. The current common hit target and layout use this envelope.
-- Return new geometry/material instances for each object. The scene owns their lifecycle and disposes them on rebuild and teardown.
-- Use the supplied color; it identifies the object's group. Type is communicated by shape.
-- Use `wire()`, `box()`, and `trace()` helpers for the shared visual style. If a new primitive needs textures, add explicit texture disposal to the scene lifecycle.
-- Leave labels, hit-testing, camera movement, and persistence to their existing modules.
+The object inspector has an **Object type** selector. The catalog, inspector, search, and type filter include configured custom types. Omitted types default to Container. An unregistered type preserves its ID and renders as Container with a validation warning.
 
-The scene wraps the geometry with a consistent hit target and highlights its point samples when selected or hovered. Connection endpoints currently attach to the center at Y = 1.5.
+## Define your own vocabulary
 
-For substantially larger or nested objects, extend the layout/geometry contract deliberately rather than slipping oversized geometry into this envelope.
+Add `objectTypes` in Configure, or edit the deployment's `architecture.json`. No application code is needed. The catalog is part of the document and survives browser saving and JSON export.
+
+```json
+{
+  "schemaVersion": 1,
+  "objectTypes": [
+    {
+      "id": "customer",
+      "name": "Customer",
+      "symbol": "♙",
+      "description": "A person buying from our business.",
+      "shape": "user"
+    },
+    {
+      "id": "parcel-locker",
+      "name": "Parcel locker",
+      "symbol": "▥",
+      "description": "An unattended pickup location.",
+      "shape": "warehouse",
+      "model": {
+        "url": "models/parcel-locker.gltf",
+        "rotation": [0, 0, 0]
+      }
+    }
+  ],
+  "groups": [{ "id": "pickup", "name": "Pickup experience" }],
+  "objects": [
+    { "id": "person", "name": "Customer", "group": "pickup", "type": "customer" },
+    { "id": "locker", "name": "Pickup locker", "group": "pickup", "type": "parcel-locker" }
+  ],
+  "connections": [
+    { "id": "collect", "from": "person", "to": "locker", "direction": "bidirectional" }
+  ]
+}
+```
+
+Import the ready-to-use [custom object example](../frontend/public/examples/custom-objects.json). The **Retail operations** preset also includes the bundled parcel locker. **Order approval workflow** demonstrates a custom Approval type using the built-in Processing shape.
+
+| Custom type field | Contract |
+| --- | --- |
+| `id` | Required lowercase slug, unique within `objectTypes`; cannot replace a built-in ID |
+| `name` | Required display name |
+| `description` | Optional plain text |
+| `symbol` | Optional text symbol, at most 8 Unicode characters; defaults to `◇` |
+| `shape` | Any built-in type ID; defaults to `container`. Used alone or as a model fallback |
+| `model.url` | Optional model definition; requires a relative asset path or HTTPS URL ending in `.glb` or `.gltf` |
+| `model.rotation` | Optional `[X, Y, Z]` rotation in degrees, each from −360 to 360; defaults to `[0, 0, 0]` |
+
+Up to 50 custom types are allowed. Shape aliases refer to built-ins, avoiding recursive custom-type chains. Symbols and names remain plain text, not HTML or executable code. Object decorators remain a separate future addition.
+
+## Supply a model
+
+The supported interchange format is **glTF 2.0**, including its `.glb` binary form. See the [Khronos format overview](https://www.khronos.org/gltf/) and [Three.js GLTFLoader documentation](https://threejs.org/docs/pages/GLTFLoader.html).
+
+1. Export a **static, uncompressed mesh** as a self-contained GLB, or glTF with embedded buffers and images. Apply or remove rigs and morph targets before exporting.
+2. Put the asset in `frontend/public/models/`, or host it at an HTTPS URL that permits browser CORS requests.
+3. Reference it with `model.url`. Relative paths resolve under the deployed application's base path, including subdirectory hosting. Absolute paths, traversal, credentials in URLs, query strings, and temporary `blob:`/`file:` URLs are not supported.
+4. Apply the configuration. While the model loads, the configured `shape` stays visible. A failed load retains that shape and displays an explanation in the directory.
+
+The loader renders static mesh geometry in the shared wire-and-point style using the group's color. Source materials, textures, lights, cameras, and animations do not determine the displayed appearance. Node transforms are baked into geometry; the configured rotation is applied, then the model is uniformly scaled to fit **4.6 × 2.5 × 2.5** scene units, centered on X/Z, and grounded at Y = 0. Labels, hit targets, connections, and elevation remain stable when the model replaces the fallback.
+
+Limits per asset: 20 MB downloaded and decoded buffers, 100,000 mesh vertices after instancing, 256 mesh definitions, and 1,024 nodes. External buffer/image sidecars are rejected. Required extensions are limited to `KHR_materials_unlit`, `KHR_mesh_quantization`, and `KHR_texture_transform`; Draco, Meshopt, KTX2, rigged models, and morph targets are not supported in this version. Animated files are shown at their initial static transforms. The loader times out after 30 seconds, deduplicates loads within a scene, and discards results after the scene changes.
+
+JSON export includes the model reference, not the model file. Keep referenced assets alongside the deployment when sharing it. Remote model hosts receive asset requests; the app sends no credentials with those requests. The bundled parcel-locker model is original project geometry and needs no external asset host.
+
+## Add a built-in shape in code
+
+1. Add metadata to `frontend/src/catalog/catalog.ts` with a stable ID, name, symbol, and description.
+2. Add a geometry builder in `frontend/src/catalog/geometry.ts`, receiving a group color and returning a new `THREE.Group`.
+3. Register it in `builders`. `Record<ObjectType, Builder>` checks completeness.
+4. Add the new ID to the JSON Schema's custom `shape` enum, add an example, and run `npm test` and `npm run build`.
+
+Built-in geometry uses a base at Y = 0 and is centered at X/Z = 0. Keep it inside the common hit envelope (approximately 4.7 × 2.5 × 2.5 units), and return independently disposable geometry and materials. Reuse `wire()`, `box()`, and `trace()` for the visual style. Leave camera movement, labels, selection, connections, and persistence to their existing modules.

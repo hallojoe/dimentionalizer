@@ -8,10 +8,10 @@ import { isKnownType } from '../src/catalog/catalog';
 const directory = new URL('../public/presets/', import.meta.url);
 const read = (id: string) => readFileSync(new URL(`${id}.json`, directory), 'utf8');
 
-test('seven reference patterns and one sourced Umbraco preset are discoverable', () => {
-  assert.equal(presetCatalog.length, 8);
-  assert.equal(presetCatalog.filter(preset => !preset.source).length, 7);
-  assert.equal(new Set(presetCatalog.map(preset => preset.id)).size, 8);
+test('infrastructure, Umbraco, business, and workflow presets are discoverable', () => {
+  assert.equal(presetCatalog.length, 11);
+  assert.equal(presetCatalog.filter(preset => !preset.source).length, 10);
+  assert.equal(new Set(presetCatalog.map(preset => preset.id)).size, 11);
   assert.deepEqual(readdirSync(directory).filter(name => name !== 'index.json').sort(), presetCatalog.map(p => `${p.id}.json`).sort());
   for (const preset of presetCatalog) assert.match(preset.id, /^[a-z0-9]+(?:-[a-z0-9]+)*$/);
 });
@@ -23,7 +23,7 @@ test('all shipped presets validate, round-trip, and have accurate picker counts'
     assert.equal(config.groups.length, preset.groups, preset.id);
     assert.equal(config.objects.length, preset.objects, preset.id);
     assert.equal(config.connections.length, preset.connections, preset.id);
-    assert.ok(config.objects.every(object => isKnownType(object.type ?? 'container')));
+    assert.ok(config.objects.every(object => isKnownType(object.type ?? 'container', config.objectTypes)));
     assert.ok(config.objects.every(object => object.description?.trim()));
     assert.ok(config.groups.every(group => config.objects.some(object => object.group === group.id)));
     assert.ok(config.connections.every(connection => connection.label?.trim()));
