@@ -49,7 +49,8 @@ The frontend uses **TypeScript, Vite, and Three.js**, with native DOM components
 - **40 built-in types** covering infrastructure, people, business entities, and workflows. New business shapes: **User, User group, Event, Product, Shop, Warehouse**.
 - Everyday shapes include Human, Family, Adult, Child, Food, Bed, Shower, Toilet, Sofa, Chair, Desk, Wall, Window wall, Bus, Train, Airplane, Office, and Home.
 - Workflow, Request, Response, Processing, Webhook, API call, Dataflow, and Message types; use E-mail for send-mail steps and Message for Slack notifications. These describe a process; they do not execute it.
-- Custom `objectTypes` with names, symbols, and reusable built-in shapes or self-contained **glTF 2.0 / GLB** models. Imported geometry fits the existing wire style and layout; loading failures retain a fallback shape.
+- Custom `objectTypes` with names, symbols, and reusable built-in shapes or self-contained **glTF 2.0 / GLB** models. Imported geometry follows the selected model theme and existing layout; loading failures retain a fallback shape.
+- **Wire** and **Textured** model themes: retain the original luminous appearance or add solid, softly lit surfaces with a subtle grain. Choose Model theme in the view controls; the choice persists and exports.
 - Omitted types default to Container; unknown types retain their identifier but render as Container with a warning.
 - Configurable brand text, browser title, eyebrow, headline, description, accent, background, group names and colors.
 - Grouped 3D platforms, orbit/pan/zoom, group and object focus, labels, automatic orbit, and animated directional connection packets.
@@ -83,6 +84,7 @@ Changes are stored locally under `dimentionalizer.config.v1` for the browser's o
 
 ## Customize and extend
 
+- [3D model themes](docs/model-themes.md)
 - [Visibility switches and frame controls](docs/visibility.md)
 - [Spacing, overrides, and planning checklists](docs/spacing.md)
 - [Spaces, portals, and connector capacity](docs/spaces.md)

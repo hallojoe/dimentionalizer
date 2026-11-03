@@ -18,6 +18,7 @@ import { checklistControls } from './checklist';
 import { planeControls } from './planes';
 import { visibleEntities } from '../config/visibility';
 import { visibilityControls } from './visibility';
+import { modelThemes, isModelTheme } from '../catalog/themes';
 
 export async function startApp(): Promise<() => void> {
   get('app').innerHTML = shell;
@@ -334,6 +335,7 @@ export async function startApp(): Promise<() => void> {
     syncControls();
   }
   function syncControls(): void {
+    get<HTMLSelectElement>('model-theme').value = config.view.modelTheme;
     for (const [id, key] of [['names', 'showNames'], ['orbit', 'autoOrbit'], ['effects', 'effects'], ['grid', 'showGrid'], ['plane-frames', 'showPlaneFrames'], ['group-frames', 'showGroupFrames']] as const) {
       get(id).setAttribute('aria-pressed', String(config.view[key]));
     }
@@ -373,6 +375,15 @@ export async function startApp(): Promise<() => void> {
     filter.value = typeFilter;
   }
   renderCatalog();
+  const themeSelect = get<HTMLSelectElement>('model-theme');
+  modelThemes.forEach(theme => {
+    const option = element('option', '', theme.name); option.value = theme.id; option.title = theme.description; themeSelect.append(option);
+  });
+  themeSelect.onchange = () => {
+    if (!isModelTheme(themeSelect.value)) return;
+    config.view.modelTheme = themeSelect.value;
+    clearModelErrors(); viewer?.setOptions(config.view); syncControls(); persist();
+  };
   const disposeSpaces = mountSpaces(() => config, apply, changeSpaceView, refreshConfiguration);
   get<HTMLSelectElement>('space-focus').onchange = event => { const id = (event.target as HTMLSelectElement).value; changeSpaceView(id ? enterSpace(config.spaceView, id) : { ...config.spaceView, active: null }); };
   get('space-back').onclick = () => { const previous = spaceHistory.pop(); if (previous) changeSpaceView(previous, false); };

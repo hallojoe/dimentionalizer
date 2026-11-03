@@ -38,7 +38,7 @@ Planes extend the version 1 document additively. Validation supplies an implicit
 
 ## Model loading lifecycle
 
-`objectTypes` is normalized and validated with the document. The resolved catalog drives geometry, names, symbols, filters, and inspector choices. A model type starts with its built-in fallback shape. Each scene owns a `ModelLibrary`, which loads and parses each asset URL once, normalizes independent wire visuals, and replaces only the object's appearance. Stable hit targets, positions, and callbacks remain owned by the viewer.
+`objectTypes` is normalized and validated with the document. The resolved catalog drives geometry, names, symbols, filters, and inspector choices. A model type starts with its built-in fallback shape. Each scene owns a `ModelLibrary`, which loads and parses each asset URL once, normalizes independent themed visuals, and replaces only the object's appearance. Stable hit targets, positions, and callbacks remain owned by the viewer.
 
 Scene replacement cancels pending model requests and disposes cached geometry. A generation check prevents late completions from attaching to a newer scene. Source GPU resources, textures, and image bitmaps are disposed after mesh extraction; generated resources are disposed on replacement/teardown. Loader errors are displayed without discarding the object or document. The Three.js GLTFLoader addon is dynamically imported only for model-backed objects.
 
@@ -57,3 +57,9 @@ Connector styles produce shared curves for both tube geometry and moving dots. C
 `config/spacing.ts` validates optional spacing and resolves direct-child defaults. Omission is preserved, so explicit zero can override inheritance. Layout keeps surface dimensions separate from occupied dimensions: margins affect packing, while padding affects the target's interior footprint. Objects use variable-width columns and variable-depth rows; this reserves different leaf allocations without resizing their visual models. Locked surfaces retain their dimensions and report additional spacing overflow.
 
 Object checklists are ordinary document data. The inspector persists checkbox changes without rebuilding the scene. Normalization and space duplication produce independent checklist values; geometry, routing, and workflow execution do not depend on completion state.
+
+## Model themes
+
+`catalog/themes.ts` owns the theme registry, procedural grain, material finishing, and model highlighting. Built-in builders retain triangle surfaces until the chosen theme is applied; the default Wire appearance discards those surfaces, preserving the original outlines and points. Textured adds UV-mapped standard materials lit by the viewer. Imported meshes clone cached geometry before surface preparation, so disposing a visual never invalidates the model cache. `view.modelTheme` is validated independently of boolean view options.
+
+Changing the model theme rebuilds scene resources while retaining the camera, selection, object filters, and space state. Scene generations cancel obsolete model loads. Each visual owns its texture and materials, including resources shared within its component meshes. Space dimming preserves original opacity, transparency, and depth-write settings so opaque surfaces are restored when a space regains focus.

@@ -37,6 +37,12 @@ export function createViewer(host: HTMLElement, onSelect: (id: string) => void, 
   labelLayer.className = 'scene-labels';
   host.append(labelLayer);
   const scene = new THREE.Scene();
+  // Only solid model materials respond to these lights; wire geometry stays unchanged.
+  scene.add(new THREE.HemisphereLight('#e9f5ff', '#26313b', 2));
+  const keyLight = new THREE.DirectionalLight('#fff0dc', 3);
+  keyLight.position.set(30, 60, 40); scene.add(keyLight);
+  const fillLight = new THREE.DirectionalLight('#9bcfff', 1.2);
+  fillLight.position.set(-40, 20, -30); scene.add(fillLight);
   const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 2000);
   const controls = new OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true;
@@ -57,7 +63,7 @@ export function createViewer(host: HTMLElement, onSelect: (id: string) => void, 
   let configState: ArchitectureConfig;
   let visibleSpaces = new Set<string>(), activeSpace: string | null = null;
   let visibleObjects = new Set<string>(), requestedObjects = new Set<string>(), visibleFrames = new Set<string>();
-  const materialOpacity = new WeakMap<THREE.Material, number>();
+  const materialAppearance = new WeakMap<THREE.Material, { opacity: number; transparent: boolean; depthWrite: boolean }>();
   function addToSpace(space: string, ...entries: THREE.Object3D[]): void {
     entries.forEach(entry => { entry.userData.space = space; root.add(entry); });
   }
@@ -77,8 +83,12 @@ export function createViewer(host: HTMLElement, onSelect: (id: string) => void, 
       entry.traverse(child => {
         if (!(child instanceof THREE.Mesh || child instanceof THREE.Line || child instanceof THREE.Points)) return;
         for (const material of Array.isArray(child.material) ? child.material : [child.material]) {
-          if (!materialOpacity.has(material)) materialOpacity.set(material, material.opacity);
-          material.transparent = true; material.opacity = materialOpacity.get(material)! * (dim ? 0.12 : 1);
+          if (!materialAppearance.has(material)) materialAppearance.set(material, { opacity: material.opacity, transparent: material.transparent, depthWrite: material.depthWrite });
+          const original = materialAppearance.get(material)!;
+          const transparent = original.transparent || dim;
+          if (material.transparent !== transparent) { material.transparent = transparent; material.needsUpdate = true; }
+          material.opacity = original.opacity * (dim ? 0.12 : 1);
+          material.depthWrite = original.depthWrite && !dim;
         }
       });
     }
@@ -102,7 +112,7 @@ export function createViewer(host: HTMLElement, onSelect: (id: string) => void, 
   controls.addEventListener('start', cancelFlight);
 
   function setConfig(config: ArchitectureConfig, preserveCamera = false): void {
-    configState = config;
+    configState = config; options = { ...config.view };
     visibleSpaces = new Set(config.spaceView.visible); activeSpace = config.spaceView.active;
     const currentGeneration = ++generation;
     modelLibrary?.dispose();
@@ -171,10 +181,10 @@ export function createViewer(host: HTMLElement, onSelect: (id: string) => void, 
       labelLayer.append(heading);
       groupLabels.push({ element: heading, space, key: endpointKey({ kind: 'group', id: group.id }), position: new THREE.Vector3(group.x - group.width / 2, group.y + 0.1, group.z + group.depth / 2 + 1.2) });
       for (const entry of group.objects) {
-        const visual = createObjectVisual(entry.object.type, group.color, config.objectTypes);
+        const visual = createObjectVisual(entry.object.type, group.color, config.objectTypes, config.view.modelTheme);
         const type = resolveType(entry.object.type, config.objectTypes);
         if (type.model) {
-          void modelLibrary.create(type.model, group.color).then(model => {
+          void modelLibrary.create(type.model, group.color, config.view.modelTheme).then(model => {
             if (generation !== currentGeneration) { disposeResources(model); return; }
             // Keep the stable hit target, position, labels, and selection callbacks.
             const fallback = new THREE.Group();
@@ -239,6 +249,12 @@ export function createViewer(host: HTMLElement, onSelect: (id: string) => void, 
   }
 
   function setOptions(value: ArchitectureConfig['view']): void {
+    if (value.modelTheme !== options.modelTheme) {
+      const ids = new Set(requestedObjects), selection = selected;
+      setConfig({ ...configState, spaceView: { visible: [...visibleSpaces], active: activeSpace }, view: { ...value } }, true);
+      setVisible(ids); selected = selection;
+      return;
+    }
     options = { ...value };
     controls.autoRotate = options.autoOrbit && !reducedMotion;
     grid.visible = options.showGrid;

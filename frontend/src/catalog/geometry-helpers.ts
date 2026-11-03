@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { surfaceGeometry } from './themes';
 
 export type Builder = (color: string) => THREE.Group;
 export type Point = [number, number, number];
@@ -26,7 +27,7 @@ export function wire(geometry: THREE.BufferGeometry, color: string): THREE.Group
   cloud.setAttribute('position', new THREE.Float32BufferAttribute(points, 3));
   root.add(new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.5 })));
   root.add(new THREE.Points(cloud, new THREE.PointsMaterial({ color, size: 0.055, transparent: true, opacity: 0.9 })));
-  geometry.dispose();
+  root.add(surfaceGeometry(geometry));
   return root;
 }
 export function box(root: THREE.Group, color: string, size: Point, position: Point): void {

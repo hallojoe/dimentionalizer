@@ -1,3 +1,4 @@
+import type { ModelTheme } from '../catalog/themes';
 import type { ObjectType } from '../catalog/catalog';
 
 /** Portable document model. IDs, not display names, define relationships. */
@@ -12,7 +13,7 @@ export interface ArchitectureConfig {
     accent: string;
     background: string;
   };
-  view: { showNames: boolean; effects: boolean; autoOrbit: boolean; showGrid: boolean; showPlaneFrames: boolean; showGroupFrames: boolean };
+  view: { modelTheme: ModelTheme; showNames: boolean; effects: boolean; autoOrbit: boolean; showGrid: boolean; showPlaneFrames: boolean; showGroupFrames: boolean };
   spaces: ArchitectureSpace[];
   spaceView: SpaceView;
   objectTypes: CustomObjectType[];

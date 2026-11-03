@@ -1,5 +1,6 @@
 import { isKnownType } from '../catalog/catalog';
-import { palette, presentationDefaults, viewDefaults } from './defaults';
+import { isModelTheme } from '../catalog/themes';
+import { palette, presentationDefaults, viewDefaults, viewBooleanDefaults } from './defaults';
 import type { ArchitectureConfig, ConnectionEndpoint, CustomObjectType, ValidationResult } from './types';
 import { validateElevation } from './elevation';
 import { endpointKey } from './connections';
@@ -76,10 +77,12 @@ export function validateConfig(input: unknown): ValidationResult {
       : string(p[key], `presentation.${key}`, presentationDefaults[key]);
   }
   const view = { ...viewDefaults };
-  for (const key of Object.keys(viewDefaults) as (keyof typeof view)[]) {
+  for (const key of Object.keys(viewBooleanDefaults) as (keyof typeof viewBooleanDefaults)[]) {
     if (v[key] !== undefined && typeof v[key] !== 'boolean') throw Error(`view.${key} must be true or false.`);
     view[key] = (v[key] as boolean | undefined) ?? viewDefaults[key];
   }
+  if (v.modelTheme !== undefined && !isModelTheme(v.modelTheme)) throw Error('view.modelTheme must be wire or textured.');
+  view.modelTheme = v.modelTheme === undefined ? viewDefaults.modelTheme : v.modelTheme as typeof view.modelTheme;
   const spaces = array(value.spaces === undefined ? [{ id: 'main', name: 'Main space' }] : value.spaces, 'spaces', 50).map((entry, i) => {
     const space = record(entry, `spaces[${i}]`);
     return { ...validateSpacing(space.spacing, `spaces[${i}].spacing`), id: string(space.id, `spaces[${i}].id`), name: string(space.name, `spaces[${i}].name`), description: optionalText(space.description, `spaces[${i}].description`) };

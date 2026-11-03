@@ -38,7 +38,8 @@ Start with `frontend/public/examples/minimal.json`. `architecture.schema.json` c
 | `presentation.headline` | Main heading; `\n` produces a line break |
 | `presentation.description` | Introduction and HTML description metadata |
 | `presentation.accent`, `background` | Six-digit hex colors; group colors are independent |
-| `view` | Optional boolean settings; reduced-motion preference suppresses automatic motion |
+| `view` | Optional display settings; reduced-motion preference suppresses automatic motion |
+| `view.modelTheme` | `wire` (default) or `textured`; see [3D model themes](model-themes.md) |
 | `view.showGrid` | Show/hide the world ground grid; defaults to `true`; does not hide group platforms |
 | `view.showPlaneFrames`, `view.showGroupFrames` | Global frame visibility; each defaults to `true`; leaves contents and connectors visible |
 | Plane, group, or object `visible` | Optional boolean, default `true`; hidden parents also hide descendants; see [visibility](visibility.md) |

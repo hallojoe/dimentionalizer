@@ -1,4 +1,6 @@
 import * as THREE from 'three';
+import { applyModelTheme, highlightModel } from './themes';
+import type { ModelTheme } from './themes';
 import { resolveType } from './catalog';
 import type { ObjectType } from './catalog';
 import type { CustomObjectType } from '../config/types';
@@ -198,17 +200,16 @@ const builders: Record<ObjectType, Builder> = {
   user, usergroup, event, product, shop, warehouse, workflow, request, response, processing, webhook, 'api-call': apiCall, dataflow, message,
 };
 
-export function createObjectVisual(type: string | undefined, color: string, customTypes: readonly CustomObjectType[] = []): ObjectVisual {
+export function createObjectVisual(type: string | undefined, color: string, customTypes: readonly CustomObjectType[] = [], theme: ModelTheme = 'wire'): ObjectVisual {
   const root = builders[resolveType(type, customTypes).shape](color);
+  applyModelTheme(root, theme, color);
   const hit = new THREE.Mesh(new THREE.BoxGeometry(4.8, 2.6, 2.6), new THREE.MeshBasicMaterial({ visible: false }));
   hit.position.y = 1.3;
   root.add(hit);
   return {
     root, hit,
     highlight(active) {
-      root.traverse(object => {
-        if (object instanceof THREE.Points) object.material.size = active ? 0.105 : 0.055;
-      });
+      highlightModel(root, active);
     },
   };
 }

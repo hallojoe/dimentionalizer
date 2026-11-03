@@ -1,4 +1,6 @@
 import * as THREE from 'three';
+import { applyModelTheme, surfaceGeometry } from './themes';
+import type { ModelTheme } from './themes';
 import type { CustomObjectType } from '../config/types';
 import { resolveModelUrl } from '../config/model-url';
 import { disposeResources } from '../scene/resources';
@@ -106,14 +108,16 @@ export const loadModelAsset: ModelLoader = async (url, signal) => {
 };
 
 /** Center X/Z, ground Y, preserve proportions, and fit the common object envelope. */
-export function modelVisual(asset: ModelAsset, color: string, rotation: [number, number, number]): THREE.Group {
+export function modelVisual(asset: ModelAsset, color: string, rotation: [number, number, number], theme: ModelTheme = 'wire'): THREE.Group {
   const root = new THREE.Group(), body = new THREE.Group(); root.add(body);
   try {
     for (const geometry of asset) {
+      if (theme === 'textured') body.add(surfaceGeometry(geometry.clone()));
       body.add(new THREE.LineSegments(new THREE.EdgesGeometry(geometry, 15), new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.75 })));
       const cloud = new THREE.BufferGeometry(); cloud.setAttribute('position', geometry.getAttribute('position').clone());
       body.add(new THREE.Points(cloud, new THREE.PointsMaterial({ color, size: 0.055, transparent: true, opacity: 0.8 })));
     }
+    applyModelTheme(body, theme, color);
     body.rotation.set(...rotation.map(THREE.MathUtils.degToRad) as [number, number, number]);
     body.updateMatrixWorld(true);
     const bounds = new THREE.Box3().setFromObject(body);
@@ -132,7 +136,7 @@ export class ModelLibrary {
   private pending = new Map<string, Promise<ModelAsset>>();
   private assets: ModelAsset[] = [];
   constructor(private base: string, private loader: ModelLoader = loadModelAsset) {}
-  async create(model: NonNullable<CustomObjectType['model']>, color: string): Promise<THREE.Group> {
+  async create(model: NonNullable<CustomObjectType['model']>, color: string, theme: ModelTheme = 'wire'): Promise<THREE.Group> {
     this.controller.signal.throwIfAborted();
     const url = resolveModelUrl(model.url, this.base);
     let pending = this.pending.get(url);
@@ -146,7 +150,7 @@ export class ModelLibrary {
     }
     const asset = await pending;
     this.controller.signal.throwIfAborted();
-    return modelVisual(asset, color, model.rotation);
+    return modelVisual(asset, color, model.rotation, theme);
   }
   dispose(): void {
     this.controller.abort();

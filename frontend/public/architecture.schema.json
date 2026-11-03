@@ -79,6 +79,15 @@
         "showGroupFrames": {
           "type": "boolean",
           "default": true
+        },
+        "modelTheme": {
+          "type": "string",
+          "enum": [
+            "wire",
+            "textured"
+          ],
+          "default": "wire",
+          "description": "Object appearance: luminous wire geometry or solid grain-textured surfaces."
         }
       },
       "additionalProperties": false
