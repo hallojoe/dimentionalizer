@@ -4,7 +4,7 @@ Choose **Presets** in the header, filter by category, then **Open editable prese
 
 Presets use the existing version 1 document format. All normal controls work after applying one: group focus, object inspection, connection navigation, search, type filtering, view options, JSON import/export, and browser-local saving. No separate preset renderer or backend is involved. Preset loading also works in the WebGL fallback directory.
 
-The 21 presets are grouped into **Planning & learning**, **Home & family**, **Work & study**, **Travel & mobility**, **Business & workflows**, **Infrastructure**, and **Repository snapshots**. To add a preset without replacing the current document, use **Spaces → Add a space → A preset template**.
+The 22 presets are grouped into **Planning & learning**, **Home & family**, **Work & study**, **Travel & mobility**, **Business & workflows**, **Infrastructure**, and **Repository snapshots**. To add a preset without replacing the current document, use **Spaces → Add a space → A preset template**.
 
 ## Included setups
 
@@ -20,6 +20,7 @@ The 21 presets are grouped into **Planning & learning**, **Home & family**, **Wo
 | Outside and inside the office | Campus and Office portal, workstations, partitions, lounge, and shared facilities |
 | Daily commute | Human, home, bus, train, office, and visually distinct in/out transport capacities |
 | Family trip | Family, airport bus, airplane, and an accommodation portal with beds and facilities |
+| Email login and delivery | Key, envelope, and response models; independent return models and smooth spawn/arrival animations |
 | Three-tier web application | Browser/CDN, proxy, application, relational database, cache, files, worker and e-mail |
 | Multi-tenant SaaS | Tenant clients, shared tenant-aware API/data, external identity and billing, background notifications |
 | E-commerce platform | Storefront, catalog, cart, checkout, payment callbacks, transactional outbox, fulfillment |

@@ -4,6 +4,7 @@ import type { CustomObjectType } from '../config/types';
 export const objectCatalog = [
   { id: 'container', name: 'Container', symbol: '▤', description: 'The universal building block. Use it for anything without a specialized type.' },
   { id: 'database', name: 'Database', symbol: '▱', description: 'A persistent, structured data store.' },
+  { id: 'key', name: 'Key / Login', symbol: '⚿', description: 'A key representing access, credentials, authentication, or permission.' },
   { id: 'email', name: 'E-mail', symbol: '✉', description: 'A component that sends, receives, or processes e-mail.' },
   { id: 'cache', name: 'Cache', symbol: 'ϟ', description: 'Fast, temporary storage close to the application.' },
   { id: 'reverse-proxy', name: 'Reverse proxy', symbol: '⇄', description: 'An entry point forwarding requests to upstream services.' },

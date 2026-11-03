@@ -5,16 +5,19 @@ import { resolveType } from '../catalog/catalog';
 import { ModelLibrary } from '../catalog/models';
 import { disposeResources } from './resources';
 import type { ObjectVisual } from '../catalog/geometry';
-import type { ArchitectureConfig, ArchitectureConnection, ConnectionEndpoint, EntityRef } from '../config/types';
+import type { ArchitectureConfig, ConnectionEndpoint, EntityRef } from '../config/types';
 import { endpointKey, endpointSpace } from '../config/connections';
 import { sceneVisibility } from '../config/visibility';
 import { viewDefaults } from '../config/defaults';
-import { capacityMaximum, capacityRadius, connectorPath, connectionAnchor, packetProgress } from './connections';
+import { resolveFlow } from '../config/flow';
+import { createFlowVisual, flowFrame } from './flow';
+import type { ConnectionFlow } from '../config/types';
+import { capacityMaximum, capacityRadius, connectorPath, connectionAnchor } from './connections';
 import { layoutGroups, groupViewBounds, planeViewBounds, spaceViewBounds } from './layout';
 import type { PlacedGroup, PlacedPlane, PlacedSpace } from './layout';
 
 interface RenderedObject extends ObjectVisual { id: string; group: string; position: THREE.Vector3; label: HTMLButtonElement }
-interface Packet { dots: THREE.Mesh[]; path: THREE.Curve<THREE.Vector3>; reverse: boolean; enabled: boolean; offset: number; from: ConnectionEndpoint; to: ConnectionEndpoint; direction: ArchitectureConnection['direction'] }
+interface Packet { visual: ReturnType<typeof createFlowVisual>; path: THREE.Curve<THREE.Vector3>; reverse: boolean; enabled: boolean; offset: number; born: number; settings: ConnectionFlow; spaces: string[]; from: ConnectionEndpoint; to: ConnectionEndpoint }
 export interface SceneViewer {
   setConfig(config: ArchitectureConfig, preserveCamera?: boolean): void;
   focusObject(id: string): void;
@@ -74,6 +77,7 @@ export function createViewer(host: HTMLElement, onSelect: (id: string) => void, 
   function dimmed(space: string): boolean { return activeSpace !== null && activeSpace !== space; }
   function applySpaceAppearance(): void {
     for (const entry of root.children) {
+      if (entry.userData.flow) continue; // Flow opacity composes lifecycle fading with space dimming each frame.
       const space = entry.userData.space as string | undefined;
       const endpoints = entry.userData.endpoints as string[] | undefined;
       if (space) entry.visible = visibleSpaces.has(space)
@@ -228,10 +232,22 @@ export function createViewer(host: HTMLElement, onSelect: (id: string) => void, 
           line.userData.endpoints = [endpointSpace(config, connection.from), endpointSpace(config, connection.to)];
           root.add(line); links.push({ line, from: connection.from, to: connection.to });
         }
-        const dot = new THREE.Mesh(new THREE.SphereGeometry(Math.max(0.09, radius * 1.1), 6, 6), new THREE.MeshBasicMaterial({ color: config.presentation.accent }));
-        dot.userData.endpoints = [endpointSpace(config, connection.from), endpointSpace(config, connection.to)];
-        root.add(dot);
-        packets.push({ dots: [dot], path, offset: index * 0.13, from: connection.from, to: connection.to, direction: 'forward', reverse, enabled: value !== 0 });
+        const settings = resolveFlow(connection), type = resolveType(reverse ? settings.in : settings.out, config.objectTypes);
+        const visual = createFlowVisual(type.id, config.presentation.accent, config.objectTypes, config.view.modelTheme);
+        root.add(visual.root);
+        if (type.model) {
+          void modelLibrary!.create(type.model, config.presentation.accent, config.view.modelTheme).then(model => {
+            if (generation !== currentGeneration) { disposeResources(model); return; }
+            visual.setModel(model);
+          }).catch(error => {
+            if (generation !== currentGeneration || modelErrors.has(type.id)) return;
+            modelErrors.add(type.id);
+            onModelError?.(type.id, `${type.name}: ${(error as Error).message} Showing the ${type.shape} fallback.`);
+          });
+        }
+        packets.push({ visual, path, settings, born: performance.now(), offset: (index % 8) * 0.18 + (reverse ? 0.8 : 0),
+          spaces: [endpointSpace(config, connection.from), endpointSpace(config, connection.to)],
+          from: connection.from, to: connection.to, reverse, enabled: value !== 0 });
       }
     });
     homeTarget.set(0, layout.centerY, 0);
@@ -353,11 +369,14 @@ export function createViewer(host: HTMLElement, onSelect: (id: string) => void, 
     }
     groupLabels.forEach(label => { label.element.style.opacity = dimmed(label.space) ? '0.12' : '1'; positionLabel(label.element, label.position, visibleFrames.has(label.key)); });
     packets.forEach(packet => {
-      const progress = packetProgress(reducedMotion ? 0.25 : now * 0.00008 + packet.offset, packet.direction);
-      packet.dots.forEach((dot, i) => {
-        dot.visible = packet.enabled && options.effects && visibleEndpoints.has(endpointKey(packet.from)) && visibleEndpoints.has(endpointKey(packet.to));
-        dot.position.copy(packet.path.getPointAt(packet.reverse ? 1 - progress[i] : progress[i]));
-      });
+      const state = flowFrame((now - packet.born) / 1000 - packet.offset, packet.settings, packet.reverse, reducedMotion);
+      const model = packet.visual.root;
+      model.visible = packet.enabled && options.effects && state.presence > 0
+        && visibleEndpoints.has(endpointKey(packet.from)) && visibleEndpoints.has(endpointKey(packet.to));
+      if (!model.visible) return;
+      model.position.copy(packet.path.getPointAt(state.progress));
+      model.quaternion.copy(camera.quaternion); // Keep symbols readable without tumbling along curves.
+      packet.visual.appearance(state.presence, packet.settings.size, packet.spaces.some(dimmed));
     });
     renderer.render(scene, camera);
   }

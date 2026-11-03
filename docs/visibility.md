@@ -17,7 +17,7 @@ All fields are optional booleans and default to `true`. Existing documents retai
 
 Hidden entities remain in the directory, marked **Hidden**, so their inspector switches are always reachable within the selected space and filters. The inspector explains when a visible child is hidden by its parent. Hidden portal objects can be inspected from the directory without automatically entering their linked space. Hiding a portal does not hide the separate space it points to.
 
-Visibility does not repack the layout: positions, spacing, elevations, and camera bounds remain stable. Connectors and animated dots require both endpoints to be visible and included by the current filters. Showing a frame does not override a hidden parent or hidden space. A visible parent retains its own frame and connectors when its children are individually hidden.
+Visibility does not repack the layout: positions, spacing, elevations, and camera bounds remain stable. Connectors and animated models require both endpoints to be visible and included by the current filters. Showing a frame does not override a hidden parent or hidden space. A visible parent retains its own frame and connectors when its children are individually hidden.
 
 Individual frame settings survive global frame toggles. Plane decoration preferences also survive: turning a plane frame back on restores its configured fill opacity, border, grid, and label settings.
 

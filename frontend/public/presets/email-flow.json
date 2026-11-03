@@ -1,0 +1,107 @@
+{
+  "schemaVersion": 1,
+  "presentation": {
+    "title": "Email login and delivery — Dimentionalizer",
+    "eyebrow": "CONNECTION MODELS",
+    "headline": "Keys in.\nEnvelopes out.",
+    "description": "An illustrative login and mail-delivery flow. Keys travel into the mail service, envelopes travel out, and response models acknowledge receipt. Each model grows and fades in, then shrinks and fades away at arrival. Select an object and edit its connection models in the inspector."
+  },
+  "view": {
+    "modelTheme": "textured",
+    "showGrid": false,
+    "effects": true
+  },
+  "groups": [
+    {
+      "id": "access",
+      "name": "Access",
+      "color": "#61d8ee"
+    },
+    {
+      "id": "mail",
+      "name": "Mail handling",
+      "color": "#b8ff6c"
+    },
+    {
+      "id": "delivery",
+      "name": "Delivery",
+      "color": "#ffb16c"
+    }
+  ],
+  "objects": [
+    {
+      "id": "client",
+      "name": "Mail client",
+      "type": "user",
+      "group": "access",
+      "description": "Starts an illustrative authenticated session. The outbound key represents a login request, not an actual credential."
+    },
+    {
+      "id": "mail-service",
+      "name": "E-mail service",
+      "type": "email",
+      "group": "mail",
+      "description": "Accepts login requests, returns a response, and submits envelopes for delivery. This is a conceptual example, not a complete protocol implementation."
+    },
+    {
+      "id": "outbox",
+      "name": "Outgoing mail queue",
+      "type": "queue",
+      "group": "mail",
+      "description": "Holds outgoing messages until delivery. Envelopes represent mail; returning response models represent acknowledgements."
+    },
+    {
+      "id": "recipient",
+      "name": "Recipient mailbox",
+      "type": "email",
+      "group": "delivery",
+      "description": "Receives delivered messages and returns a receipt. Nothing in this preset sends real email or performs authentication."
+    }
+  ],
+  "connections": [
+    {
+      "id": "login",
+      "from": "client",
+      "to": "mail-service",
+      "label": "Login request → session response",
+      "direction": "bidirectional",
+      "style": "normal",
+      "flow": {
+        "out": "key",
+        "in": "response",
+        "size": 1.8,
+        "duration": 4,
+        "gap": 0.8
+      }
+    },
+    {
+      "id": "send",
+      "from": "mail-service",
+      "to": "outbox",
+      "label": "Submit outgoing email",
+      "direction": "forward",
+      "style": "normal",
+      "flow": {
+        "out": "email",
+        "size": 1.5,
+        "duration": 3,
+        "gap": 0.6
+      }
+    },
+    {
+      "id": "deliver",
+      "from": "outbox",
+      "to": "recipient",
+      "label": "Deliver envelope → receipt",
+      "direction": "bidirectional",
+      "style": "wobbly",
+      "flow": {
+        "out": "email",
+        "in": "response",
+        "size": 1.6,
+        "duration": 5,
+        "gap": 1
+      }
+    }
+  ]
+}

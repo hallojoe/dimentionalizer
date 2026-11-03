@@ -271,7 +271,7 @@ export async function startApp(): Promise<() => void> {
       }
       select.value = connection.direction;
       select.onchange = () => { connection.direction = select.value as typeof connection.direction; refreshConfiguration(); };
-      label.append(select); panel.append(label, connectorControls(connection, refreshConfiguration));
+      label.append(select); panel.append(label, connectorControls(connection, refreshConfiguration, config.objectTypes));
     });
   }
   function groupPlaneControl(group: ArchitectureGroup): HTMLElement {

@@ -378,6 +378,9 @@
                 "default": ""
               }
             }
+          },
+          "flow": {
+            "$ref": "#/$defs/connectionFlow"
           }
         },
         "additionalProperties": false
@@ -515,6 +518,7 @@
             "enum": [
               "container",
               "database",
+              "key",
               "email",
               "cache",
               "reverse-proxy",
@@ -673,6 +677,43 @@
           "minimum": 0,
           "maximum": 1000,
           "description": "Extra horizontal scene units per side, beyond the baseline layout."
+        }
+      }
+    },
+    "connectionFlow": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "out": {
+          "type": "string",
+          "minLength": 1,
+          "default": "message",
+          "description": "Built-in or custom object type for travel from source to destination."
+        },
+        "in": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Return model for a bidirectional connection; omitted uses out."
+        },
+        "size": {
+          "type": "number",
+          "minimum": 0.2,
+          "maximum": 6,
+          "default": 1.4
+        },
+        "duration": {
+          "type": "number",
+          "minimum": 0.5,
+          "maximum": 60,
+          "default": 5,
+          "description": "Travel time in seconds."
+        },
+        "gap": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 30,
+          "default": 0.7,
+          "description": "Invisible pause in seconds after arrival."
         }
       }
     }

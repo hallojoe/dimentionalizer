@@ -28,7 +28,7 @@ export function appendSpaces(target: ArchitectureConfig, source: ArchitectureCon
     entries.forEach(entry => maps[kind].set(entry.id, id(`${name}-${entry.id}`)));
   }
   const typeIds = new Map<string, string>();
-  const allocateType = allocator([...next.objectTypes.map(t => t.id), ...next.objects.map(o => o.type ?? 'container')]);
+  const allocateType = allocator([...next.objectTypes.map(t => t.id), ...next.objects.map(o => o.type ?? 'container'), ...next.connections.flatMap(c => c.flow ? [c.flow.out, ...(c.flow.in ? [c.flow.in] : [])] : [])]);
   for (const type of source.objectTypes) {
     const match = next.objectTypes.find(entry => JSON.stringify(entry) === JSON.stringify(type));
     const id = match?.id ?? allocateType(type.id);
@@ -46,7 +46,7 @@ export function appendSpaces(target: ArchitectureConfig, source: ArchitectureCon
     return typeof value === 'string' ? id : { kind: ref.kind, id };
   }
   const connectionId = allocator(next.connections.map(c => c.id));
-  source.connections.forEach(connection => next.connections.push({ ...structuredClone(connection), id: connectionId(`${name}-${connection.id}`), from: endpoint(connection.from), to: endpoint(connection.to) }));
+  source.connections.forEach(connection => next.connections.push({ ...structuredClone(connection), id: connectionId(`${name}-${connection.id}`), from: endpoint(connection.from), to: endpoint(connection.to), ...(connection.flow ? { flow: { ...connection.flow, out: typeIds.get(connection.flow.out) ?? connection.flow.out, ...(connection.flow.in ? { in: typeIds.get(connection.flow.in) ?? connection.flow.in } : {}) } } : {}) }));
   const spaceId = maps.space.get(source.spaces[0].id)!;
   next.spaceView = { visible: [...new Set([...next.spaceView.visible, ...maps.space.values()])], active: spaceId };
   return { config: validateConfig(next).config, spaceId };
@@ -66,7 +66,7 @@ export function duplicateSpace(config: ArchitectureConfig, spaceId: string, name
   source.groups = source.groups.filter(group => source.planes.some(plane => plane.id === group.plane));
   source.objects = source.objects.filter(object => source.groups.some(group => group.id === object.group));
   source.connections = source.connections.filter(connection => endpointSpace(config, connection.from) === spaceId && endpointSpace(config, connection.to) === spaceId);
-  source.objectTypes = source.objectTypes.filter(type => source.objects.some(object => object.type === type.id));
+  source.objectTypes = source.objectTypes.filter(type => source.objects.some(object => object.type === type.id) || source.connections.some(connection => connection.flow?.out === type.id || connection.flow?.in === type.id));
   return appendSpaces(config, source, name);
 }
 

@@ -59,7 +59,7 @@ Older documents receive one `main` space named Main space. Planes without `space
 
 ## Connector appearance and capacity
 
-Every connection can use `style: "normal"`, `"lightning"`, or `"wobbly"`. Normal is a smooth arc; Lightning uses angular segments; Wobbly uses a repeating wave. Moving dots follow the same styled path. Direction remains `forward` or `bidirectional`.
+Every connection can use `style: "normal"`, `"lightning"`, or `"wobbly"`. Normal is a smooth arc; Lightning uses angular segments; Wobbly uses a repeating wave. Moving models follow the same styled path. Direction remains `forward` or `bidirectional`.
 
 Enable **Show capacity** under a connection in an object, group, or plane inspector, or configure it in JSON:
 
@@ -80,8 +80,8 @@ Enable **Show capacity** under a connection in an object, group, or plane inspec
 | `in` | Capacity from `to` back to `from`; rendered as a return lane for bidirectional connectors |
 | `unit` | Optional shared unit, such as `people/hour` or `Mbps`, up to 40 characters |
 
-At least one capacity value is required when the decoration is present. Each value is finite, from 0 to 1,000,000,000; fractions are allowed. Blank fields are unspecified, not zero. A zero value draws a very thin lane and pauses that lane's dot. Omitted capacity keeps the thin default connector.
+At least one capacity value is required when the decoration is present. Each value is finite, from 0 to 1,000,000,000; fractions are allowed. Blank fields are unspecified, not zero. A zero value draws a very thin lane and pauses that lane's model. Omitted capacity keeps the thin default connector.
 
 Two-way decorated connectors have independent outbound and return lanes. Widths use a bounded square-root scale relative to the largest configured capacity with exactly the same unit string. Different units are not compared; unitless capacities form their own set. This expresses relative capacity rather than measured throughput. Bigger configured capacities make thicker lanes, with the largest capped to keep the scene readable. Exact values remain in the inspector and exported JSON.
 
-The Effects toggle still hides dots independently of the connectors. Reduced-motion preference freezes dots and makes camera transitions immediate. Style, direction, and capacity controls retain the existing inspector layout.
+The Effects toggle still hides moving models independently of the connectors. Reduced-motion preference shows stationary models and makes camera transitions immediate. Style, direction, and capacity controls retain the existing inspector layout.

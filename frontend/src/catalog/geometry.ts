@@ -32,6 +32,14 @@ const database: Builder = color => {
   }
   return root;
 };
+const key: Builder = color => {
+  const root = new THREE.Group();
+  const ring = wire(new THREE.TorusGeometry(0.6, 0.15, 8, 24), color);
+  ring.position.set(-1.1, 1.3, 0); root.add(ring);
+  box(root, color, [2.25, 0.25, 0.3], [0.55, 1.3, 0]);
+  for (const x of [0.75, 1.45]) box(root, color, [0.25, 0.65, 0.3], [x, 1.05, 0]);
+  return root;
+};
 const email: Builder = color => {
   const root = new THREE.Group();
   box(root, color, [3.8, 2.3, 0.7], [0, 1.15, 0]);
@@ -196,7 +204,7 @@ const message: Builder = color => {
 /** Adding a catalog type requires a renderer here; TypeScript checks completeness. */
 const builders: Record<ObjectType, Builder> = {
   ...everydayBuilders,
-  container, database, email, cache, 'reverse-proxy': proxy, queue, storage, cdn,
+  container, database, key, email, cache, 'reverse-proxy': proxy, queue, storage, cdn,
   user, usergroup, event, product, shop, warehouse, workflow, request, response, processing, webhook, 'api-call': apiCall, dataflow, message,
 };
 

@@ -20,7 +20,7 @@ TypeScript + Vite + Three.js keep local development familiar without a backend o
 
 The original explorer's grouped platforms, luminous objects, camera navigation, and inspector concept are retained. Its monolithic script has been replaced with readable modules; its vendor-specific content and branding have been replaced with configurable presentation and a generic example. Explicit relationships between planes, groups, and objects replace decorative links.
 
-The catalog has 40 built-in types spanning infrastructure, business entities, people, and workflows. Custom types separate domain meaning from built-in or imported appearance. No attempt is made to guess technology or architecture from object names. Stable IDs permit duplicate names and renaming without breaking links.
+The catalog has 41 built-in types spanning infrastructure, business entities, people, and workflows. Custom types separate domain meaning from built-in or imported appearance. No attempt is made to guess technology or architecture from object names. Stable IDs permit duplicate names and renaming without breaking links.
 
 ## Deliberately deferred
 
@@ -50,7 +50,7 @@ Spaces sit above planes in the document. Their IDs, plane memberships, object po
 
 The viewer retains all space geometry, separates space footprints horizontally, and applies visibility and opacity independently of object filtering. Entering a portal updates the visible-space set and active focus, flies the camera to the destination, and leaves the selected object's inspector intact. Back restores a prior view state. This is linked-space navigation, not recursive geometry embedded inside an object's mesh.
 
-Connector styles produce shared curves for both tube geometry and moving dots. Capacity widths use a bounded square-root scale normalized against other capacities with the same unit; two-way capacity decoration creates separate outbound and inbound lanes. A zero-capacity lane remains visible with no animated dot.
+Connector styles produce shared curves for both tube geometry and moving models. Capacity widths use a bounded square-root scale normalized against other capacities with the same unit; two-way capacity decoration creates separate outbound and inbound lanes. A zero-capacity lane remains visible with no moving model.
 
 ## Spacing and checklist state
 
@@ -63,3 +63,7 @@ Object checklists are ordinary document data. The inspector persists checkbox ch
 `catalog/themes.ts` owns the theme registry, procedural grain, material finishing, and model highlighting. Built-in builders retain triangle surfaces until the chosen theme is applied; the default Wire appearance discards those surfaces, preserving the original outlines and points. Textured adds UV-mapped standard materials lit by the viewer. Imported meshes clone cached geometry before surface preparation, so disposing a visual never invalidates the model cache. `view.modelTheme` is validated independently of boolean view options.
 
 Changing the model theme rebuilds scene resources while retaining the camera, selection, object filters, and space state. Scene generations cancel obsolete model loads. Each visual owns its texture and materials, including resources shared within its component meshes. Space dimming preserves original opacity, transparency, and depth-write settings so opaque surfaces are restored when a space regains focus.
+
+## Connection model lifecycle
+
+`config/flow.ts` resolves per-direction model choices and timing defaults. `scene/flow.ts` owns centered, independently disposable miniature appearances and a pure lifecycle function. The viewer reuses each lane model, animates eased progress plus scale/opacity envelopes, and resets position only while invisible. Flow materials compose lifecycle opacity with space dimming separately from static scene materials. Custom connection models reuse the existing cancellable model library; template import and duplication retain types referenced exclusively by connections.

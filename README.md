@@ -30,7 +30,7 @@ npm run preview   # Serve the production build locally
 | --- | --- |
 | `frontend/public/architecture.json` | Default architecture and presentation settings; edit this to customize a deployment |
 | `frontend/public/examples/` | Small importable starting documents |
-| `frontend/public/presets/` | Twenty-one categorized structure presets and their metadata index |
+| `frontend/public/presets/` | Twenty-two categorized structure presets and their metadata index |
 | `frontend/public/architecture.schema.json` | JSON Schema for editor assistance |
 | `frontend/src/config/` | Document types, defaults, runtime validation, migration, and browser persistence |
 | `frontend/src/catalog/` | Built-in and custom type resolution, geometry builders, and glTF/GLB loading |
@@ -46,7 +46,7 @@ The frontend uses **TypeScript, Vite, and Three.js**, with native DOM components
 
 ## Version 1
 
-- **40 built-in types** covering infrastructure, people, business entities, and workflows. New business shapes: **User, User group, Event, Product, Shop, Warehouse**.
+- **41 built-in types** covering infrastructure, people, business entities, and workflows. New business shapes: **User, User group, Event, Product, Shop, Warehouse**.
 - Everyday shapes include Human, Family, Adult, Child, Food, Bed, Shower, Toilet, Sofa, Chair, Desk, Wall, Window wall, Bus, Train, Airplane, Office, and Home.
 - Workflow, Request, Response, Processing, Webhook, API call, Dataflow, and Message types; use E-mail for send-mail steps and Message for Slack notifications. These describe a process; they do not execute it.
 - Custom `objectTypes` with names, symbols, and reusable built-in shapes or self-contained **glTF 2.0 / GLB** models. Imported geometry follows the selected model theme and existing layout; loading failures retain a fallback shape.
@@ -55,6 +55,7 @@ The frontend uses **TypeScript, Vite, and Three.js**, with native DOM components
 - Configurable brand text, browser title, eyebrow, headline, description, accent, background, group names and colors.
 - Grouped 3D platforms, orbit/pan/zoom, group and object focus, labels, automatic orbit, and animated directional connection packets.
 - Multiple spaces: create blank, start from a preset template, or duplicate an existing space; show one, several, or all together. Object portals pan into a linked space, dim the surrounding context, and retain the inspector. Back restores the previous view.
+- Moving connection models: choose Key / Login, E-mail, any catalog type, or a custom model independently per direction. Smooth spawn/arrival fading, adjustable size, travel time, and pause.
 - Connector styles **Normal, Lightning, Wobbly**, with optional independent in/out capacities expressed as lane thickness.
 - Spacing on spaces, planes, groups, and objects: margin or padding, applied to self or direct children with explicit child overrides.
 - Saved object checklists for planning and learning, displayed in the existing inspector.
@@ -62,11 +63,13 @@ The frontend uses **TypeScript, Vite, and Three.js**, with native DOM components
 - Configurable planes with auto-fit or locked dimensions, color, opacity, border, grid, and labels. Groups reference their parent plane; existing documents receive a default auto-fit plane.
 - Signed plane, group, and item elevation controls (`0` baseline, positive above, negative below), plus independently toggleable ground-grid visibility. Settings persist and export with the configuration.
 - Search and type filtering; keyboard-accessible directory and inspector. Left/right arrows browse objects while inspecting; Escape closes the inspector.
-- Connections between planes, groups, and items, with one-way or bidirectional animated dots and inspector controls. Explicit labels and incoming/outgoing inspection. Only configured connections are displayed; no dependencies are inferred from proximity.
+- Connections between planes, groups, and items, with one-way or bidirectional animated models and inspector controls. Explicit labels and incoming/outgoing inspection. Only configured connections are displayed; no dependencies are inferred from proximity.
 - JSON editing, import, validated export, default restoration, and browser-local persistence.
-- Preset picker with seven common system setups, a source-grounded Umbraco Cluster snapshot, three business/workflow examples, five human-situation examples, four detailed planning/workflow walkthroughs, and a fictional 16-year CV; open any preset as an editable draft before applying it.
+- Preset picker with seven common system setups, a source-grounded Umbraco Cluster snapshot, three business/workflow examples, five human-situation examples, four detailed planning/workflow walkthroughs, a fictional 16-year CV, and an email connection-model demo; open any preset as an editable draft before applying it.
 - Migration of the original `{ name, group, text }[]` format into a version 1 document.
 - Responsive layout, reduced-motion support, and a usable WebGL fallback.
+
+Try **Presets → Infrastructure → Email login and delivery** for keys entering a mail service, envelopes leaving it, and response models returning.
 
 Try **Presets → Work & study → A CV in layers · 16 years** for six chronological employment planes and three parallel private side businesses. See the [CV walkthrough](docs/career-cv.md).
 
@@ -84,6 +87,7 @@ Changes are stored locally under `dimentionalizer.config.v1` for the browser's o
 
 ## Customize and extend
 
+- [Moving connection models and lifecycle](docs/connection-models.md)
 - [3D model themes](docs/model-themes.md)
 - [Visibility switches and frame controls](docs/visibility.md)
 - [Spacing, overrides, and planning checklists](docs/spacing.md)

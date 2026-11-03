@@ -64,6 +64,7 @@ Start with `frontend/public/examples/minimal.json`. `architecture.schema.json` c
 | Object `elevation` | Signed offset relative to its group; defaults to `0` |
 | `connections` | Optional array, up to 2,000 edges |
 | Connection `id`, `from`, `to` | Required; IDs must be unique; endpoints must exist; no self-connections in v1 |
+| Connection `flow` | Optional per-direction model IDs, size, duration, and pause; see [connection models](connection-models.md) |
 | Connection `style` | `normal` (default), `lightning`, or `wobbly` |
 | Connection `capacity` | Optional `{ out?, in?, unit? }`; see [spaces and connector guide](spaces.md) |
 | Connection `direction` | `forward` (default) or `bidirectional` |
@@ -73,7 +74,7 @@ Text values are limited to 10,000 characters and imported documents to 2 MB. A l
 
 Built-in types cover infrastructure, people, business entities, and workflow steps. See the complete [type catalog and custom model contract](object-types.md). Add `objectTypes` to define a custom meaning that reuses a shape or loads a self-contained glTF/GLB asset. Names do not determine type: a component named "Database" with no `type` is still a generic container.
 
-Duplicate display names are allowed. Stable IDs keep relationships unambiguous. Connections default to one-way from `from` to `to`. Set `direction: "bidirectional"` to animate two particles traveling in opposite directions. Every entity inspector lists its connections and lets you change their direction. These particles illustrate the configuration and do not represent traffic measurements.
+Duplicate display names are allowed. Stable IDs keep relationships unambiguous. Connections default to one-way from `from` to `to`. Set `direction: "bidirectional"` to animate two models traveling in opposite directions. Every entity inspector lists its connections and lets you change their direction. These models illustrate the configuration and do not represent traffic measurements.
 
 ## Spaces
 
@@ -147,7 +148,7 @@ The **Grid** view button toggles the world reference grid at zero. Each plane ha
 
 A string endpoint remains shorthand for an object ID, preserving existing documents. Typed endpoints use `{ "kind": "space" | "plane" | "group" | "object", "id": "..." }`. Any combination is supported, including space-to-object, plane-to-plane, group-to-group, object-to-object, and mixed levels. The referenced entity must exist. Self-connections are rejected, including a shorthand object linked to its equivalent typed reference.
 
-`direction: "forward"` draws one animated dot from `from` to `to`; `"bidirectional"` draws two opposing dots on the same path. To reverse a one-way connection, swap its endpoints in Configure. The Effects toggle hides dots without hiding connection lines. Reduced-motion preference freezes particles. These effects describe the document rather than measured traffic.
+`direction: "forward"` animates a model from `from` to `to`; `"bidirectional"` adds a model traveling back. Each grows and fades in at the source, then shrinks and fades out at arrival. See [connection models](connection-models.md) for model selection, timing, and examples. To reverse a one-way connection, swap its endpoints in Configure. The Effects toggle hides moving models without hiding connection lines. Reduced-motion preference shows stationary models. These effects describe the document rather than measured traffic.
 
 ## Validation and persistence
 

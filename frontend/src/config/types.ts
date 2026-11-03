@@ -62,7 +62,10 @@ export interface ArchitectureObject extends SpacedEntity, VisibleEntity {
   /** Signed height relative to its group. Defaults to 0. */
   elevation?: number;
 }
+export interface ConnectionFlow { out: string; in?: string; size: number; duration: number; gap: number }
 export interface ArchitectureConnection {
+  /** Animated model types, independent of the endpoint object types. */
+  flow?: ConnectionFlow;
   id: string;
   from: ConnectionEndpoint;
   to: ConnectionEndpoint;

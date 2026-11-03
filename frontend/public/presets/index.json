@@ -108,6 +108,15 @@
     "connections": 15
   },
   {
+    "id": "email-flow",
+    "name": "Email login and delivery",
+    "category": "Infrastructure",
+    "summary": "Keys enter an email service, envelopes leave it, and response models return as acknowledgements. Demonstrates custom connection models, both directions, and smooth spawn/arrival animations.",
+    "groups": 3,
+    "objects": 4,
+    "connections": 3
+  },
+  {
     "id": "web-application",
     "name": "Three-tier web application",
     "category": "Infrastructure",

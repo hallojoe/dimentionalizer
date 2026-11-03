@@ -7,14 +7,14 @@ An object can represent a person, place, product, event, action, data stream, se
 | Category | Type IDs |
 | --- | --- |
 | General | `container` |
-| Infrastructure | `database`, `email`, `cache`, `reverse-proxy`, `queue`, `storage`, `cdn` |
+| Infrastructure | `database`, `key`, `email`, `cache`, `reverse-proxy`, `queue`, `storage`, `cdn` |
 | People and business | `user`, `usergroup`, `event`, `product`, `shop`, `warehouse` |
 | Everyday people | `human`, `family`, `adult`, `child` |
 | Home and furniture | `home`, `food`, `bed`, `shower`, `toilet`, `sofa`, `chair`, `desk`, `wall`, `window-wall` |
 | Travel and work | `bus`, `train`, `airplane`, `office` |
 | Workflows and communication | `workflow`, `request`, `response`, `processing`, `webhook`, `api-call`, `dataflow`, `message` |
 
-Use `email` for a Send e-mail step and `message` for a Slack or chat notification. `warehouse` depicts a physical location; an analytical data warehouse can use `database`. Labels and descriptions provide the context. These are visual model elements: they do not execute workflows, make API calls, send e-mails, or post Slack messages. Animated connection dots illustrate direction rather than live execution or measured traffic.
+Use `key` for login, access, or credentials, including as a moving connection model. Use `email` for a Send e-mail step and `message` for a Slack or chat notification. `warehouse` depicts a physical location; an analytical data warehouse can use `database`. Labels and descriptions provide the context. These are visual model elements: they do not execute workflows, make API calls, send e-mails, or post Slack messages. Animated connection models illustrate direction rather than live execution or measured traffic.
 
 The object inspector has an **Object type** selector. The catalog, inspector, search, and type filter include configured custom types. Omitted types default to Container. An unregistered type preserves its ID and renders as Container with a validation warning.
 

@@ -1,3 +1,4 @@
+import { flowDefaults } from './flow';
 import { isKnownType } from '../catalog/catalog';
 import { isModelTheme } from '../catalog/themes';
 import { palette, presentationDefaults, viewDefaults, viewBooleanDefaults } from './defaults';
@@ -197,7 +198,19 @@ export function validateConfig(input: unknown): ValidationResult {
       for (const key of ['out', 'in'] as const) if (raw[key] !== undefined) capacity[key] = number(raw[key], `connections[${i}].capacity.${key}`, 0, 0, 1_000_000_000);
       if (capacity.out === undefined && capacity.in === undefined) throw Error(`connections[${i}].capacity needs an in or out value.`);
     }
-    return { style: style as 'normal' | 'lightning' | 'wobbly', ...(capacity ? { capacity } : {}), id: string(c.id, `connections[${i}].id`), from, to, label: optionalText(c.label, `connections[${i}].label`), direction: direction as 'forward' | 'bidirectional' };
+    let flow: ArchitectureConfig['connections'][number]['flow'];
+    if (c.flow !== undefined) {
+      const raw = record(c.flow, `connections[${i}].flow`);
+      const out = string(raw.out, `connections[${i}].flow.out`, flowDefaults.out);
+      const inbound = raw.in === undefined ? undefined : string(raw.in, `connections[${i}].flow.in`);
+      for (const type of new Set([out, ...(inbound ? [inbound] : [])])) if (!isKnownType(type, objectTypes)) warnings.push(`Connection "${String(c.id)}": unknown flow type "${type}"; displayed as Container.`);
+      flow = { out, ...(inbound ? { in: inbound } : {}),
+        size: number(raw.size, `connections[${i}].flow.size`, flowDefaults.size, 0.2, 6),
+        duration: number(raw.duration, `connections[${i}].flow.duration`, flowDefaults.duration, 0.5, 60),
+        gap: number(raw.gap, `connections[${i}].flow.gap`, flowDefaults.gap, 0, 30),
+      };
+    }
+    return { ...(flow ? { flow } : {}), style: style as 'normal' | 'lightning' | 'wobbly', ...(capacity ? { capacity } : {}), id: string(c.id, `connections[${i}].id`), from, to, label: optionalText(c.label, `connections[${i}].label`), direction: direction as 'forward' | 'bidirectional' };
   });
   unique(connections.map(c => c.id), 'connections');
   const config: ArchitectureConfig = { schemaVersion: 1, presentation, view, spaces, spaceView, objectTypes, planes, groups, objects, connections };
