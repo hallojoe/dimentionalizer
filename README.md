@@ -101,6 +101,10 @@ Decorators (such as `sqlite` or `file-system`) are intentionally deferred. They 
 
 ## Hosting
 
+GitHub Pages is published by [Publish GitHub Pages](.github/workflows/pages.yml) on every push to `main`, or manually through **Actions → Publish GitHub Pages → Run workflow**. In **Settings → Pages**, the publishing source must be **GitHub Actions**. The workflow installs dependencies, runs tests, builds the frontend, and deploys `frontend/dist` to the `github-pages` environment. It reads the site's base path from GitHub so scripts, presets, configuration, and models load correctly under the repository URL or a configured custom domain. No additional repository secrets are required.
+
+Repository site: **https://hallojoe.github.io/dimentionalizer/**.
+
 `npm run build` emits a static site in `frontend/dist/`. Serve the complete directory on any static host. For a subdirectory deployment, use `npm run build -- --base=/your-path/` so assets and the configuration load under that path. Vite's development server is for local development, not production.
 
 ## Verification limits
